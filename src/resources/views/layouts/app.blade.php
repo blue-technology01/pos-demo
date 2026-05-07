@@ -11,7 +11,9 @@
 <body>
     @include('components.navbar')
     @include('components.sidebar')
-
+    <h2>
+        Hello master page
+    </h2>
     <main class="main-content">
         @include('components.alert')
         @yield('content')
