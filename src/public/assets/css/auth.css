@@ -1,0 +1,378 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sky:    #2E6DA4;
+  --sky-dk: #245a8a;
+  --sky-lt: #e8f1f9;
+  --label:  #2E6DA4;
+  --txt:    #1a1a2e;
+  --muted:  #6b7280;
+  --border: #d1d5db;
+  --bg:     #ffffff;
+  --slide-dur: .7s;
+}
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ── LEFT PANEL ── */
+.panel-image {
+  position: relative;
+  flex: 1 1 55%;
+  overflow: hidden;
+}
+
+/* Slideshow */
+.slides {
+  position: absolute;
+  inset: 0;
+}
+.slide {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity var(--slide-dur) ease;
+}
+.slide.active { opacity: 10; }
+
+.slide-1 { background-image: url('https://www.casindo.co.id/wp-content/uploads/2022/11/pexels-imin-technology-12935048-1-scaled.jpg'); }
+
+/* Dark overlay */
+.panel-image::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,.25) 0%,
+    rgba(0,0,0,.1)  40%,
+    rgba(0,0,0,.65) 100%
+  );
+  pointer-events: none;
+}
+
+/* Slide nav arrows */
+.slide-nav {
+  position: absolute;
+  top: 1.1rem; right: 1.1rem;
+  z-index: 10;
+  display: flex; gap: .5rem;
+}
+.slide-btn {
+  width: 2rem; height: 2rem;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,.25);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: .85rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
+}
+.slide-btn:hover {
+   background: rgba(255,255,255,.45);
+}
+
+/* Bottom copy */
+.panel-copy {
+  position: absolute;
+  bottom: 2.5rem; left: 2.5rem; right: 2.5rem;
+  z-index: 10;
+  color: #fff;
+}
+.panel-logo {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  z-index: 10;
+}
+
+.panel-logo img {
+  height: 90px;
+  width: auto;
+  object-fit: contain;
+}
+.panel-copy h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+  font-weight: 400;
+  line-height: 1.15;
+  margin-bottom: .45rem;
+  text-shadow: 0 2px 12px rgba(0,0,0,.4);
+}
+.panel-copy p {
+  font-size: .82rem;
+  font-weight: 300;
+  opacity: .85;
+  margin-bottom: 1.1rem;
+}
+.features { list-style: none; display: flex; flex-direction: column; gap: .4rem; }
+.features li {
+  display: flex; align-items: center; gap: .55rem;
+  font-size: .82rem; font-weight: 400;
+}
+.features li::before {
+  content: '';
+  width: 1.1rem; height: 1.1rem; flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--sky);       /* ✅ Brand color dot */
+  background-size: contain;
+}
+
+/* Dots */
+.slide-dots {
+  position: absolute;
+  bottom: 1rem; left: 2.5rem;
+  z-index: 10;
+  display: flex; gap: .45rem;
+}
+.dot {
+  width: .45rem; height: .45rem;
+  border-radius: 50%;
+  background: rgba(255,255,255,.45);
+  transition: background .3s, transform .3s;
+  cursor: pointer;
+}
+.dot.active {
+  background: #fff;
+  transform: scale(1.35);
+}
+
+/* ── RIGHT PANEL ── */
+.panel-form {
+  flex: 0 0 42%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  padding: 2rem 3rem;
+  overflow-y: auto;
+}
+
+/* Lang switcher */
+.lang-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: .75rem;
+  margin-bottom: auto;
+}
+.lang-btn {
+  display: flex; align-items: center; gap: .35rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .78rem;
+  font-weight: 500;
+  color: var(--txt);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: .2rem .3rem;
+  border-radius: .3rem;
+  transition: background .15s;
+}
+.lang-btn:hover { background: var(--sky-lt); }  /* ✅ Brand light tint */
+.lang-flag {
+  width: 1.15rem; height: 1.15rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  background: #e5e7eb;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .7rem;
+}
+
+/* Form card area */
+.form-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.form-head { margin-bottom: 2.2rem; }
+.form-head h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.6rem, 2.5vw, 2rem);
+  font-weight: 400;
+  color: var(--txt);
+  margin-bottom: .35rem;
+}
+.form-head p {
+  font-size: .84rem;
+  color: var(--muted);
+}
+
+/* Phone row */
+.phone-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 .75rem;
+  align-items: end;
+  margin-bottom: 1.2rem;
+}
+.field-group { display: flex; flex-direction: column; gap: .35rem; }
+.field-label {
+  font-size: .65rem;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--label);           /* ✅ Brand color label */
+}
+
+select, input {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .88rem;
+  color: var(--txt);
+  border: 1.5px solid var(--border);
+  border-radius: .55rem;
+  padding: .7rem .9rem;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  width: 100%;
+}
+select:focus, input:focus {
+  border-color: var(--sky);      /* ✅ Brand color focus border */
+  box-shadow: 0 0 0 3px rgba(46,109,164,.12);  /* ✅ Brand color glow */
+}
+select { appearance: none; padding-right: 2rem; cursor: pointer; }
+.select-wrap { position: relative; }
+.select-wrap::after {
+  content: '▾';
+  position: absolute; right: .7rem; top: 50%; transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--muted);
+  font-size: .75rem;
+}
+
+/* Phone input with icon */
+.input-icon { position: relative; }
+.input-icon svg {
+  position: absolute; left: .75rem; top: 50%; transform: translateY(-50%);
+  color: var(--muted); pointer-events: none;
+}
+.input-icon input { padding-left: 2.2rem; }
+
+/* Password field */
+.pw-wrap { position: relative; margin-bottom: 1.8rem; }
+.pw-wrap input { padding-right: 2.8rem; }
+.pw-toggle {
+  position: absolute; right: .75rem; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: var(--sky);             /* ✅ Brand color icon */
+  display: flex; align-items: center;
+}
+
+/* Login button */
+.btn-login {
+  width: 100%;
+  padding: 1rem;
+  background: var(--sky);        /* ✅ Brand color button */
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: .65rem;
+  cursor: pointer;
+  letter-spacing: .01em;
+  transition: background .2s, transform .1s, box-shadow .2s;
+  box-shadow: 0 4px 14px rgba(46,109,164,.35);  /* ✅ Brand color shadow */
+  margin-bottom: 1.3rem;
+  margin-top: 1rem;
+}
+.btn-login:hover {
+  background: var(--sky-dk);     /* ✅ Brand darker hover */
+  box-shadow: 0 6px 20px rgba(46,109,164,.45);  /* ✅ Brand color shadow */
+}
+.btn-login:active { transform: scale(.98); }
+
+.forgot {
+  text-align: center;
+  font-size: .82rem;
+  color: var(--sky);             /* ✅ Brand color link */
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity .15s;
+}
+.forgot:hover { opacity: .75; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .panel-image { display: none; }
+  .panel-form {
+    flex: 1;
+    max-width: 100%;
+    padding: 2rem 1.5rem;
+  }
+}
+
+/* ── OTP ── */
+.otp-resend {
+  text-decoration: underline;
+  color: var(--sky);             /* ✅ Brand color */
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.otp-center {
+  width: 100%;
+  max-width: 420px;
+}
+
+.otp-text {
+  margin-top: 8px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.otp-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 30px 0;
+}
+
+.otp-input {
+  width: 55px;
+  height: 55px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  outline: none;
+  transition: 0.2s;
+}
+
+.otp-input:focus {
+  border-color: var(--sky);      /* ✅ Brand color focus */
+  box-shadow: 0 0 0 3px rgba(46,109,164,.12);  /* ✅ Brand color glow */
+}
+
+.otp-footer {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.otp-footer a {
+  color: var(--sky);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+.otp-input.error { animation: shake 0.3s ease; border-color: #e24b4a; }

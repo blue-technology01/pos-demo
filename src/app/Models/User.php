@@ -2,31 +2,58 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
+
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasRoles, HasFactory, Notifiable, SoftDeletes;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'phone',
+        'avatar',
+        'is_active',
+        'last_login_at',
+        'otp_code',
+        'otp_expires_at',
+    ];
+
+    protected $hidden = [
+        'remember_token',
+        'otp_code',
+        'password',
+    ];
+
+    protected $casts = [
+        'is_active'      => 'boolean',
+        'last_login_at'  => 'datetime',
+        'otp_expires_at' => 'datetime',
+    ];
+
+    public function isOtpValid(): bool
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->otp_code !== null
+            && $this->otp_expires_at !== null
+            && $this->otp_expires_at->isFuture();
+    }
+
+    public function clearOtp(): void
+    {
+        $this->update([
+            'otp_code'       => null,
+            'otp_expires_at' => null,
+        ]);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

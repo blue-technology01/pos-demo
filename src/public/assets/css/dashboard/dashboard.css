@@ -1,0 +1,577 @@
+/* ════════════════════════════════════════════
+   DASHBOARD PAGE — Flat / Full-Screen Edition
+════════════════════════════════════════════ */
+
+/* ── Page Header ── */
+.dash-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.dash-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 2px;
+    line-height: 1.2;
+}
+
+.dash-subtitle {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+/* ── Period Filter ── */
+.dash-period {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: #f3f4f6;
+    padding: 3px;
+    border-radius: 9px;
+    border: 0.5px solid #e5e7eb;
+}
+
+.period-btn {
+    padding: 5px 13px;
+    border: none;
+    background: none;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.period-btn:hover {
+    background: #ffffff;
+    color: #111827;
+}
+
+.period-btn.active {
+    background: #ffffff;
+    color: #2563eb;
+    font-weight: 600;
+    border: 0.5px solid #e5e7eb;
+}
+
+/* ════════════════════════════════════════════
+   STAT CARDS ROW
+════════════════════════════════════════════ */
+.dash-grid {
+    display: grid;
+    /* grid-template-columns: repeat(4, 1fr); */
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.stat-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px 18px;
+    border: 0.5px solid #e5e7eb;
+    transition: border-color 0.15s;
+}
+
+.stat-card:hover {
+    border-color: #d1d5db;
+}
+
+.stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.icon-blue   { background: #eff6ff; color: #2563eb; }
+.icon-orange { background: #fff7ed; color: #f97316; }
+.icon-green  { background: #f0fdf4; color: #16a34a; }
+.icon-red    { background: #fef2f2; color: #dc2626; }
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 6px;
+    line-height: 1;
+}
+
+.stat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 20px;
+}
+
+.badge-up   { background: #f0fdf4; color: #16a34a; }
+.badge-down { background: #fef2f2; color: #dc2626; }
+
+/* ════════════════════════════════════════════
+   ROW 2: CHART + DONUT + MINI STATS
+════════════════════════════════════════════ */
+.dash-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 220px 170px;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: start;
+}
+
+/* ── Shared Card ── */
+.dash-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 18px;
+    border: 0.5px solid #e5e7eb;
+    margin-bottom: 12px;
+}
+
+.dash-card:last-child {
+    margin-bottom: 0;
+}
+
+.dash-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.dash-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.card-select {
+    font-size: 12px;
+    color: #6b7280;
+    border: 0.5px solid #e5e7eb;
+    border-radius: 7px;
+    padding: 4px 8px;
+    background: #ffffff;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.card-select:hover {
+    border-color: #d1d5db;
+}
+
+.view-all {
+    font-size: 13px;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: gap 0.2s;
+}
+
+.view-all:hover {
+    gap: 8px;
+}
+
+/* ════════════════════════════════════════════
+   BAR CHART
+════════════════════════════════════════════ */
+.chart-area {
+    display: flex;
+    gap: 8px;
+    height: 180px;
+}
+
+.chart-y-labels {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #d1d5db;
+    text-align: right;
+    padding-bottom: 20px;
+    min-width: 26px;
+}
+
+.chart-bars-wrap {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.chart-bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.chart-bar-track {
+    width: 100%;
+    height: calc(100% - 22px);
+    background: #f3f4f6;
+    border-radius: 5px 5px 0 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: visible;
+    position: relative;
+}
+
+.chart-bar {
+    width: 100%;
+    background: #2563eb;
+    border-radius: 5px 5px 0 0;
+    transition: height 0.4s ease;
+    position: relative;
+    opacity: 0.75;
+}
+
+.chart-bar.active {
+    background: #f97316;
+    opacity: 1;
+}
+
+.bar-tooltip {
+    position: absolute;
+    top: -26px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: #fff;
+    font-size: 10px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.bar-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: #1e293b;
+}
+
+.chart-bar-label {
+    font-size: 11px;
+    color: #9ca3af;
+    white-space: nowrap;
+}
+
+/* ════════════════════════════════════════════
+   DONUT CHART
+════════════════════════════════════════════ */
+.donut-card {
+    margin-bottom: 0;
+}
+
+.donut-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 6px 0 10px;
+}
+
+.donut-svg {
+    width: 130px;
+    height: 130px;
+}
+
+.donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #374151;
+    font-weight: 500;
+}
+
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.legend-pct {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* ════════════════════════════════════════════
+   MINI STAT CARDS
+════════════════════════════════════════════ */
+.mini-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mini-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 14px 16px;
+    border: 0.5px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.15s;
+}
+
+.mini-card:hover {
+    border-color: #d1d5db;
+}
+
+.mini-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.mini-info {
+    flex: 1;
+}
+
+.mini-label {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+    margin-bottom: 3px;
+}
+
+.mini-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 20px;
+    margin-bottom: 5px;
+}
+
+.mini-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1;
+}
+
+/* ════════════════════════════════════════════
+   ROW 3: TRENDING + EMPLOYEES (optional)
+════════════════════════════════════════════ */
+.dash-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.dash-row-3 .dash-card {
+    margin-bottom: 0;
+}
+
+/* ════════════════════════════════════════════
+   TABLES
+════════════════════════════════════════════ */
+.trend-table,
+.recent-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.trend-table th,
+.recent-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0 0 10px 0;
+    border-bottom: 0.5px solid #e5e7eb;
+}
+
+.trend-table td,
+.recent-table td {
+    padding: 11px 0;
+    font-size: 13px;
+    color: #374151;
+    border-bottom: 0.5px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.trend-table tr:last-child td,
+.recent-table tr:last-child td {
+    border-bottom: none;
+}
+
+.trend-table tr:hover td,
+.recent-table tr:hover td {
+    background: #f9fafb;
+}
+
+.order-id   { font-weight: 600; color: #2563eb; }
+.order-count { font-weight: 600; color: #111827; font-size: 14px; }
+.earn-val   { font-weight: 600; color: #111827; }
+.role-text  { color: #9ca3af; font-size: 12px; }
+
+/* ── Product Cell ── */
+.product-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.product-thumb {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.thumb-orange { background: #fff7ed; color: #f97316; }
+.thumb-blue   { background: #eff6ff; color: #2563eb; }
+.thumb-red    { background: #fef2f2; color: #dc2626; }
+.thumb-yellow { background: #fefce8; color: #ca8a04; }
+
+/* ── Category Badge ── */
+.cat-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 20px;
+}
+
+.cat-food  { background: #fff7ed; color: #c2410c; }
+.cat-drink { background: #eff6ff; color: #1d4ed8; }
+
+/* ── Employee Cell ── */
+.employee-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.emp-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid #e5e7eb;
+}
+
+/* ── Status Pills ── */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 20px;
+}
+
+.pill-paid      { background: #f0fdf4; color: #16a34a; }
+.pill-pending   { background: #fff7ed; color: #c2410c; }
+.pill-cancelled { background: #fef2f2; color: #dc2626; }
+
+/* ════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════ */
+@media (max-width: 1200px) {
+    .dash-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dash-row-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .mini-stats {
+        grid-column: span 2;
+        flex-direction: row;
+    }
+
+    .mini-card {
+        flex: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .dash-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .dash-row-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .dash-row-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .dash-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .mini-stats {
+        flex-direction: column;
+    }
+}

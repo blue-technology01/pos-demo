@@ -1,12 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Login page</h1>
-</body>
-</html>
+@extends('layouts.auth')
+
+@section('title', 'POS Login | Point of Sale')
+
+@section('content')
+  <!-- Login Form -->
+  <div class="panel-form">
+    <div class="form-center">
+      <div class="form-head">
+        <h1>Welcome Back</h1>
+        <p>Sign in to POS System</p>
+      </div>
+      <form method="POST" action="{{ route('auth.login.post') }}">
+        @csrf
+        <!-- Email -->
+        <div class="field-group">
+          <label class="field-label" for="email">Email</label>
+          <div class="input-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 5.53 5.53l.94-.93a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92z"/>
+            </svg>
+            <input type="email" default=null id="email" name="email" value="{{old('email')}}" placeholder="Enter your email" required autofocus>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="field-group">
+          <label class="field-label" for="password">Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="password" value="{{old('password')}}" name="password" placeholder="Enter password" required>
+            <button type="button" class="pw-toggle" id="pw-toggle" aria-label="Toggle password visibility">
+              <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn-login">Login to POS</button>
+      </form>
+
+      <a href="{{route('auth.forgot-password')}}" class="forgot">Forgot your password?</a>
+    </div>
+  </div>
+@endsection
+
+@section('scripts')
+<script>
+    // Slideshow - POS Focused
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+
+    const titles = [
+      'Fast Point of Sale',
+      'Smart Table Management',
+      'Real-time Billing'
+    ];
+
+    const subs = [
+      'Quick checkout, table management, and real-time orders.',
+      'Monitor all tables and orders from one screen.',
+      'Cash, card, room charge &amp; multiple payment methods.'
+    ];
+
+    let cur = 0;
+    let timer;
+
+    function goTo(n) {
+      slides[cur].classList.remove('active');
+      dots[cur].classList.remove('active');
+
+      cur = (n + slides.length) % slides.length;
+
+      slides[cur].classList.add('active');
+      dots[cur].classList.add('active');
+
+      document.getElementById('slide-title').textContent = titles[cur];
+      document.getElementById('slide-sub').innerHTML = subs[cur];
+    }
+
+    function autoPlay() {
+      timer = setInterval(() => goTo(cur + 1), 5000);
+    }
+
+    function resetAuto() {
+      clearInterval(timer);
+      autoPlay();
+    }
+  </script>
+@endsection
