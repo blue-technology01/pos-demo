@@ -1,0 +1,331 @@
+        .form-section {
+            font-family: system-ui, -apple-system, sans-serif;
+            background:white;
+        }
+
+        .form-section__header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .form-section__title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .form-section__subtitle {
+            color: #64748b;
+            font-size: 13px;
+            margin: 4px 0 0 0;
+        }
+
+        /* Responsive Grid Form Architecture */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        .form-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background-color: #ffffff;
+        }
+
+        .form-card__title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #0f172a;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: gray;
+        }
+
+        /* Vector Graphic Positioning Wrapper */
+        .barcode-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .barcode-input {
+            padding-right: 40px;
+        }
+
+        .barcode-icon {
+            position: absolute;
+            right: 12px;
+            width: 16px;
+            height: 16px;
+            color: #94a3b8;
+        }
+
+        /* Pure & Flat Dotted Upload Area */
+        .image-uploader {
+            border: 1px dashed #cbd5e1;
+            border-radius: 6px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .image-uploader:hover {
+            border-color: #0f172a;
+        }
+
+        .uploader-icon {
+            width: 24px;
+            height: 24px;
+            color: #64748b;
+        }
+
+        .uploader-text {
+            font-size: 13px;
+            color: #475569;
+            margin: 0;
+        }
+
+        .uploader-text span {
+            text-decoration: underline;
+        }
+
+        .uploader-hint {
+            color: #94a3b8;
+            font-size: 11px;
+            margin: 4px 0 0 0;
+            line-height: 1.4;
+        }
+
+        /* Checkbox Layout Controls */
+        .toggle-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .status-toggle {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .status-toggle input {
+            width: 16px;
+            height: 16px;
+            margin-top: 2px;
+            accent-color: #0f172a;
+        }
+
+        .toggle-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .toggle-desc {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        /* Bottom Footer Action Toolbar Rules */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn-form {
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-form--cancel {
+            background-color: red;
+            color: white;
+        }
+
+
+        .btn-form--submit {
+            background-color: green;
+            color: #ffffff;
+        }
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+.form-section {
+            padding: 24px;
+            background-color: #ffffff;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .form-section__header {
+            margin-bottom: 24px;
+        }
+
+        .form-section__title {
+            font-family: 'Sora', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        /* 2-Column Flat Grid Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        .form-column {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Flat Card Block Container */
+        .form-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background-color: #ffffff;
+        }
+
+        .form-card__title {
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 10px;
+            margin: 0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group--switch {
+            gap: 14px;
+        }
+
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Text Input & Field Element Boundaries */
+        .barcode-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .barcode-input-wrapper .form-input {
+            padding-right: 44px;
+        }
+
+        .barcode-icon {
+            position: absolute;
+            right: 16px;
+            width: 18px;
+            height: 18px;
+            color: #94a3b8;
+        }
+
+        /* Minimal Dotted Media Selector Box */
+        .image-uploader-icon {
+            width: 32px;
+            height: 32px;
+            color: #1a4a8a;
+        }
+
+        .uploader-hint {
+            color: #94a3b8;
+            font-size: 11px;
+            margin-top: 2px;
+            line-height: 1.3;
+        }
+
+        /* Clean Visibility Text Switches */
+        .toggle-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .toggle-desc {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }

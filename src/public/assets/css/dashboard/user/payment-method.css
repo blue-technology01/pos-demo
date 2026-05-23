@@ -1,0 +1,241 @@
+.pm-wrapper {
+    padding: 24px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb; /* Flat crisp border instead of shadow */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Header Section */
+.pm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.pm-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+/* Base Add Button */
+.btn-add {
+    background-color: #3b82f6;
+    color: #ffffff;
+    border: none;
+
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+/* Table Responsive Wrapper */
+.pm-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+}
+
+/* Table Styling */
+.pm-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    background-color: #ffffff;
+}
+
+/* Table Header Styles */
+.pm-table th {
+    background-color: #f9fafb; /* Soft gray header fill */
+    color: #4b5563;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Table Body Styles */
+.pm-table td {
+    color: #374151;
+    font-size: 0.875rem;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+/* Row Hover Interaction */
+.pm-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Make sure the last row doesn't have a double border with the container */
+.pm-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Font Style for Code Column */
+.pm-table td:nth-child(3) {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.8rem;
+    color: #4b5563;
+    background-color: #f3f4f6;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* Status Badges */
+.status {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 4px; /* Slightly squared pill for flat design */
+}
+
+.status.active {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status.inactive {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+/* Action Buttons */
+.btn {
+    padding: 6px 12px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border-radius: 50px;
+    cursor: pointer;
+    border:none;
+    transition: all 0.15s ease;
+    margin-right: 4px;
+}
+
+.btn.edit {
+    background-color:#00ffff;
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+.btn.delete {
+    background-color:#ff0000;
+    border-color:none;
+    color: white;
+}
+
+.ui-widget-overlay {
+    background: rgba(0, 0, 0, 0.4) !important;
+    opacity: 1 !important;
+}
+
+.ui-dialog {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05) !important; /* Soft depth layout */
+}
+
+.ui-dialog .ui-dialog-titlebar {
+    background: #f9fafb !important;
+    border: none !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    padding: 16px 20px !important;
+    margin: 0 !important;
+    border-radius: 8px 8px 0 0 !important;
+}
+
+.ui-dialog .ui-dialog-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.ui-dialog .ui-dialog-titlebar-close {
+    border: none !important;
+    background: transparent !important;
+    right: 16px !important;
+}
+
+.ui-dialog .ui-dialog-content {
+    padding: 20px !important;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-sizing: border-box;
+    color: #111827;
+    background-color: #ffffff;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #111827;
+}
+
+.ui-dialog .ui-dialog-buttonpane {
+    border: none !important;
+    border-top: 1px solid #e5e7eb !important;
+    background: #f9fafb !important;
+    margin-top: 0 !important;
+    padding: 12px 20px !important;
+}
+
+/* Sync Dialog Buttons with Main Style layout */
+.ui-dialog .ui-dialog-buttonpane button {
+    margin: 0 0 0 8px !important;
+    padding: 8px 16px !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+}
+
+/* Primary "Save Method" Button Style */
+.ui-dialog .ui-dialog-buttonpane button:nth-child(1) {
+    background: green !important;
+    border: none !important;
+    color: #ffffff !important;
+}
+
+/* Secondary "Cancel" Button Style */
+.ui-dialog .ui-dialog-buttonpane button:nth-child(2) {
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    color: #374151 !important;
+}
+
+.ui-dialog .ui-dialog-buttonpane button:nth-child(2):hover {
+    background: #f9fafb !important;
+}

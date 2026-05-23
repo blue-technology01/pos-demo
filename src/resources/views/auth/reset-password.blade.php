@@ -64,6 +64,7 @@
                         </svg>
                     </button>
                 </div>
+                <div id="password-error" style="color: #dc2626; font-size: 10px; margin-top: 4px;"></div>
             </div>
 
             {{-- Confirm Password --}}
@@ -82,10 +83,10 @@
                         </svg>
                     </button>
                 </div>
+                <div id="confirm-error" style="color: #dc2626; font-size: 10px; margin-top: 4px;"></div>
             </div>
-
             {{-- Submit --}}
-            <button type="submit" class="btn-login">Reset Password</button>
+            <button type="submit" id="submitBtn" class="btn-login">Reset Password</button>
 
             {{-- Back to Login --}}
             <div class="otp-footer" style="margin-top: 1rem;">
@@ -99,42 +100,15 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+$(document).ready(function () {
 
-    const form     = document.getElementById('reset-form');
-    const password = document.getElementById('password');
-    const confirm  = document.getElementById('password_confirmation');
-
-    // ── Password match validation ──
-    form.addEventListener('submit', (e) => {
-        if (password.value !== confirm.value) {
-            e.preventDefault();
-            confirm.style.borderColor = '#e24b4a';
-            confirm.setCustomValidity('Passwords do not match.');
-            confirm.reportValidity();
-            return;
-        }
-
-        if (password.value.length < 6) {
-            e.preventDefault();
-            password.style.borderColor = '#e24b4a';
-            password.setCustomValidity('Password must be at least 6 characters.');
-            password.reportValidity();
-            return;
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+            'Accept': 'application/json',
         }
     });
 
-    confirm.addEventListener('input', () => {
-        confirm.style.borderColor = '';
-        confirm.setCustomValidity('');
-    });
-
-    password.addEventListener('input', () => {
-        password.style.borderColor = '';
-        password.setCustomValidity('');
-    });
-
-    // ── Password toggle visibility ──
     const eyeOpen = `
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
         <circle cx="12" cy="12" r="3"/>
@@ -145,16 +119,92 @@ document.addEventListener('DOMContentLoaded', () => {
         <line x1="1" y1="1" x2="23" y2="23"/>
     `;
 
-    document.getElementById('toggle-password').addEventListener('click', () => {
-        const isPassword = password.type === 'password';
-        password.type = isPassword ? 'text' : 'password';
-        document.getElementById('eye-1').innerHTML = isPassword ? eyeClosed : eyeOpen;
+    $('#toggle-password').on('click', function () {
+        const input = $('#password');
+        const isPassword = input.attr('type') === 'password';
+        input.attr('type', isPassword ? 'text' : 'password');
+        $('#eye-1').html(isPassword ? eyeClosed : eyeOpen);
     });
 
-    document.getElementById('toggle-confirm').addEventListener('click', () => {
-        const isPassword = confirm.type === 'password';
-        confirm.type = isPassword ? 'text' : 'password';
-        document.getElementById('eye-2').innerHTML = isPassword ? eyeClosed : eyeOpen;
+    $('#toggle-confirm').on('click', function () {
+        const input = $('#password_confirmation');
+        const isPassword = input.attr('type') === 'password';
+        input.attr('type', isPassword ? 'text' : 'password');
+        $('#eye-2').html(isPassword ? eyeClosed : eyeOpen);
+    });
+
+    $('#password').on('input', function () {
+        $('#password-error').text('');
+        $('#general-error').hide().text('');
+    });
+
+    $('#password_confirmation').on('input', function () {
+        $('#confirm-error').text('');
+    });
+
+    $('#reset-form').on('submit', function (e) {
+        e.preventDefault();
+
+        const $btn   = $('#submitBtn');
+        const pw     = $('#password').val();
+        const pwConf = $('#password_confirmation').val();
+
+        // Clear all errors
+        $('#password-error').text('');
+        $('#confirm-error').text('');
+        $('#general-error').hide().text('');
+        $('#general-success').hide().text('');
+
+        // Client-side checks
+        if (pw.length < 8) {
+            $('#password-error').text('Password must be at least 8 characters.');
+            return;
+        }
+
+        if (pw !== pwConf) {
+            $('#confirm-error').text('Passwords do not match.');
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('auth.reset-password.post') }}",
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                password: pw,
+                password_confirmation: pwConf,
+            }),
+
+            beforeSend: function () {
+                $btn.prop('disabled', true).text('Resetting...');
+            },
+
+            success: function (res) {
+                if (res.success) {
+                    $('#general-success').text(res.message).show();
+                    $btn.text('Redirecting...');
+                    setTimeout(function () {
+                        window.location.href = "{{ route('auth.login') }}";
+                    }, 1500);
+                }
+            },
+
+            error: function (xhr) {
+                const json   = xhr.responseJSON;
+                const errors = json?.errors;
+                const status = xhr.status;
+
+                if (errors?.password) {
+                    $('#password-error').text(errors.password[0]);
+                } else if (status === 422 && json?.message) {
+                    $('#general-error').text(json.message).show();
+                } else {
+                    $('#general-error').text('Something went wrong. Please try again.').show();
+                }
+
+                $btn.prop('disabled', false).text('Reset Password');
+            },
+        });
     });
 
 });

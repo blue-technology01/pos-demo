@@ -11,28 +11,23 @@
         <p>Enter your phone number to receive an OTP</p>
       </div>
 
-      {{-- Error Messages --}}
-      @if ($errors->any())
-        <div style="
-          background: #fef2f2;
-          border: 1px solid #fecaca;
-          border-radius: .55rem;
-          padding: .75rem 1rem;
-          margin-bottom: 1.2rem;
-          font-size: .84rem;
-          color: #dc2626;
-        ">
-          @foreach ($errors->all() as $error)
-            <div>{{ $error }}</div>
-          @endforeach
-        </div>
-      @endif
+      {{-- General Error --}}
+      <div id="general-error" style="
+        display: none;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: .55rem;
+        padding: .75rem 1rem;
+        margin-bottom: 1.2rem;
+        font-size: .84rem;
+        color: #dc2626;
+      "></div>
 
-      <form method="POST" action="{{ route('auth.forgot-password.post') }}">
+      <form id="forgotPasswordForm" method="POST" novalidate>
         @csrf
 
         {{-- Phone --}}
-        <div class="field-group" style="margin-bottom: 1.2rem;">
+        <div class="field-group">
           <label class="field-label" for="phone">Phone Number</label>
           <div class="input-icon">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -42,21 +37,86 @@
               type="tel"
               id="phone"
               name="phone"
-              value="{{ old('phone') }}"
-              placeholder="Enter your phone number"
-              required
+              placeholder="e.g. +85512345678"
+              autocomplete="tel"
               autofocus
             >
           </div>
+          <div id="phone-error" class="message" style="color: red; font-size: 10px;"></div>
         </div>
 
-        <button type="submit" class="btn-login">Continue</button>
+        <button type="submit" id="submitBtn" class="btn-login">Continue</button>
       </form>
 
-      <a href="{{ route('auth.login') }}" class="forgot" style="margin-top: 1rem; display:block;">
+      <a href="{{ route('auth.login') }}" class="forgot" style="margin-top: 1rem; display: block;">
         ← Back to Login
       </a>
 
     </div>
   </div>
 @endsection
+@push('scripts')
+<script>
+$(document).ready(function () {
+
+    $.ajaxSetup({
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+    });
+
+    $('#phone').on('input', function () {
+        $('#phone-error').text('');
+        $('#general-error').hide().text('');
+    });
+
+    $('#forgotPasswordForm').on('submit', function (e) {
+        e.preventDefault();
+
+        const $btn = $('#submitBtn');
+
+        $('#phone-error').text('');
+        $('#general-error').hide().text('');
+
+        $.ajax({
+            url: "{{ route('auth.forgot-password.send-otp') }}",
+            type: 'POST',
+            data: {
+                phone: $('#phone').val().trim(),
+            },
+
+            beforeSend: function () {
+                $btn.prop('disabled', true).text('Sending OTP...');
+            },
+
+            success: function (res) {
+                if (res.success) {
+                    window.location.href = res.redirect;
+                } else {
+                    $('#general-error').text(res.message).show();
+                    $btn.prop('disabled', false).text('Continue');
+                }
+            },
+
+            error: function (xhr) {
+                const json   = xhr.responseJSON;
+                const errors = json?.errors;
+                const status = xhr.status;
+
+                if (errors?.phone) {
+                    $('#phone-error').text(errors.phone[0]);
+                }
+
+                if (status === 429 && json?.message) {
+                    $('#general-error').text(json.message).show();
+                }
+
+                if (status === 500) {
+                    $('#general-error').text('Something went wrong. Please try again.').show();
+                }
+
+                $btn.prop('disabled', false).text('Continue');
+            },
+        });
+    });
+});
+</script>
+@endpush

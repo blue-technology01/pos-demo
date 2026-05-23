@@ -16,16 +16,18 @@
 
     {{-- Main CSS --}}
     <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
-    @stack('styles')
-    {{-- @stack('scripts') <!-- Define a stack for additional scripts --> --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="{{ asset('assets/css/components/navbar.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/components/sidebar.css') }}">
 
+    @stack('styles')
 </head>
-<body class="dashboard-body">
+<body class="dashboard-body" x-data="sidebarApp()" :class="{ 'sidebar-open': open }">
     @include('components.navbar')
     <div class="dashboard-wrapper" id="dashboard-wrapper">
         @include('components.sidebar')
         <main class="main-content">
-            @include('components.alert')
+            {{-- @include('components.alert') --}}
             <div class="content-body">
                 @yield('content')
             </div>
@@ -35,7 +37,9 @@
     {{-- Scripts --}}
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://code.jquery.com/ui/1.14.2/jquery-ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('assets/js/app.js') }}"></script>
+
     @stack('scripts')
 </body>
 </html>

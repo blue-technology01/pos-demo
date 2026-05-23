@@ -1,167 +1,205 @@
 @extends('layouts.auth')
 
-@section('title', 'OTP Verification | POS System')
+@section('title', 'OTP Verification | Point of Sale')
 
 @section('content')
+  <div class="panel-form">
+    <div class="form-center">
 
-<div class="panel-form">
-    <div class="form-center otp-center">
+      <div class="form-head">
+        <h1>OTP Verification</h1>
+        <p>Enter the 6-digit code sent to your phone</p>
+      </div>
 
-        {{-- Header --}}
-        <div class="form-head">
-            <h1>OTP Verification</h1>
-            <p class="otp-text">
-                Enter the 6-digit verification code for
-                <strong>{{ session('phone') }}</strong>
-            </p>
+      {{-- Session Error --}}
+      @if (session('error'))
+        <div style="
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: .55rem;
+            padding: .75rem 1rem;
+            margin-bottom: 1.2rem;
+            font-size: .84rem;
+            color: #dc2626;
+        ">{{ session('error') }}</div>
+      @endif
+
+      {{-- ✅ FIXED: uncommented so JS can use it --}}
+      <div id="general-error" style="
+        display: none;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: .55rem;
+        padding: .75rem 1rem;
+        margin-bottom: 1.2rem;
+        font-size: .84rem;
+        color: #dc2626;
+      "></div>
+
+      <form id="otpForm" method="POST" novalidate>
+        @csrf
+
+        <input type="hidden" id="phone" name="phone" value="{{ session('otp_phone') }}">
+
+        <div class="field-group">
+          <label class="field-label">Enter OTP Code</label>
+          <div id="otp-inputs" style="display: flex; gap: .6rem; justify-content: center; margin: 1rem 0;">
+            {{-- ✅ FIXED: removed stray "// loop 6 input" text --}}
+            @for ($i = 0; $i < 6; $i++)
+              <input
+                type="text"
+                class="otp-box"
+                maxlength="1"
+                inputmode="numeric"
+                pattern="[0-9]"
+                style="
+                    width: 46px;
+                    height: 52px;
+                    text-align: center;
+                    font-size: 1.4rem;
+                    font-weight: 600;
+                    border: 1.5px solid #d1d5db;
+                    border-radius: .5rem;
+                    outline: none;
+                    transition: border-color .2s;
+                "
+              >
+            @endfor
+          </div>
+          <div id="otp-error" class="message" style="color: red; font-size: 10px; text-align: center;"></div>
         </div>
 
-        {{-- OTP hint for testing (remove in production) --}}
-        @if(session('otp'))
-            <div style="
-                background: #e8f1f9;
-                border: 1px solid #2E6DA4;
-                border-radius: .55rem;
-                padding: .75rem 1rem;
-                margin-bottom: 1.2rem;
-                font-size: .84rem;
-                color: #2E6DA4;
-                text-align: center;
-            ">
-                Your OTP (testing only): <strong>{{ session('otp') }}</strong>
-            </div>
-        @endif
+        <div style="text-align: center; margin-bottom: 1rem; font-size: .84rem; color: #6b7280;">
+          Didn't receive the code?
+          <a href="#" id="resendOtp" style="color: #4f46e5; font-weight: 500;">Resend OTP</a>
+          <span id="resendTimer" style="color: #9ca3af;"></span>
+        </div>
 
-        {{-- Error Messages --}}
-        @if ($errors->any())
-            <div style="
-                background: #fef2f2;
-                border: 1px solid #fecaca;
-                border-radius: .55rem;
-                padding: .75rem 1rem;
-                margin-bottom: 1.2rem;
-                font-size: .84rem;
-                color: #dc2626;
-            ">
-                @foreach ($errors->all() as $error)
-                    <div>{{ $error }}</div>
-                @endforeach
-            </div>
-        @endif
+        <button type="submit" id="submitBtn" class="btn-login">Verify OTP</button>
+      </form>
 
-        {{-- Form --}}
-        <form method="POST" action="{{ route('auth.otp.verify') }}" id="otp-form">
-            @csrf
-
-            {{-- Hidden fields --}}
-            <input type="hidden" name="phone" value="{{ session('phone') }}">
-            <input type="hidden" name="otp" id="otp-value">
-
-            {{-- OTP Inputs --}}
-            <div class="otp-wrapper">
-                @for ($i = 0; $i < 6; $i++)
-                    <input
-                        type="text"
-                        maxlength="1"
-                        class="otp-input"
-                        inputmode="numeric"
-                        pattern="[0-9]"
-                        {{ $i === 0 ? 'autofocus' : '' }}
-                    >
-                @endfor
-            </div>
-
-            {{-- Submit --}}
-            <button type="submit" class="btn-login">Verify OTP</button>
-
-            {{-- Resend --}}
-            <div class="otp-footer">
-                <p>
-                    Didn't receive code?
-                    <a href="{{ route('auth.forgot-password') }}" class="otp-resend">Resend OTP</a>
-                </p>
-            </div>
-
-        </form>
-
-        <a href="{{ route('auth.login') }}" class="forgot" style="margin-top: 1rem; display:block;">
-            ← Back to Login
-        </a>
+      <a href="{{ route('auth.forgot-password') }}" class="forgot" style="margin-top: 1rem; display: block;">
+        ← Back
+      </a>
 
     </div>
-</div>
-
+  </div>
 @endsection
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const inputs    = document.querySelectorAll('.otp-input');
-    const form      = document.getElementById('otp-form');
-    const otpHidden = document.getElementById('otp-value');
+$(document).ready(function () {
 
-    inputs.forEach((input, index) => {
+    $.ajaxSetup({
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+    });
 
-        // Numbers only + auto move forward
-        input.addEventListener('keyup', (e) => {
-            input.value = input.value.replace(/[^0-9]/g, '');
+    // OTP box navigation
+    $(document).on('input', '.otp-box', function () {
+        const val = $(this).val().replace(/\D/g, '');
+        $(this).val(val);
+        if (val && $(this).next('.otp-box').length) {
+            $(this).next('.otp-box').focus();
+        }
+    });
 
-            if (input.value.length === 1 && index < inputs.length - 1) {
-                inputs[index + 1].focus();
+    $(document).on('keydown', '.otp-box', function (e) {
+        if (e.key === 'Backspace' && !$(this).val()) {
+            $(this).prev('.otp-box').focus();
+        }
+    });
+
+    $('.otp-box').first().focus();
+
+    // Resend timer
+    let countdown = 60;
+
+    function startResendTimer() {
+        $('#resendOtp').hide();
+        const interval = setInterval(function () {
+            $('#resendTimer').text(`(${countdown}s)`);
+            countdown--;
+            if (countdown < 0) {
+                clearInterval(interval);
+                $('#resendTimer').text('');
+                $('#resendOtp').show();
+                countdown = 60;
             }
+        }, 1000);
+    }
 
-            // Auto submit when last digit entered
-            if (index === inputs.length - 1 && input.value.length === 1) {
-                combineAndSubmit();
-            }
-        });
+    startResendTimer();
 
-        // Move backward on backspace
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && input.value === '' && index > 0) {
-                inputs[index - 1].focus();
-            }
-        });
-
-        // Handle paste e.g. 123456
-        input.addEventListener('paste', (e) => {
-            e.preventDefault();
-            const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g, '');
-            if (pasted.length === 6) {
-                inputs.forEach((inp, i) => inp.value = pasted[i] || '');
-                inputs[5].focus();
-                combineAndSubmit();
+    $('#resendOtp').on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: "{{ route('auth.otp.resend') }}",
+            type: 'POST',
+            data: { phone: $('#phone').val() },
+            success: function (res) {
+                if (res.success) {
+                    $('#general-error').hide().text('');
+                    startResendTimer();
+                }
+            },
+            error: function (xhr) {
+                const json = xhr.responseJSON;
+                $('#general-error').text(json?.message || 'Failed to resend OTP.').show();
             }
         });
     });
 
-    // Combine all 6 inputs into hidden field then submit
-    function combineAndSubmit() {
-        let otp = '';
-        inputs.forEach(inp => otp += inp.value);
+    // OTP submit
+    $('#otpForm').on('submit', function (e) {
+        e.preventDefault();
 
-        if (otp.length === 6) {
-            otpHidden.value = otp;
-            form.submit();
-        }
-    }
+        const $btn = $('#submitBtn');
+        const otp  = $('.otp-box').map(function () {
+            return $(this).val();
+        }).get().join('');
 
-    // Manual submit (clicking Verify button)
-    form.addEventListener('submit', (e) => {
-        let otp = '';
-        inputs.forEach(inp => otp += inp.value);
+        $('#otp-error').text('');
+        $('#general-error').hide().text('');
 
         if (otp.length < 6) {
-            e.preventDefault();
-            // Shake animation on incomplete OTP
-            inputs.forEach(inp => {
-                inp.classList.add('error');
-                setTimeout(() => inp.classList.remove('error'), 400);
-            });
+            $('#otp-error').text('Please enter all 6 digits.');
             return;
         }
 
-        otpHidden.value = otp;
+        $.ajax({
+            url: "{{ route('auth.otp.verify') }}",
+            type: 'POST',
+            data: {
+                otp: otp,
+                //controller reads it from session
+            },
+            beforeSend: function () {
+                $btn.prop('disabled', true).text('Verifying...');
+            },
+            success: function (res) {
+                if (res.success) {
+                    $btn.text('Verified! Redirecting...');
+                    window.location.href = res.redirect;
+                }
+            },
+            error: function (xhr) {
+                const json   = xhr.responseJSON;
+                const errors = json?.errors;
+                const status = xhr.status;
+
+                if (errors?.otp) {
+                    $('#otp-error').text(errors.otp[0]);
+                } else if (status === 429 && json?.message) {
+                    $('#general-error').text(json.message).show();
+                } else {
+                    $('#general-error').text(json?.message || 'Something went wrong.').show();
+                }
+
+                $('.otp-box').val('');
+                $('.otp-box').first().focus();
+                $btn.prop('disabled', false).text('Verify OTP');
+            },
+        });
     });
 });
 </script>

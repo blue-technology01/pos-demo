@@ -1,0 +1,347 @@
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 64px;
+    padding: 0 24px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    position: sticky;
+    top: 0;
+    z-index: 50; /* Stays above content during scroll */
+}
+
+/* --- Left Section (Toggle & Logo) --- */
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Sidebar Hamburger Toggle Button */
+.navbar-toggle {
+    background: transparent;
+    border: none;
+    color: #4b5563;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.navbar-toggle:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+}
+
+/* Panel Logo Space */
+.panel-logo img {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* --- Right Section (Controls & Profile) --- */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* CompactSpacing for flat pills */
+}
+
+/* Wrap containers managing absolute positioning dropdowns */
+.nav-pill-wrap {
+    position: relative;
+}
+
+/* Base Pill Button Template */
+.nav-pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    padding: 0 12px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    color: #374151;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.nav-pill-btn:hover {
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+    color: #111827;
+}
+
+.nav-pill-btn i {
+    font-size: 1.1rem;
+    color: #4b5563;
+}
+
+/* Modification for single-icon elements (Fullscreen, Notifications) */
+.nav-pill-btn.icon-only {
+    width: 38px;
+    padding: 0;
+    justify-content: center;
+    position: relative;
+}
+
+/* Notification Alert Red Counter Dot */
+.notif-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background-color: #ef4444; /* Premium crimson alert */
+    border-radius: 50%;
+    border: 1px solid #ffffff;
+}
+
+/* --- Flat Dropdown Layout Templates (Language & Notifications) --- */
+.nav-pill-dropdown {
+    display: none; /* Controlled via your script 'open' class injection */
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 160px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); /* Soft structure depth */
+}
+
+/* Toggle drop behavior when container parent receives active state */
+.nav-pill-wrap.open .nav-pill-dropdown {
+    display: block;
+}
+
+/* Language Dropdown Core Rows */
+.pill-dropdown-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    font-size: 0.875rem;
+    color: #374151;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
+}
+
+.pill-dropdown-item:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+}
+
+.pill-dropdown-item.active {
+    background-color: #f3f4f6;
+    color: #111827;
+    font-weight: 600;
+}
+
+/* Notifications Card Custom Adjustments */
+.nav-pill-dropdown.notif-dropdown {
+    width: 280px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.pill-dropdown-header {
+    padding: 12px 16px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    border-bottom: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+}
+
+.notif-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.notif-item:hover {
+    background-color: #f9fafb;
+}
+
+.notif-title {
+    font-size: 0.8125rem;
+    color: #374151;
+    margin-bottom: 2px;
+    line-height: 1.4;
+}
+
+.notif-time {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+/* --- User Profile Dropdown Setup --- */
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    transition: background-color 0.15s ease;
+}
+
+.navbar-user:hover {
+    background-color: #f9fafb;
+}
+
+/* Tiny Navigation Avatar Framework */
+.avatar-img-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #e5e7eb;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.user-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.2;
+}
+
+.user-position {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* Sub-chevron alignment indicator */
+.navbar-user > i {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    transition: transform 0.15s ease;
+}
+
+/* Rotate Chevron Indicator when active opens layout block */
+.navbar-user.open > i {
+    transform: rotate(180deg);
+}
+
+/* Main User Floating Block Container */
+.navbar-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    width: 240px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.navbar-user.open .navbar-dropdown {
+    display: block;
+}
+
+/* Header context blocks interior to profile dropdown toggles */
+.dropdown-user-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 8px 12px 8px;
+    text-align: left;
+}
+
+.avatar-img-lg {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.dropdown-user-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.dropdown-user-role {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* Standard structural line breaks */
+.navbar-dropdown hr {
+    border: 0;
+    border-top: 1px solid #e5e7eb;
+    margin: 6px 0;
+}
+
+/* Action Hyperlinks Row Styles inside Dropdown */
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    color: #374151;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+}
+
+.dropdown-item i {
+    font-size: 1.1rem;
+    color: #4b5563;
+}
+
+/* System Danger / Destructive Actions Layout (Logout Line) */
+.dropdown-item.text-danger {
+    color: #dc2626;
+}
+
+.dropdown-item.text-danger:hover {
+    background-color: #fef2f2;
+    color: #b91c1c;
+}
+
+.dropdown-item.text-danger i {
+    color: inherit;
+}

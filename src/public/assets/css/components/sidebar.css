@@ -1,0 +1,431 @@
+:root {
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 78px;
+
+    --sidebar-bg: #ffffff;
+    --sidebar-border: #e5e7eb;
+
+    --sidebar-text: #6b7280;
+    --sidebar-text-hover: #1a4a8a;
+
+    --sidebar-active-bg: rgba(37, 99, 168, 0.08);
+    --sidebar-active-color: #2563a8;
+
+    --sidebar-icon-color: #9ca3af;
+
+    --brand-primary: #2563a8;
+    --brand-secondary: #1a4a8a;
+
+    --brand-gradient: linear-gradient(
+        135deg,
+        #2563a8,
+        #1a4a8a
+    );
+}
+
+/* ─────────────────────────
+   BODY LAYOUT
+───────────────────────── */
+
+.dashboard-body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-wrapper {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+
+    padding: 20px;
+
+    background: #f8fafc;
+}
+
+/* ─────────────────────────
+   SIDEBAR
+───────────────────────── */
+
+.sidebar {
+    width: var(--sidebar-width);
+
+    flex-shrink: 0;
+
+    position: sticky;
+    top: 0;
+
+    height: calc(100vh - 60px);
+
+    background: var(--sidebar-bg);
+
+    border-right: 1px solid var(--sidebar-border);
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    transition:
+        width .32s cubic-bezier(.4,0,.2,1),
+        box-shadow .28s ease;
+}
+
+/* smooth animation */
+
+.sidebar * {
+    transition:
+        opacity .18s ease,
+        transform .22s ease,
+        margin .22s ease,
+        padding .22s ease,
+        color .18s ease,
+        background .18s ease;
+}
+
+/* ─────────────────────────
+   SIDEBAR MENU
+───────────────────────── */
+
+.sidebar-menu {
+    padding: 12px 14px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+/* ─────────────────────────
+   MENU ITEM
+───────────────────────── */
+
+.menu-item {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    width: 100%;
+
+    padding: 11px 14px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: transparent;
+
+    color: var(--sidebar-text);
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+/* hover */
+
+.menu-item:hover {
+    background: rgba(37, 99, 168, 0.06);
+    color: var(--brand-primary);
+}
+
+.menu-item:hover .menu-icon {
+    color: var(--brand-primary);
+}
+
+/* active */
+
+.menu-item.active {
+    background: var(--sidebar-active-bg);
+    color: var(--sidebar-active-color);
+    font-weight: 600;
+}
+
+.menu-item.active::before {
+    content: '';
+
+    position: absolute;
+
+    left: 0;
+    top: 7px;
+    bottom: 7px;
+
+    width: 3px;
+
+    /* background: var(--brand-primary); */
+
+    border-radius: 50%;
+
+}
+
+/* ─────────────────────────
+   ICONS
+───────────────────────── */
+
+.menu-icon {
+    width: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    font-size: 20px;
+
+    color: var(--sidebar-icon-color);
+}
+
+.menu-label {
+    flex: 1;
+}
+
+.menu-arrow {
+    font-size: 14px;
+    color: var(--sidebar-icon-color);
+}
+
+/* ─────────────────────────
+   SUB MENU
+───────────────────────── */
+
+.menu-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-group.open > .menu-item .menu-arrow {
+    transform: rotate(90deg);
+}
+
+.sub-menu {
+    display: none;
+
+    flex-direction: column;
+
+    padding-top: 4px;
+
+    gap: 2px;
+}
+
+.sub-item {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 8px 12px 8px 44px;
+
+    border-radius: 8px;
+
+    text-decoration: none;
+
+    color: var(--sidebar-text);
+
+    font-size: 13px;
+
+    white-space: nowrap;
+}
+
+.sub-item:hover {
+    background: rgba(37, 99, 168, 0.06);
+    color: var(--brand-primary);
+}
+
+.sub-item.active {
+    background: rgba(37, 99, 168, 0.08);
+    color: var(--brand-primary);
+}
+
+/* ─────────────────────────
+   DIVIDER
+───────────────────────── */
+
+.menu-divider {
+    height: 1px;
+
+    margin: 8px 4px;
+
+    background: var(--sidebar-border);
+}
+
+/* ─────────────────────────
+   COLLAPSED SIDEBAR
+───────────────────────── */
+
+.sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+}
+ a
+/* center items */
+
+.sidebar.collapsed .menu-item {
+    justify-content: center;
+
+}
+
+/* center icon */
+
+.sidebar.collapsed .menu-icon {
+    margin: 0;
+
+    width: auto;
+
+    font-size: 22px;
+}
+
+/* hide labels */
+
+.sidebar.collapsed .menu-label,
+.sidebar.collapsed .menu-arrow {
+
+    opacity: 0;
+    visibility: hidden;
+
+    width: 0;
+
+    overflow: hidden;
+
+    transform: translateX(-10px);
+}
+
+/* hide submenu */
+
+.sidebar.collapsed .sub-menu {
+    display: none !important;
+}
+
+/* active center */
+
+.sidebar.collapsed .menu-item.active {
+    justify-content: center;
+}
+
+/* divider */
+
+.sidebar.collapsed .menu-divider {
+    width: 38px;
+
+    margin: 14px auto;
+}
+
+/* ─────────────────────────
+   HOVER EXPAND
+───────────────────────── */
+
+.sidebar.collapsed.hover-expand {
+    width: var(--sidebar-width);
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.08);
+}
+
+/* restore alignment */
+
+.sidebar.collapsed.hover-expand .menu-item {
+    justify-content: flex-start;
+
+    padding: 11px 14px;
+}
+
+/* restore spacing */
+
+.sidebar.collapsed.hover-expand .menu-icon {
+    margin-right: 12px;
+}
+
+/* show labels */
+
+.sidebar.collapsed.hover-expand .menu-label,
+.sidebar.collapsed.hover-expand .menu-arrow {
+
+    opacity: 1;
+    visibility: visible;
+
+    width: auto;
+
+    transform: translateX(0);
+}
+
+/* STILL HIDE submenu */
+
+.sidebar.collapsed.hover-expand .sub-menu {
+    display: none !important;
+}
+
+/* ─────────────────────────
+   TOOLTIP
+───────────────────────── */
+
+.sidebar.collapsed .menu-item::after {
+
+    content: attr(data-tooltip);
+
+    position: absolute;
+
+    left: 88px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    background: #111827;
+    color: #fff;
+
+    padding: 7px 10px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+
+    opacity: 0;
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transition: .18s ease;
+
+    z-index: 999;
+}
+
+.sidebar.collapsed .menu-item:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* hide tooltip while expanded */
+
+.sidebar.collapsed.hover-expand .menu-item::after {
+    display: none;
+}
+.nav-pill-dropdown,
+.navbar-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #fff;
+    min-width: 200px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    border-radius: 10px;
+    z-index: 9999;
+}
+
+.nav-pill-dropdown.show,
+.navbar-dropdown.show {
+    display: block;
+}

@@ -1,0 +1,176 @@
+/* Flat Minimalist Structural Layout */
+        .product-section {
+            padding: 24px;
+            background-color: #ffffff;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .product-section__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .product-section__title {
+            font-family: 'Sora', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        /* Clean Dark Button */
+        .product-section__btn-add {
+            background-color: #0f172a;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .product-section__btn-add:hover {
+            background-color: #1e293b;
+        }
+
+        .product-section__btn-add a {
+            display: block;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 13px;
+            padding: 10px 16px;
+        }
+
+        /* Borderless Matrix Table Layout */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .table-custom {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .table-custom th {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 12px 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table-custom td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        .table-custom tr:hover td {
+            background-color: #fafafa;
+        }
+
+        .col-image { width: 48px; }
+        .col-actions { width: 100px; text-align: right; }
+
+        /* Row Typography Elements */
+        .table-img-container {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .barcode-badge {
+            font-family: monospace;
+            color: #64748b;
+        }
+
+        .product-title {
+            font-weight: 500;
+            color: #0f172a;
+        }
+
+        /* Action Buttons with Flat Background Color Fill */
+        .action-group {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            padding: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            transition: opacity 0.15s ease;
+        }
+
+        .btn-action:hover {
+            opacity: 0.85;
+        }
+
+        .btn-action--edit { background-color: #10b981; }
+        .btn-action--delete { background-color: #ef4444; }
+
+        .btn-action i {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Ultra-Clean Pagination Layout Bar */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .pagination-list {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .pagination-item a, .pagination-item span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0 6px;
+            text-decoration: none;
+            color: #475569;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .pagination-item a:hover {
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .pagination-item--active span {
+            background-color: #0f172a;
+            color: #ffffff;
+        }
+
+        .pagination-item--disabled span {
+            color: #cbd5e1;
+            cursor: not-allowed;
+        }

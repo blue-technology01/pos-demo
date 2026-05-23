@@ -10,12 +10,14 @@
     <link rel="icon" type="image/png" href="{{ asset('assets/images/logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
     <link rel="stylesheet" href="{{ asset('assets/css/auth.css') }}">
 
     @stack('styles')
 </head>
 <body>
-    @include('components.alert')
+    {{-- @include('components.alert') --}}
 
     <div class="panel-image">
         <div class="panel-logo">

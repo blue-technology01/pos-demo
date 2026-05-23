@@ -39,102 +39,174 @@
                 <i class="ti ti-chevron-right menu-arrow"></i>
             </div>
             <div class="sub-menu">
-                <a href="#" class="sub-item {{ request()->routeIs('admin.products.index') ? 'active' : '' }}">
+                <a href="{{route('admin.productlist')}}" class="sub-item {{ request()->routeIs('admin.products.productlist') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> All products
                 </a>
-                <a href="#" class="sub-item {{ request()->routeIs('admin.products.categories') ? 'active' : '' }}">
-                    <i class="ti ti-point"></i> Categories
+                <a href="{{route('admin.category')}}" class="sub-item {{ request()->routeIs('admin.products.category') ? 'active' : '' }}">
+                    <i class="ti ti-point"></i> Category
+                </a>
+                <a href="{{route('admin.unit')}}" class="sub-item {{ request()->routeIs('admin.products.unit') ? 'active' : '' }}">
+                    <i class="ti ti-point"></i> Units
+                </a>
+            </div>
+        </div>
+        {{-- Inventory --}}
+        <div class="menu-group {{ request()->routeIs('admin.stocks*') ? 'open' : '' }}">
+            <div class="menu-item has-sub" data-tooltip="Products">
+                <i class="ti ti-box menu-icon"></i>
+                <span class="menu-label">Inventory</span>
+                <i class="ti ti-chevron-right menu-arrow"></i>
+            </div>
+            <div class="sub-menu">
+                <a href="{{route('admin.stock-update')}}" class="sub-item {{ request()->routeIs('admin.stocks.stock-update') ? 'active' : '' }}">
+                    <i class="ti ti-point"></i> Stock History
+                </a>
+                <a href="{{route('admin.stock-validation')}}" class="sub-item {{ request()->routeIs('admin.stocks.stock-validation') ? 'active' : '' }}">
+                    <i class="ti ti-point"></i> Stock Validate
                 </a>
             </div>
         </div>
 
-        {{-- Customers --}}
-        <a href="#"
-           class="menu-item {{ request()->routeIs('admin.customers*') ? 'active' : '' }}"
-           data-tooltip="Customers">
-            <i class="ti ti-users menu-icon"></i>
-            <span class="menu-label">Customers</span>
-        </a>
-
         {{-- Reports --}}
-        <a href="#"
-           class="menu-item {{ request()->routeIs('admin.reports*') ? 'active' : '' }}"
-           data-tooltip="Reports">
-            <i class="ti ti-report-analytics menu-icon"></i>
-            <span class="menu-label">Reports</span>
-        </a>
-
-        {{-- Users --}}
-        <div class="menu-group {{ request()->routeIs('admin.users*') ? 'open' : '' }}">
-            <div class="menu-item has-sub" data-tooltip="Users">
+        <div class="menu-group {{ request()->routeIs('admin.reports*') ? 'open' : '' }}">
+            <div class="menu-item has-sub" data-tooltip="Reports">
                 <i class="ti ti-user-cog menu-icon"></i>
-                <span class="menu-label">Users</span>
+                <span class="menu-label">Reports</span>
+                <i class="ti ti-chevron-right menu-arrow"></i>
+            </div>
+            <div class="sub-menu">
+                <a href="" class="sub-item">
+                    <i class="ti ti-point"></i>Daily sale Report
+                </a>
+                <a href="" class="sub-item">
+                    <i class="ti ti-point"></i>Reven Tracking
+                </a>
+                <a href="" class="sub-item">
+                    <i class="ti ti-point"></i>Top Product
+                </a>
+                <a href="" class="sub-item">
+                    <i class="ti ti-point"></i>Sale Person
+                </a>
+            </div>
+        </div>
+
+        {{-- Settings --}}
+        <div class="menu-group {{ request()->routeIs('admin.users*') ? 'open' : '' }}">
+            <div class="menu-item has-sub" data-tooltip="Settings">
+                <i class="ti ti-user-cog menu-icon"></i>
+                <span class="menu-label">Settings</span>
                 <i class="ti ti-chevron-right menu-arrow"></i>
             </div>
             <div class="sub-menu">
                 <a href="{{ route('admin.users') }}" class="sub-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> All users
                 </a>
-                <a href="#" class="sub-item">
-                    <i class="ti ti-point"></i> Roles
+                <a href="{{ route('admin.profile') }}" class="sub-item {{ request()->routeIs('admin.profile*') ? 'active' : '' }}" class="sub-item">
+                    <i class="ti ti-point"></i> Profile
+                </a>
+                <a href="{{ route('admin.payment-method') }}" class="sub-item {{ request()->routeIs('admin.payment-method*') ? 'active' : '' }}" class="sub-item">
+                    <i class="ti ti-point"></i> Payment Method
                 </a>
             </div>
         </div>
-
-        <div class="menu-divider"></div>
-
-        {{-- Settings --}}
-        <a href="#" class="menu-item" data-tooltip="Settings">
-            <i class="ti ti-settings menu-icon"></i>
-            <span class="menu-label">Settings</span>
-        </a>
         @endrole
     </div>
 </nav>
 
 @push('scripts')
     <script>
-    // public/assets/js/app.js
-    $(document).ready(function () {
+        $(document).ready(function () {
 
-        // ── User dropdown ──
-        $('#userDropdownToggle').on('click', function (e) {
-            e.stopPropagation();
-            $('#userDropdown').toggleClass('open');
-        });
+            // ── User dropdown ──
+            $('#userDropdownToggle').on('click', function (e) {
+                e.stopPropagation();
+                $('#userDropdown').toggleClass('open');
+            });
 
-        $(document).on('click', function () {
-            $('#userDropdown').removeClass('open');
-        });
+            $(document).on('click', function () {
+                $('#userDropdown').removeClass('open');
+            });
 
-        // ── Sidebar collapse ──
-        $('#sidebarToggle').on('click', function () {
-            $('#sidebar').toggleClass('collapsed');
-            localStorage.setItem('sidebar_collapsed', $('#sidebar').hasClass('collapsed'));
-        });
+            // ── Sidebar collapse toggle ──
+            $('#sidebarToggle').on('click', function () {
+                $('#sidebar').toggleClass('collapsed');
 
-        if (localStorage.getItem('sidebar_collapsed') === 'true') {
-            $('#sidebar').addClass('collapsed');
-        }
+                localStorage.setItem(
+                    'sidebar_collapsed',
+                    $('#sidebar').hasClass('collapsed')
+                );
+            });
 
-        // ── Submenu toggle ──
-        $('.menu-item.has-sub').on('click', function () {
-            var $group = $(this).closest('.menu-group');
-            var isOpen = $group.hasClass('open');
+            let sidebarTimer;
 
-            $('.menu-group.open').not($group).removeClass('open')
-                .find('.sub-menu').slideUp(200);
+            $('#sidebar').on('mouseenter', function(){
 
-            if (isOpen) {
-                $group.removeClass('open');
-                $group.find('.sub-menu').slideUp(200);
-            } else {
-                $group.addClass('open');
-                $group.find('.sub-menu').slideDown(200);
+                if($(this).hasClass('collapsed')){
+
+                    clearTimeout(sidebarTimer);
+
+                    $(this).addClass('hover-expand');
+                }
+            });
+
+            $('#sidebar').on('mouseleave', function(){
+
+                const sidebar=$(this);
+
+                sidebarTimer=setTimeout(function(){
+
+                    sidebar.removeClass('hover-expand');
+
+                },120);
+            });
+
+            // Restore state
+            if (localStorage.getItem('sidebar_collapsed') === 'true') {
+                $('#sidebar').addClass('collapsed');
             }
+
+            // ── Auto expand on hover ──
+            $('#sidebar').hover(
+                function () {
+                    if ($(this).hasClass('collapsed')) {
+                        $(this).addClass('hover-expand');
+                    }
+                },
+                function () {
+                    $(this).removeClass('hover-expand');
+                }
+            );
+
+            // ── Submenu toggle ──
+            $('.menu-item.has-sub').on('click', function () {
+
+                // prevent submenu in collapsed mode
+                if ($('#sidebar').hasClass('collapsed')) {
+                    return;
+                }
+
+                let $group = $(this).closest('.menu-group');
+                let isOpen = $group.hasClass('open');
+
+                $('.menu-group.open')
+                    .not($group)
+                    .removeClass('open')
+                    .find('.sub-menu')
+                    .slideUp(200);
+
+                if (isOpen) {
+                    $group.removeClass('open');
+                    $group.find('.sub-menu').slideUp(200);
+                } else {
+                    $group.addClass('open');
+                    $group.find('.sub-menu').slideDown(200);
+                }
+            });
+
+            // Restore submenu
+            $('.menu-group.open').each(function () {
+                $(this).find('.sub-menu').css('display', 'block');
+            });
         });
-        // ── Restore open submenus on load ──
-        $('.menu-group.open').find('.sub-menu').show();
-    });
     </script>
 @endpush
