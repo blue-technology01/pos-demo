@@ -1,0 +1,252 @@
+.unit-section {
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+.unit-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.unit-section__header {
+    margin-bottom: 16px;
+}
+
+.search-wrap {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.search-wrap input[type="text"],
+.search-wrap input[type="date"] {
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+    transition: 0.2s;
+}
+
+.search-wrap input:focus {
+    border-color: #6366f1;
+}
+
+.btn-filter,
+.btn-reset {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-filter {
+    background: #3b82f6;
+    color: #fff;
+}
+
+.btn-reset {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.btn-reset:hover {
+    background: #e5e7eb;
+}
+
+.sp-top-performer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #3b82f6;
+    /* background: linear-gradient(135deg, #6366f1, #8b5cf6); */
+    color: #fff;
+    padding: 18px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+}
+
+.sp-performer-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sp-performer-avatar img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.5);
+}
+
+.sp-performer-name {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.sp-performer-sub {
+    font-size: 12px;
+    opacity: 0.85;
+}
+
+.sp-performer-stats {
+    display: flex;
+    gap: 20px;
+    text-align: right;
+}
+
+.sp-stat-val {
+    display: block;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.sp-stat-lbl {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+/* table  */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table-custom {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.table-custom thead {
+    background: #f9fafb;
+}
+
+.table-custom th {
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table-custom td {
+    padding: 12px;
+    border-bottom: 1px solid #f1f1f1;
+    color: #111827;
+}
+
+/* Hover row */
+.table-custom tbody tr:hover {
+    background: rgb(219, 255, 255);
+}
+
+/* staff cell */
+.sp-staff-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sp-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #fff;
+    font-size: 13px;
+}
+
+.sp-staff-name {
+    font-weight: 500;
+}
+
+/* progress bar */
+.sp-progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sp-progress-bar {
+    width: 100%;
+    max-width: 120px;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.sp-progress-fill {
+    height: 100%;
+    background: green;
+    border-radius: 999px;
+}
+
+.sp-progress-label {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* =========================
+   Badge / Numbers
+========================= */
+.unit-badge {
+    background: #f3f4f6;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+/* pagination */
+.pm-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.pm-pagination__meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.pm-pagination__select {
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.pm-pagination__links button {
+    border: none;
+    background: #f3f4f6;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.pm-pagination__links button.active {
+    background: #6366f1;
+    color: #fff;
+}
+
+.pm-pagination__links button.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}

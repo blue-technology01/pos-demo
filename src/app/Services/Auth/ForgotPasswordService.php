@@ -12,15 +12,16 @@ use Illuminate\Support\Facades\Session;
 class ForgotPasswordService
 {
     private const OTP_LENGTH    = 6;
-    private const OTP_TTL       = 300; // 5 minutes
-    private const MAX_ATTEMPTS  = 3;
-    private const DECAY_SECONDS = 300;
+    private const OTP_TTL       = 300; // 5mn >  valid
+    private const MAX_ATTEMPTS  = 3; // try attampt 3> block
+    private const DECAY_SECONDS = 300;   // 5mn block time after max attempts
 
     // send OTP
     public function sendOtp(string $phone): array
     {
         $key = "otp-send:{$phone}";
 
+        // Check rate limit before generating OTP to prevent abuse
         if (RateLimiter::tooManyAttempts($key, self::MAX_ATTEMPTS)) {
             return [
                 'success' => false,
@@ -30,12 +31,12 @@ class ForgotPasswordService
 
         $otp = $this->generateOtp();
 
-        // Store only in cache (secure OTP storage)
+        // Store only in cache
         Cache::put("otp:{$phone}", Hash::make($otp), self::OTP_TTL);
 
-        // Store only flow state in session (NOT OTP)
+        // Store only flow state in session
         Session::put('otp_phone', $phone);
-
+        // Hit rate limiter after generating OTP to prevent abuse
         RateLimiter::hit($key, self::DECAY_SECONDS);
 
         $sent = $this->sendSms($phone, $otp);
@@ -87,13 +88,14 @@ class ForgotPasswordService
         $key        = "otp-verify:{$phone}";
         $cachedHash = Cache::get("otp:{$phone}");
 
+
         if (RateLimiter::tooManyAttempts($key, self::MAX_ATTEMPTS)) {
             return [
                 'success' => false,
                 'message' => 'Too many attempts. Try again later.'
             ];
         }
-
+        // Check OTP validity
         if (!$cachedHash || !Hash::check($otp, $cachedHash)) {
             RateLimiter::hit($key, self::DECAY_SECONDS);
             return [
@@ -181,7 +183,7 @@ class ForgotPasswordService
             (string) random_int(0, 999999),
             self::OTP_LENGTH,
             '0',
-            STR_PAD_LEFT
+            STR_PAD_LEFT  // Ensure OTP is always 6 digits
         );
     }
 

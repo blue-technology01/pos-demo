@@ -20,9 +20,6 @@
     --brand-gradient: linear-gradient(135deg, #2563a8, #1a4a8a);
 }
 
-/* ════════════════════════════════════════════
-   RESET / BASE
-════════════════════════════════════════════ */
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -73,4 +70,11 @@ body {
 
 #langWrap {
     position: relative;
+}
+.navbar svg,
+.nav-pill-btn svg,
+.dropdown-item svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
 }

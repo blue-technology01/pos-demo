@@ -36,7 +36,7 @@
         color: #dc2626;
       "></div>
 
-      <form id="otpForm" method="POST" novalidate>
+      <form id="otpForm" method="POST" action="{{route('auth.otp.verify') }}" novalidate>
         @csrf
 
         <input type="hidden" id="phone" name="phone" value="{{ session('otp_phone') }}">
@@ -71,7 +71,7 @@
 
         <div style="text-align: center; margin-bottom: 1rem; font-size: .84rem; color: #6b7280;">
           Didn't receive the code?
-          <a href="#" id="resendOtp" style="color: #4f46e5; font-weight: 500;">Resend OTP</a>
+          <a href="{{ route('auth.otp.resend') }}" id="resendOtp" style="color: #4f46e5; font-weight: 500;">Resend OTP</a>
           <span id="resendTimer" style="color: #9ca3af;"></span>
         </div>
 
@@ -88,119 +88,95 @@
 
 @push('scripts')
 <script>
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
 
-    $.ajaxSetup({
-        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
-    });
+    const boxes = document.querySelectorAll('.otp-box');
+    const form = document.getElementById('otpForm');
 
-    // OTP box navigation
-    $(document).on('input', '.otp-box', function () {
-        const val = $(this).val().replace(/\D/g, '');
-        $(this).val(val);
-        if (val && $(this).next('.otp-box').length) {
-            $(this).next('.otp-box').focus();
-        }
-    });
+    // Create hidden OTP input
+    const hiddenOtp = document.createElement('input');
+    hiddenOtp.type = 'hidden';
+    hiddenOtp.name = 'otp';
+    hiddenOtp.id = 'otp';
+    form.appendChild(hiddenOtp);
 
-    $(document).on('keydown', '.otp-box', function (e) {
-        if (e.key === 'Backspace' && !$(this).val()) {
-            $(this).prev('.otp-box').focus();
-        }
-    });
+    // Auto focus first box
+    boxes[0].focus();
 
-    $('.otp-box').first().focus();
+    // Input handling
+    boxes.forEach((box, index) => {
 
-    // Resend timer
-    let countdown = 60;
+        box.addEventListener('input', function () {
 
-    function startResendTimer() {
-        $('#resendOtp').hide();
-        const interval = setInterval(function () {
-            $('#resendTimer').text(`(${countdown}s)`);
-            countdown--;
-            if (countdown < 0) {
-                clearInterval(interval);
-                $('#resendTimer').text('');
-                $('#resendOtp').show();
-                countdown = 60;
+            // Allow numbers only
+            this.value = this.value.replace(/\D/g, '');
+
+            // Move next
+            if (this.value && boxes[index + 1]) {
+                boxes[index + 1].focus();
             }
-        }, 1000);
-    }
 
-    startResendTimer();
-
-    $('#resendOtp').on('click', function (e) {
-        e.preventDefault();
-        $.ajax({
-            url: "{{ route('auth.otp.resend') }}",
-            type: 'POST',
-            data: { phone: $('#phone').val() },
-            success: function (res) {
-                if (res.success) {
-                    $('#general-error').hide().text('');
-                    startResendTimer();
-                }
-            },
-            error: function (xhr) {
-                const json = xhr.responseJSON;
-                $('#general-error').text(json?.message || 'Failed to resend OTP.').show();
-            }
         });
+
+        // Backspace previous
+        box.addEventListener('keydown', function (e) {
+
+            if (e.key === 'Backspace' && !this.value && boxes[index - 1]) {
+                boxes[index - 1].focus();
+            }
+
+        });
+
+        // Paste full OTP
+        box.addEventListener('paste', function (e) {
+
+            e.preventDefault();
+
+            const pasted = (e.clipboardData || window.clipboardData)
+                .getData('text')
+                .replace(/\D/g, '')
+                .slice(0, 6);
+
+            pasted.split('').forEach((char, i) => {
+                if (boxes[i]) {
+                    boxes[i].value = char;
+                }
+            });
+
+        });
+
     });
 
-    // OTP submit
-    $('#otpForm').on('submit', function (e) {
-        e.preventDefault();
+    // Before submit combine OTP
+    form.addEventListener('submit', function (e) {
 
-        const $btn = $('#submitBtn');
-        const otp  = $('.otp-box').map(function () {
-            return $(this).val();
-        }).get().join('');
+        let otp = '';
 
-        $('#otp-error').text('');
-        $('#general-error').hide().text('');
+        boxes.forEach(box => {
+            otp += box.value;
+        });
 
-        if (otp.length < 6) {
-            $('#otp-error').text('Please enter all 6 digits.');
+        // Validate
+        if (otp.length !== 6) {
+
+            e.preventDefault();
+
+            document.getElementById('otp-error').textContent =
+                'Please enter complete OTP code.';
+
             return;
         }
 
-        $.ajax({
-            url: "{{ route('auth.otp.verify') }}",
-            type: 'POST',
-            data: {
-                otp: otp,
-                //controller reads it from session
-            },
-            beforeSend: function () {
-                $btn.prop('disabled', true).text('Verifying...');
-            },
-            success: function (res) {
-                if (res.success) {
-                    $btn.text('Verified! Redirecting...');
-                    window.location.href = res.redirect;
-                }
-            },
-            error: function (xhr) {
-                const json   = xhr.responseJSON;
-                const errors = json?.errors;
-                const status = xhr.status;
+        hiddenOtp.value = otp;
 
-                if (errors?.otp) {
-                    $('#otp-error').text(errors.otp[0]);
-                } else if (status === 429 && json?.message) {
-                    $('#general-error').text(json.message).show();
-                } else {
-                    $('#general-error').text(json?.message || 'Something went wrong.').show();
-                }
+        // Disable button
+        const btn = document.getElementById('submitBtn');
 
-                $('.otp-box').val('');
-                $('.otp-box').first().focus();
-                $btn.prop('disabled', false).text('Verify OTP');
-            },
-        });
+        btn.disabled = true;
+        btn.textContent = 'Verifying...';
+
     });
+
 });
 </script>
 @endpush

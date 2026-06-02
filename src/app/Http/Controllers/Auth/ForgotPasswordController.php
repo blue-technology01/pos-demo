@@ -7,7 +7,6 @@ use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\OtpVerifyRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Services\Auth\ForgotPasswordService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -17,66 +16,60 @@ class ForgotPasswordController extends Controller
         protected ForgotPasswordService $forgotPasswordService
     ) {}
 
-    // show form forgot password
+    // show forgot password page
     public function index(): View
     {
         return view('auth.forgot-password');
     }
 
-    // send otp to phone
-    public function sendOtp(ForgotPasswordRequest $request): JsonResponse
+    // send otp
+    public function sendOtp(ForgotPasswordRequest $request): RedirectResponse
     {
         $phone = $request->validated()['phone'];
 
         $result = $this->forgotPasswordService->sendOtp($phone);
 
-        if ($result['success']) {
-
-            session([
-                'otp_phone' => $phone
-            ]);
-
-            return response()->json([
-                'success'  => true,
-                // 'otp'=> $otp,
-                'message'  => 'OTP sent successfully.',
-                'redirect' => route('auth.otp.show') // IMPORTANT
-
-                // 'redirect' => route('auth.otp.show')
-            ]);
+        if (!$result['success']) {
+            return back()
+                ->withInput()
+                ->with('error', $result['message']);
         }
 
-        return response()->json([
-            'success' => false,
-            'message' => $result['message'] ?? 'Too many attempts.'
-        ], 429);
+        session([
+            'otp_phone' => $phone
+        ]);
+
+        return redirect()
+            ->route('auth.otp.show')
+            ->with('success', $result['message']);
     }
 
-    public function resendOtp(): JsonResponse
+    // resend otp
+    public function resendOtp(): RedirectResponse
     {
         $phone = session('otp_phone');
 
         if (!$phone) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Session expired. Please start again.'
-            ], 419);
+            return redirect()
+                ->route('auth.forgot-password')
+                ->with('error', 'Session expired. Please try again.');
         }
 
         $result = $this->forgotPasswordService->sendOtp($phone);
 
-        return response()->json([
-            'success' => $result['success'],
-            'message' => $result['message'] ?? 'OTP resent successfully.'
-        ], $result['success'] ? 200 : 429);
+        if (!$result['success']) {
+            return back()
+                ->with('error', $result['message']);
+        }
+
+        return back()
+            ->with('success', $result['message']);
     }
 
-    // show otp form
+    // show otp page
     public function otpForm(): View|RedirectResponse
     {
-        // dd(session()->all());
         if (!session()->has('otp_phone')) {
-
             return redirect()
                 ->route('auth.forgot-password')
                 ->with('error', 'Session expired. Please try again.');
@@ -86,56 +79,70 @@ class ForgotPasswordController extends Controller
     }
 
     // verify otp
-    public function verifyOtp(OtpVerifyRequest $request): JsonResponse
+    public function verifyOtp(OtpVerifyRequest $request): RedirectResponse
     {
         $phone = session('otp_phone');
 
         if (!$phone) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Session expired.'
-            ], 419);
+            return redirect()
+                ->route('auth.forgot-password')
+                ->with('error', 'Session expired.');
         }
 
         $result = $this->forgotPasswordService->verifyOtp(
             $phone,
-            $request->otp
+            $request->validated()['otp']
         );
 
         if (!$result['success']) {
-            return response()->json($result, 422);
+            return back()
+                ->withInput()
+                ->with('error', $result['message']);
         }
 
         session([
             'reset_user_id' => $result['user_id']
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'OTP verified successfully',
-            'redirect' => route('auth.reset-password.show')
-        ]);
+        return redirect()
+            ->route('auth.reset-password.show')
+            ->with('success', $result['message']);
     }
 
-    // show form reset password
+    // show reset password page
     public function resetForm(): View|RedirectResponse
     {
-        if (!session('reset_user_id')) {
-            return redirect()->route('auth.forgot-password')
-                ->withErrors(['error' => 'Session expired. Please try again.']);
+        if (!session()->has('reset_user_id')) {
+            return redirect()
+                ->route('auth.forgot-password')
+                ->with('error', 'Session expired. Please try again.');
         }
         return view('auth.reset-password');
     }
 
-    /**
-     * Step 3 — Reset password.
-     */
-    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    // reset password
+    public function resetPassword(ResetPasswordRequest $request): RedirectResponse
     {
+        if (!session()->has('reset_user_id')) {
+            return redirect()
+                ->route('auth.forgot-password')
+                ->with('error', 'Session expired. Please try again.');
+        }
+
         $result = $this->forgotPasswordService->resetPassword(
             $request->validated()['password']
         );
 
-        return response()->json($result, $result['success'] ? 200 : 422);
+        if (!$result['success']) {
+            return back()
+                ->withInput()
+                ->with('error', $result['message']);
+        }
+
+        session()->forget(['reset_user_id', 'otp_phone']);
+
+        return redirect()
+            ->route('auth.login')
+            ->with('success', $result['message']);
     }
 }

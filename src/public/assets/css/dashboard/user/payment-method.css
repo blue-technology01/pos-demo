@@ -113,14 +113,23 @@
 
 /* Action Buttons */
 .btn {
-    padding: 6px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 8px; /* Reduced side padding to keep button compact */
     font-size: 0.8125rem;
     font-weight: 500;
     border-radius: 50px;
     cursor: pointer;
-    border:none;
+    border: none;
     transition: all 0.15s ease;
     margin-right: 4px;
+}
+
+.btn svg {
+    width: 14px;
+    height: 14px;
+    display: block;
 }
 
 .btn.edit {
@@ -130,7 +139,7 @@
 }
 
 .btn.delete {
-    background-color:#ff0000;
+    background-color:#da7171;
     border-color:none;
     color: white;
 }

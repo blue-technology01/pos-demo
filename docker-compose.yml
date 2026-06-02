@@ -12,6 +12,7 @@ services:
             - php-fpm
         networks:
             - pos_app_network
+
     php-fpm:
         container_name: posapp
         build:
@@ -30,6 +31,7 @@ services:
         depends_on:
             - mariadb
             - redis
+
     mariadb:
         container_name: pos_db
         image: mariadb:latest
@@ -40,37 +42,24 @@ services:
             MYSQL_DATABASE: ${DB_DATABASE:-pos}
             MYSQL_USER: ${DB_USERNAME:-app}
             MYSQL_PASSWORD: ${DB_PASSWORD:-root}
-            DB_USERNAME: ${DB_USERNAME:-root}
-            DB_PASSWORD: ${DB_PASSWORD:-root}
         env_file:
             - ./src/.env
         volumes:
             - pos-db-data:/var/lib/mysql
             - ./docker/mariadb/my.cnf:/etc/mysql/conf.d/my.cnf:ro
-            # - ./docker/mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
         networks:
             - pos_app_network
+
     redis:
         image: redis:alpine
         ports:
             - "${REDIS_PORT:-6379}:6379"
         environment:
             - REDIS_PASSWORD=${REDIS_PASSWORD:-123456}
-        command: redis-server --appendonly yes ${REDIS_PASSWORD:+--requirepass
-            $REDIS_PASSWORD}
+        command: redis-server --appendonly yes ${REDIS_PASSWORD:+--requirepass $REDIS_PASSWORD}
         networks:
             - pos_app_network
-    node:
-        image: node:20-alpine
-        container_name: pos-node
-        working_dir: /var/www/html
-        command: sh -c "npm install && npm run dev"
-        volumes:
-            - .:/var/www/html
-        ports:
-            - "5174:5174"
-        networks:
-            - pos_app_network
+
 networks:
     pos_app_network:
         driver: bridge

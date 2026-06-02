@@ -22,7 +22,7 @@ class RegisterRequest extends FormRequest
             'phone'     => 'required|string|unique:users,phone|max:20,',
             'password'  => 'required|string|min:8|confirmed',
             'avatar'    => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'role'      => ['required', Rule::in($roleNames)],
+            'role'      => ['required', Rule::in($roleNames)],  // user
         ];
     }
 }

@@ -3,127 +3,124 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\UpdateUserRequest;
 use App\Models\User;
 use App\Services\Auth\RegisterService;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
-
     public function __construct(
         protected RegisterService $registerService
     ) {}
 
-    // Show user
+     /* user list  */
     public function showFormRegister(Request $request)
     {
+        $users = User::with(['roles:id,name'])
+            ->latest()
+            ->paginate(10);
+
         $roles = $this->registerService->getRoles();
 
-        $users = $this->registerService->getUsers($request);
-
-        // AJAX request (table refresh / search)
-        if ($request->ajax()) {
-            try {
-                return response()->json([
-                    'users' => $users->items(),
-                    'pagination' => [
-                        'page'  => $users->currentPage(),
-                        'last'  => $users->lastPage(),
-                        'total' => $users->total(),
-                    ]
-                ], 200);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'error'   => 'Failed to load users.',
-                    'message' => $e->getMessage()
-                ], 500);
-            }
-        }
-
-        // Blade page load
         return view('admin.users.user', compact('users', 'roles'));
     }
 
-    // Handle User Registration
     public function register(RegisterRequest $request)
     {
         $key = 'register:' . $request->ip();
+        RateLimiter::hit($key, 60);
 
         if (RateLimiter::tooManyAttempts($key, 3)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Too many registration attempts.'
+                'message' => 'Too many attempts. Please wait a moment.',
             ], 429);
         }
 
         $data = $request->validated();
 
-        Log::info('Avatar Debug:', [
-            'hasFile' => $request->hasFile('avatar'),
-            'file_name' => $request->file('avatar')?->getClientOriginalName(),
-            'validated_avatar' => $data['avatar'] ?? 'NOT_IN_VALIDATED',
-        ]);
-
-        // Handle Avatar Upload
         $data['avatar'] = $request->hasFile('avatar')
             ? $request->file('avatar')->store('avatars', 'public')
             : null;
 
         $result = $this->registerService->registerUser($data);
 
-    }
+        if ($result['success']) {
+            RateLimiter::clear($key);
 
-    // Update User
-    public function update(UpdateUserRequest $request, User $user)
-    {
-        $key = 'update:user:' . $request->ip();
-
-        if (RateLimiter::tooManyAttempts($key, 5)) {
-            return response()->json(['success' => false, 'message' => 'Too many attempts.'], 429);
+            return response()->json([
+                'success' => true,
+                'message' => 'User created successfully!',
+                'html' => view('admin.users.partials.user-row', [
+                    'user' => $result['user'],
+                ])->render(),
+            ]);
         }
 
+        return response()->json([
+            'success' => false,
+            'message' => $result['message'] ?? 'Failed to create user',
+        ], 422);
+    }
+
+    /*
+        update user
+    */
+    public function update(UpdateUserRequest $request, User $user)
+    {
         $data = $request->validated();
 
-        // Handle Avatar
+        if (empty($data['password'])) {
+            unset($data['password'], $data['password_confirmation']);
+        }
+
         if ($request->hasFile('avatar')) {
             $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
-        } else {
-            unset($data['avatar']);
         }
 
         $result = $this->registerService->updateUser($user, $data);
 
-        if (!$result['success']) {
+        if ($result['success']) {
             return response()->json([
-                'success' => false,
-                'message' => $result['message']
-            ], 422);
+                'success' => true,
+                'message' => 'User updated successfully!',
+                'user' => $result['user'],
+            ]);
         }
 
-        RateLimiter::clear($key);
+        return response()->json([
+            'success' => false,
+            'message' => $result['message'],
+        ], 422);
+    }
+
+    public function updatePreview(Request $request)
+    {
+        $user = User::findOrFail($request->user_id);
+
+        $user->preview_receipt = $request->preview;
+
+        $user->save();
 
         return response()->json([
-            'success' => true,
-            'message' => 'User updated successfully!',
-            'user'    => $result['user']
+            'success' => true
         ]);
     }
 
-    public function destroy(Request $request,int $id, RegisterService $registerService){
-        $result=$registerService->deleteUser((int)$id);
-        if(!$result['success']){
-            return response()->json([
-                'success' => false,
-                'message' => $result['message']
-            ],422);
-        };
+    /*
+        remove user
+    */
+    public function destroy(int $id)
+    {
+        $result = $this->registerService->deleteUser($id);
+
         return response()->json([
-            'success' => true,
-            'message' => $result['message']
-        ],200);
+            'success' => $result['success'],
+            'message' => $result['message'],
+            'id' => $id
+        ], $result['success'] ? 200 : 422);
     }
 }

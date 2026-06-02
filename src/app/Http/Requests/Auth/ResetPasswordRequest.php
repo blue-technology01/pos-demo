@@ -52,11 +52,10 @@ class ResetPasswordRequest extends FormRequest
     protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(
-            response()->json([
-                'success' => false,
-                'message' => 'Validation failed.',
-                'errors'  => $validator->errors(),
-            ], 422)
+            redirect()->back()
+                ->withErrors($validator)
+                ->withInput()
         );
     }
+
 }

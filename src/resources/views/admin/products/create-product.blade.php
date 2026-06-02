@@ -1,9 +1,44 @@
 @extends('layouts.app')
+
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/create.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/create.css') }}" data-turbo-track="reload" >
+    <style>
+        /* Scoped sizing to keep inline SVGs uniform */
+        .barcode-input-wrapper svg,
+        .image-uploader svg {
+            display: inline-block;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
+        /* Input field container adjustment */
+        .barcode-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .barcode-icon-inline {
+            position: absolute;
+            right: 12px;
+            color: #9ca3af;
+            width: 18px;
+            height: 18px;
+            pointer-events: none;
+        }
+
+        /* Large file upload icon modifier */
+        .image-uploader-icon {
+            width: 40px;
+            height: 40px;
+            color: #9ca3af;
+            margin-bottom: 12px;
+        }
+    </style>
 @endpush
 
-@section('title', 'Dahboard Create Product')
+@section('title', 'Dashboard Create Product')
 @section('content')
     <div class="form-section">
 
@@ -32,7 +67,9 @@
                                 <label class="form-label" for="product_barcode">Barcode / SKU *</label>
                                 <div class="barcode-input-wrapper">
                                     <input type="text" id="product_barcode" name="barcode" class="form-input" placeholder="Scan or type barcode string" required>
-                                    <i data-lucide="scan-barcode" class="barcode-icon"></i>
+                                    <svg class="barcode-icon-inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 012-2h2m10 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M12 7v10m-4-10v10m8-10v10" />
+                                    </svg>
                                 </div>
                             </div>
 
@@ -42,7 +79,7 @@
                                     <option value="" disabled selected>Select Item Group Category</option>
                                     <option value="drink">Drinks</option>
                                     <option value="snack">Snacks / Appetizers</option>
-                                    <option value="pizza">Pizzas</option>
+                                    <option value="pizza">Box</option>
                                 </select>
                             </div>
                         </div>
@@ -54,7 +91,7 @@
 
                         <div class="form-row-2">
                             <div class="form-group">
-                                <label class="form-label" for="product_unit">Measurement Unit *</label>
+                                <label class="form-label" for="product_unit">Unit *</label>
                                 <select id="product_unit" name="unit_id" class="form-select" required>
                                     <option value="" disabled selected>Select Scale Denominator</option>
                                     <option value="pcs">Pieces (PCS)</option>
@@ -93,7 +130,9 @@
                         <div class="form-group">
                             <label class="form-label">Upload Presentation Image Thumbnail</label>
                             <div class="image-uploader" id="dropzone-trigger">
-                                <i data-lucide="cloud-lightning" class="image-uploader-icon"></i>
+                                <svg class="image-uploader-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-8m0 0l-3 3m3-3l3 3M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
                                 <p class="uploader-text">Drag and drop file here or <span>browse local files</span></p>
                                 <input type="file" id="hidden-file-input" name="image" accept="image/*" style="display: none;">
                             </div>
@@ -135,6 +174,3 @@
         </form>
     </div>
 @endsection
-@push('scripts')
-
-@endpush

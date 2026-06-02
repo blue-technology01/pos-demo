@@ -1,5 +1,6 @@
 $(function () {
-  // ─── Constants ────────────────────────────────────────────────────────────
+
+  // Define all selectors in one place for easy maintenance
   const SEL = {
     dialog:  "#pm-dialog",
     form:    "#pm-form",
@@ -12,19 +13,22 @@ $(function () {
     status:       "#pm_status",
   };
 
-  // ─── Dialog init ──────────────────────────────────────────────────────────
+  // Using jQuery UI Dialog for simplicity
   const $dialog = $(SEL.dialog).dialog({
     autoOpen:  false,
     modal:     true,
     width:     400,
     resizable: false,
     draggable: false,
+
+    // Customize close button
     open() {
       $(this)
         .closest(".ui-dialog")
         .find(".ui-dialog-titlebar-close")
         .html("&times;");
     },
+    // Form submission logic
     buttons: {
       "Save Unit"() { $(SEL.form).submit(); },
       Cancel()      { $(this).dialog("close"); },
@@ -55,36 +59,4 @@ $(function () {
 
     $dialog.dialog("option", "title", `Edit Unit #${unitId}`);
   }
-
-  function deleteUnit($row) {
-    const unitId = $row.data("unit-id");
-    if (!confirm(`Are you sure you want to delete unit #${unitId}?`)) return;
-
-    console.log("Processing AJAX deletion for ID:", unitId);
-    // Add your AJAX delete request logic here
-  }
-
-  // ─── Action dispatch ──────────────────────────────────────────────────────
-  const ACTIONS = {
-    edit:   ($row) => openUnitModal($row),
-    delete: ($row) => deleteUnit($row),
-  };
-
-  // ─── Events ───────────────────────────────────────────────────────────────
-  $(SEL.openBtn).on("click", (e) => {
-    e.preventDefault();
-    openUnitModal();
-  });
-
-  $(document).on("click", ".btn-action", function (e) {
-    e.preventDefault();
-    const action = $(this).data("action");
-    const handler = ACTIONS[action];
-
-    if (handler) {
-      handler($(this).closest("tr"));
-    } else {
-      console.warn("Unmapped action:", action);
-    }
-  });
 });

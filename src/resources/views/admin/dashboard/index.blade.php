@@ -3,7 +3,8 @@
 @section('title', 'Admin Dashboard')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/dashboard.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/dashboard.css') }}" data-turbo-track="reload">
 @endpush
 
 @section('content')
@@ -28,35 +29,75 @@
     <div class="stat-card">
         <div class="stat-top">
             <span class="stat-label">Total Revenue</span>
-            <span class="stat-icon icon-blue"><i class="ti ti-currency-dollar"></i></span>
+            <span class="stat-icon icon-blue">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="22"
+                 height="22"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round">
+
+                <path d="M12 1v22"></path>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+        </span>
+
         </div>
         <div class="stat-value">$24,350</div>
-        <div class="stat-badge badge-up"><i class="ti ti-trending-up"></i> 12% this month</div>
+        <div class="stat-badge badge-up">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2">
+
+                <path d="M7 17L17 7"></path>
+                <path d="M7 7h10v10"></path>
+            </svg>
+
+            12% this month
+        </div>
     </div>
     <div class="stat-card">
         <div class="stat-top">
             <span class="stat-label">Total Orders</span>
-            <span class="stat-icon icon-orange"><i class="ti ti-shopping-cart"></i></span>
+            <span class="stat-icon icon-orange">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="9" cy="21" r="1"></circle> <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+            </span>
         </div>
         <div class="stat-value">1,284</div>
-        <div class="stat-badge badge-up"><i class="ti ti-trending-up"></i> 8% this month</div>
+        <div class="stat-badge badge-up"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M7 17L17 7"></path> <path d="M7 7h10v10"></path> </svg>
+            8% this month </div>
     </div>
     <div class="stat-card">
         <div class="stat-top">
             <span class="stat-label">Customers</span>
-            <span class="stat-icon icon-green"><i class="ti ti-users"></i></span>
+            <span class="stat-icon icon-green">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="10"></circle> <path d="M16 16s-1.5-2-4-2-4 2-4 2"></path> </svg>
+            </span>
         </div>
         <div class="stat-value">842</div>
-        <div class="stat-badge badge-up"><i class="ti ti-trending-up"></i> 5% this month</div>
+        <div class="stat-badge badge-up"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M7 17L17 7"></path> <path d="M7 7h10v10"></path> </svg>
+             5% this month
+        </div>
     </div>
     <div class="stat-card">
         <div class="stat-top">
             <span class="stat-label">Products</span>
-            <span class="stat-icon icon-red"><i class="ti ti-box"></i></span>
+            <span class="stat-icon icon-red"> <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path> <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline> <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline> <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline> <polyline points="12 22.08 12 17"></polyline> <polyline points="12 17 21 12"></polyline> <polyline points="12 17 3 12"></polyline> </svg> </span>
         </div>
         <div class="stat-value">196</div>
-        <div class="stat-badge badge-down"><i class="ti ti-trending-down"></i> 2 low stock</div>
-    </div>
+        <div class="stat-badge badge-down"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M17 17L7 7"></path> <path d="M17 7H7v10"></path> </svg>
+             2 low stock
+        </div>
+      </div>
 </div>
 
 {{-- Row 2: Chart + Donut + Mini Stats --}}
@@ -71,68 +112,9 @@
                 <option>Last Week</option>
             </select>
         </div>
-        <div class="chart-area">
-            <div class="chart-y-labels">
-                <span>250</span>
-                <span>200</span>
-                <span>150</span>
-                <span>100</span>
-                <span>50</span>
-                <span>0</span>
-            </div>
-            <div class="chart-bars-wrap">
-                <div class="chart-bar-col">
-                    <div class="chart-bar-track">
-                        <div class="chart-bar" style="height:55%"></div>
-                    </div>
-                    <div class="chart-bar-label">Mon</div>
-                </div>
-                <div class="chart-bar-col">
-                    <div class="chart-bar-track">
-                        <div class="chart-bar" style="height:75%">
-                            <div class="bar-tooltip">$205</div>
-                        </div>
-                    </div>
-                    <div class="chart-bar-label">Tue</div>
-                </div>
-                <div class="chart-bar-col">
-                    <div class="chart-bar-track">
-                        <div class="chart-bar" style="height:45%"></div>
-                    </div>
-                    <div class="chart-bar-label">Wed</div>
-                </div>
-                <div class="chart-bar-col">
-                    <div class="chart-bar-track">
-                        <div class="chart-bar active" style="height:92%">
-                            <div class="bar-tooltip">$312</div>
-                        </div>
-                    </div>
-                    <div class="chart-bar-label">Thu</div>
-                </div>
-                <div class="chart-bar-col">
-                    <div class="chart-bar-track">
-                        <div class="chart-bar" style="height:65%"></div>
-                    </div>
-                    <div class="chart-bar-label">Fri</div>
-                </div>
-                <div class="chart-bar-col">
-                    <div class="chart-bar-track">
-                        <div class="chart-bar" style="height:82%"></div>
-                    </div>
-                    <div class="chart-bar-label">Sat</div>
-                </div>
-                <div class="chart-bar-col">
-                    <div class="chart-bar-track">
-                        <div class="chart-bar" style="height:38%"></div>
-                    </div>
-                    <div class="chart-bar-label">Sun</div>
-                </div>
-            </div>
-        </div>
+        <div id="chart"></div>
     </div>
-
-    {{-- Donut Chart --}}
-    <div class="dash-card donut-card">
+    <div class="dash-card chart-card">
         <div class="dash-card-header">
             <div class="dash-card-title">Total Income</div>
             <select class="card-select">
@@ -140,73 +122,27 @@
                 <option>Week</option>
             </select>
         </div>
-        <div class="donut-wrap">
-            <svg viewBox="0 0 120 120" class="donut-svg">
-                <circle cx="60" cy="60" r="46" fill="none" stroke="#f3f4f6" stroke-width="14"/>
-                {{-- Food: 55% --}}
-                <circle cx="60" cy="60" r="46" fill="none" stroke="#ef4444" stroke-width="14"
-                    stroke-dasharray="159 289" stroke-dashoffset="0" stroke-linecap="round"/>
-                {{-- Drinks: 30% --}}
-                <circle cx="60" cy="60" r="46" fill="none" stroke="#f97316" stroke-width="14"
-                    stroke-dasharray="87 289" stroke-dashoffset="-159" stroke-linecap="round"/>
-                {{-- Others: 15% --}}
-                <circle cx="60" cy="60" r="46" fill="none" stroke="#1e293b" stroke-width="14"
-                    stroke-dasharray="43 289" stroke-dashoffset="-246" stroke-linecap="round"/>
-                <text x="60" y="55" text-anchor="middle" font-size="11" font-weight="700" fill="#111827">$77,541</text>
-                <text x="60" y="67" text-anchor="middle" font-size="7" fill="#9ca3af">Total Income</text>
-            </svg>
-        </div>
-        <div class="donut-legend">
-            <div class="legend-item">
-                <span class="legend-dot" style="background:#ef4444"></span>
-                Food
-                <strong class="legend-pct">55%</strong>
-            </div>
-            <div class="legend-item">
-                <span class="legend-dot" style="background:#f97316"></span>
-                Drinks
-                <strong class="legend-pct">30%</strong>
-            </div>
-            <div class="legend-item">
-                <span class="legend-dot" style="background:#1e293b"></span>
-                Others
-                <strong class="legend-pct">15%</strong>
-            </div>
-        </div>
+            <div id="donutChart"></div>
     </div>
-
-    {{-- Mini Stat Cards --}}
-    <div class="mini-stats">
-        <div class="mini-card">
-            <div class="mini-icon icon-orange"><i class="ti ti-shopping-bag"></i></div>
-            <div class="mini-info">
-                <div class="mini-label">Total Orders</div>
-                <div class="mini-badge badge-down"><i class="ti ti-trending-down"></i> -2.33%</div>
-                <div class="mini-value">21,375</div>
-            </div>
-        </div>
-        <div class="mini-card">
-            <div class="mini-icon icon-green"><i class="ti ti-user-plus"></i></div>
-            <div class="mini-info">
-                <div class="mini-label">New Customers</div>
-                <div class="mini-badge badge-up"><i class="ti ti-trending-up"></i> +32.40%</div>
-                <div class="mini-value">256</div>
-            </div>
-        </div>
-    </div>
-
 </div>
+@endsection
 
 @push('scripts')
+
+{{-- ApexCharts --}}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="{{ asset('assets/js/dashboard/chart/column-chart.js') }}"></script>
+<script src="{{ asset('assets/js/dashboard/chart/donut-chart.js') }}"></script>
+
 <script>
     // Period tab switcher
     document.querySelectorAll('.period-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+            // Remove active from all, then add to clicked
             document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+            // Add active to clicked button
             btn.classList.add('active');
         });
     });
 </script>
 @endpush
-
-@endsection

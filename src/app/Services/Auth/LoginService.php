@@ -14,30 +14,22 @@ class LoginService
     public function login(array $data): array
     {
         $email = strtolower(trim($data['email']));
-        $password = $data['password'];
 
-        $user = User::where('email', $email)->first();
-
-        if (!$user) {
+        if (!Auth::attempt([ // attempt use for check email and password
+            'email' => $email,
+            'password' => $data['password']
+        ])) {
             return [
                 'success' => false,
                 'field' => 'email',
-                'message' => 'Email wrong.'
+                'message' => 'Invalid email or password'
             ];
         }
-
-        if (!Hash::check($password, $user->password)) {
-            return [
-                'success' => false,
-                'field' => 'password',
-                'message' => 'password wrong'
-            ];
-        }
-
-        Auth::login($user);
+        // Regenerate session  
+        request()->session()->regenerate();
 
         return [
-            'success' => true
+            'success' => true,
         ];
     }
 

@@ -1,0 +1,139 @@
+.customer-list-container {
+    padding: 20px;
+    background: #f8f9fb;
+    min-height: 100vh;
+}
+
+.customer-list-container h1 {
+    font-size: 22px;
+    margin-bottom: 15px;
+    color: #111827;
+}
+
+/* Actions bar */
+.customer-list-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.customer-list-actions input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.customer-list-actions input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.customer-list-actions .btn {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Card */
+.customer-list-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+/* Table */
+.customer-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+/* Header */
+.customer-table thead {
+    background: #f3f4f6;
+}
+
+.customer-table thead th {
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Rows */
+.customer-table tbody td {
+    padding: 12px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #111827;
+}
+
+/* Hover effect */
+.customer-table tbody tr:hover {
+    background: #f9fafb;
+    transition: 0.2s;
+}
+
+/* Buttons */
+.btn {
+    padding: 6px 10px;
+    border-radius: 50px;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+}
+
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+}
+
+/* Status */
+.status-active {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.status-inactive {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .customer-table {
+        font-size: 12px;
+    }
+
+    .customer-list-actions {
+        flex-direction: column;
+    }
+}

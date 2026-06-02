@@ -122,7 +122,7 @@ body {
   content: '';
   width: 1.1rem; height: 1.1rem; flex-shrink: 0;
   border-radius: 50%;
-  background: var(--sky);       /* ✅ Brand color dot */
+  background: var(--sky);
   background-size: contain;
 }
 
@@ -176,7 +176,7 @@ body {
   border-radius: .3rem;
   transition: background .15s;
 }
-.lang-btn:hover { background: var(--sky-lt); }  /* ✅ Brand light tint */
+.lang-btn:hover { background: var(--sky-lt); }
 .lang-flag {
   width: 1.15rem; height: 1.15rem;
   border-radius: 50%;
@@ -223,7 +223,7 @@ body {
   font-weight: 600;
   letter-spacing: .07em;
   text-transform: uppercase;
-  color: var(--label);           /* ✅ Brand color label */
+  color: var(--label);
 }
 
 select, input {
@@ -238,8 +238,8 @@ select, input {
   width: 100%;
 }
 select:focus, input:focus {
-  border-color: var(--sky);      /* ✅ Brand color focus border */
-  box-shadow: 0 0 0 3px rgba(46,109,164,.12);  /* ✅ Brand color glow */
+  border-color: var(--sky);
+  box-shadow: 0 0 0 3px rgba(46,109,164,.12);
 }
 select { appearance: none; padding-right: 2rem; cursor: pointer; }
 .select-wrap { position: relative; }
@@ -265,7 +265,7 @@ select { appearance: none; padding-right: 2rem; cursor: pointer; }
 .pw-toggle {
   position: absolute; right: .75rem; top: 50%; transform: translateY(-50%);
   background: none; border: none; cursor: pointer;
-  color: var(--sky);             /* ✅ Brand color icon */
+  color: var(--sky);
   display: flex; align-items: center;
 }
 
@@ -273,7 +273,7 @@ select { appearance: none; padding-right: 2rem; cursor: pointer; }
 .btn-login {
   width: 100%;
   padding: 1rem;
-  background: var(--sky);        /* ✅ Brand color button */
+  background: var(--sky);
   color: #fff;
   font-family: 'DM Sans', sans-serif;
   font-size: 1rem;
@@ -283,20 +283,20 @@ select { appearance: none; padding-right: 2rem; cursor: pointer; }
   cursor: pointer;
   letter-spacing: .01em;
   transition: background .2s, transform .1s, box-shadow .2s;
-  box-shadow: 0 4px 14px rgba(46,109,164,.35);  /* ✅ Brand color shadow */
+  box-shadow: 0 4px 14px rgba(46,109,164,.35);
   margin-bottom: 1.3rem;
   margin-top: 1rem;
 }
 .btn-login:hover {
-  background: var(--sky-dk);     /* ✅ Brand darker hover */
-  box-shadow: 0 6px 20px rgba(46,109,164,.45);  /* ✅ Brand color shadow */
+  background: var(--sky-dk);
+  box-shadow: 0 6px 20px rgba(46,109,164,.45);
 }
 .btn-login:active { transform: scale(.98); }
 
 .forgot {
   text-align: center;
   font-size: .82rem;
-  color: var(--sky);             /* ✅ Brand color link */
+  color: var(--sky);
   cursor: pointer;
   text-decoration: none;
   font-weight: 500;
@@ -317,7 +317,7 @@ select { appearance: none; padding-right: 2rem; cursor: pointer; }
 /* ── OTP ── */
 .otp-resend {
   text-decoration: underline;
-  color: var(--sky);             /* ✅ Brand color */
+  color: var(--sky);
   font-weight: 500;
   cursor: pointer;
   transition: 0.2s;
@@ -354,8 +354,8 @@ select { appearance: none; padding-right: 2rem; cursor: pointer; }
 }
 
 .otp-input:focus {
-  border-color: var(--sky);      /* ✅ Brand color focus */
-  box-shadow: 0 0 0 3px rgba(46,109,164,.12);  /* ✅ Brand color glow */
+  border-color: var(--sky);
+  box-shadow: 0 0 0 3px rgba(46,109,164,.12);
 }
 
 .otp-footer {

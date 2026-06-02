@@ -1,13 +1,55 @@
 @extends('layouts.app')
 @push('styles')
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard/stock/validate-stock.css') }}">
+    <style>
+        /* Scoped sizing to keep inline SVGs uniform */
+        .search-wrap svg {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
+        .pm-search-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            flex: 1; /* Allows the search input wrapper to expand naturally */
+        }
+
+        .search-icon-inline {
+            position: absolute;
+            left: 12px;
+            color: #9ca3af;
+            pointer-events: none;
+        }
+
+        #product-search {
+            width: 100%;
+            padding-left: 36px; /* Offsets input placeholder text for the search icon */
+        }
+    </style>
 @endpush
 
 @section('title', 'Stock Validate')
 @section('content')
     <div class="pm-wrapper">
         <div class="pm-search-box">
-            <input type="text" placeholder="Search product..." id="product-search">
+            <div class="search-wrap">
+                <svg class="search-icon-inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" placeholder="Search product..." id="product-search">
+            </div>
             <button class="btn-filter" >Filter</button>
         </div>
 

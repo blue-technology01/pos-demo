@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Product\CategoryController;
+use App\Http\Controllers\Product\UomController;
 
 Route::get('/', function () {
     return redirect()->route('auth.login');
@@ -25,8 +27,6 @@ Route::middleware('guest')->group(function () {
     ->name('auth.forgot-password.send-otp');
 
     // step 3 OTP verifycation.
-    // it only testing for otp I don't use real sms testing. But I use logic that compair
-    // phone one database with phone that input, if correctly it will send otp 6 to laravel log.
     Route::get('/forgot-password/otp', [ForgotPasswordController::class, 'otpForm'])
         ->name('auth.otp.show');
     Route::post('/forgot-password/otp/verify', [ForgotPasswordController::class, 'verifyOtp'])
@@ -39,25 +39,34 @@ Route::middleware('guest')->group(function () {
         ->name('auth.reset-password.show');
     Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])
         ->name('auth.reset-password.post');
+
+
 });
 
 Route::middleware('auth')->group(function () {
 
-    Route::post('/logout', [LoginController::class, 'logout'])
-        ->name('auth.logout');
+
+    Route::post('/logout', [LoginController::class, 'logout'])->name('auth.logout');
 
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', function () {
             return view('admin.dashboard.index');
         })->name('dashboard');
-        Route::get('/users', [RegisterController::class, 'showFormRegister'])
-            ->name('users');
-        Route::post('/users/register', [RegisterController::class, 'register'])
-        ->name('users.register');
-        Route::put('/users/{user}', [RegisterController::class, 'update'])
-        ->name('users.update');
-        Route::delete('/users/{id}', [RegisterController::class, 'destroy'])
-        ->name('users.destroy');
+        Route::get('/users', [RegisterController::class, 'showFormRegister'])->name('users');
+        Route::post('/users/register', [RegisterController::class, 'register'])->name('users.register');
+        Route::put('/users/{user}', [RegisterController::class, 'update'])->name('users.update');
+        Route::delete('/users/{id}', [RegisterController::class, 'destroy'])->name('users.destroy');
+        Route::post('/preview/update', [RegisterController::class, 'updatePreview']);
+        // product 
+        Route::get('/category',[CategoryController::class,'index'])->name('category');
+        Route::post('/category', [CategoryController::class, 'store'])->name('category.store');
+        Route::put('/category/{code}', [CategoryController::class, 'update'])->name('category.update');
+        Route::delete('/category/{code}', [CategoryController::class, 'destroy'])->name('category.destroy');
+        // unit
+        Route::get('/unit',[UomController::class,'index'])->name('unit');
+        Route::post('/unit', [UomController::class, 'store'])->name('unit.store');
+        Route::put('/unit/{code}', [UomController::class, 'update'])->name('unit.update');
+        Route::delete('/unit/{code}', [UomController::class, 'destroy'])->name('unit.destroy');
 
         // setting funciton  route test
         Route::get('/profile', function () {
@@ -67,6 +76,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/payment-method', function () {
             return view('admin.users.payment-method');
         })->name('payment-method');
+        Route::get('/preview-settings', function () {
+            return view('admin.users.preview-settings');
+        })->name('preview-settings');
 
         // test show product
         Route::get('/productlist', function () {
@@ -75,12 +87,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/create-product', function () {
             return view('admin.products.create-product');
         })->name('create-product');
-        Route::get('/unit', function () {
-            return view('admin.products.unit');
-        })->name('unit');
-        Route::get('/category',function(){
-            return view('admin.products.category');
-        })->name('category');
 
         // test show inventory
         Route::get('/stock-update',function(){
@@ -91,10 +97,41 @@ Route::middleware('auth')->group(function () {
             return view('admin.stocks.stock-validation');
         })->name('stock-validation');
 
+        // show sale
+        Route::get('/sale-list',function(){
+            return view('admin.sales.sale-list');
+        })->name('sale-list');
+
+        Route::get('/shift',function(){
+            return view('admin.sales.shift');
+        })->name('shift');
+
+        // report
+        Route::get('/index',function(){
+            return view('admin.reports.index');
+        })->name('index');
+
+        Route::get('/revent-tracking',function(){
+            return view('admin.reports.revent-tracking');
+        })->name('revent-tracking');
+
+        Route::get('/sale-person',function(){
+            return view('admin.reports.sale-person');
+        })->name('sale-person');
+
+        Route::get('/top-product',function(){
+            return view('admin.reports.top-product');
+        })->name('top-product');
+
+        Route::get('/customer-list',function(){
+            return view('admin.customers.customer-list');
+        })->name('customer-list');
+
     });
 
     // pos
     Route::prefix('cashier')->name('cashier.')->group(function () {
+    // Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'role:cashier'])->group(function () {
         Route::get('/pos', function () {
             return view('cashier.pos.index');
         })->name('pos');

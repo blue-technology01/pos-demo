@@ -2,21 +2,17 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class AssignRoleSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::find(1);
+        $admin = User::where('email', 'admin@example.com')->first();
+
         if ($admin) {
             $admin->assignRole('admin');
-        }
-
-        $cashier = User::find(2);
-        if ($cashier) {
-            $cashier->assignRole('cashier');
         }
     }
 }

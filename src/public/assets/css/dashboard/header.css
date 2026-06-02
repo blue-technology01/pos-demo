@@ -1,4 +1,5 @@
-/* ── Navbar Shell ─────────────────────────────────────────── */
+
+/* navbar shell*/
 .navbar {
     display: flex;
     align-items: center;
@@ -13,7 +14,7 @@
     margin: 12px;
 }
 
-/* ── Left Side ────────────────────────────────────────────── */
+/* left side */
 .navbar-left {
     display: flex;
     align-items: center;
@@ -58,7 +59,7 @@
     color: #94a3b8;
 }
 
-/* ── Right Side ───────────────────────────────────────────── */
+/* right side */
 .navbar-right {
     display: flex;
     align-items: center;
@@ -66,7 +67,7 @@
     flex-shrink: 0;
 }
 
-/* ── Pill Buttons ─────────────────────────────────────────── */
+/* Pill buttons */
 .nav-pill-btn {
     height: 36px;
     padding: 0 14px;
@@ -92,7 +93,7 @@
 }
 .nav-pill-btn i { font-size: 16px; }
 
-/* ── Pill Dropdown ────────────────────────────────────────── */
+
 .nav-pill-wrap { position: relative; }
 
 .nav-pill-dropdown {
@@ -147,7 +148,7 @@
     margin: 4px 0;
 }
 
-/* ── Notification Badge ───────────────────────────────────── */
+/* notification Badge */
 .notif-badge {
     position: absolute;
     top: 6px;
@@ -159,7 +160,6 @@
     border: 1.5px solid #ffffff;
 }
 
-/* ── Notification Items ───────────────────────────────────── */
 .notif-item {
     padding: 10px 14px;
     border-bottom: 0.5px solid #f1f5f9;

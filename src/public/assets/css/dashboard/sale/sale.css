@@ -1,0 +1,482 @@
+.unit-section {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #333333;
+}
+
+.unit-section__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+.header-left {
+    margin-bottom: 10px;
+}
+
+.page-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.unit-section__btn-add {
+    background-color: #3b82f6; /* Modern teal accent matching the rest of the system */
+    border: 1px solid transparent;
+    border-radius: 50px;
+    padding: 10px 16px;
+    color: #ffffff;
+    font-weight: 500;
+    font-size: 0.875rem;
+    display: inline-block;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* ====================== UNIT SECTION HEADER ====================== */
+.unit-section__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Search + Filter Group */
+.search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.search-wrap i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 16px;
+    z-index: 1;
+}
+
+.search-wrap input[type="text"] {
+    width: 250px;
+    padding: 10px 14px 10px 40px;
+    font-size: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.search-wrap input[type="text"]:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Date Input */
+.search-wrap input[type="date"] {
+    padding: 9px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+}
+.filter-date{
+    /* border: none; */
+    border-color: #3b82f6;
+}
+
+
+.btn-filter {
+    background-color: #3b82f6;
+    color: #f5f5f5;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-filter:hover {
+    background-color: #2563eb;
+}
+
+/* Add New Button */
+.unit-section__btn-add {
+    background-color:#2563eb;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+}
+
+.btn-reset {
+    background-color:#f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    border-radius: 50px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+}
+
+.btn-reset:hover {
+    background: #e5e7eb;
+}
+
+/* Card */
+.unit-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-custom {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.875rem;
+}
+
+.table-custom th {
+    background-color: #f9fafb;
+    color: #4b5563;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.table-custom td {
+    padding: 7px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+    color: #4b5563;
+}
+
+.table-custom tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table-custom tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Table Column Width Constraints */
+.col-id {
+    width: 80px;
+}
+
+.col-actions {
+    width: 100px;
+    text-align: center;
+}
+
+/* Row Content Components */
+.unit-id-text {
+    font-family: monospace;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.unit-name-text {
+    font-weight: 500;
+    color: #111827;
+}
+
+.unit-badge {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+/* Status Component Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge--active {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge--inactive {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* Action Control Groups */
+.action-group {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-start;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    /* background-color:#0f766e; */
+    border: none;
+    border-radius: 50px;
+    color:white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-action svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.btn-action--edit{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background-color:#065f46;
+    border-radius: 50px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-action--delete{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background-color:#dc2626;
+    border-radius: 50px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Form Group Spacing */
+#pm-dialog .form-group {
+    margin-bottom: 1.25rem;
+}
+
+#pm-dialog .form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Label Structures */
+#pm-dialog label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+/* Elements Structural Normalization */
+#pm-dialog input[type="text"],
+#pm-dialog select {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    color: #111827;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    box-sizing: border-box; /* Crucial to fix box breakouts inside popup frames */
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#pm-dialog input[type="text"]::placeholder {
+    color: #9ca3af;
+}
+
+#pm-dialog input[type="text"]:focus,
+#pm-dialog select:focus {
+    outline: none;
+    border-color: #0d9488;
+}
+
+/* Optional Override Rules for clean jQuery UI Dialog Theme Integrations */
+.ui-dialog {
+    border-radius: 0.5rem !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #e5e7eb !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.ui-dialog .ui-dialog-titlebar {
+    background-color: #f9fafb !important;
+    border: none !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    padding: 1rem 1.5rem !important;
+    border-radius: 0 !important;
+}
+
+.ui-dialog .ui-dialog-title {
+    font-weight: 600 !important;
+    color: #111827 !important;
+    font-size: 1.125rem !important;
+}
+
+.ui-dialog .ui-dialog-content {
+    padding: 1.5rem !important;
+}
+
+.ui-dialog .ui-dialog-buttonpane {
+    border-top: 1px solid #e5e7eb !important;
+    background-color: #f9fafb !important;
+    padding: 0.75rem 1rem !important;
+    margin-top: 0 !important;
+}
+
+.ui-dialog .ui-dialog-buttonpane button {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    border-radius: 0.375rem !important;
+    cursor: pointer !important;
+}
+
+.pm-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    padding-bottom: 16px;
+
+    border-top: 1px solid #e2e8f0;
+    font-size: 14px;
+    color: #64748b;
+    flex-wrap: wrap;
+    gap: 16px;
+    width: 100%;
+}
+
+.pm-pagination__meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.pm-pagination__meta strong {
+    color: #1e293b;
+}
+
+.pm-pagination__per-page {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.pm-pagination__select {
+    padding: 4px 24px 4px 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #334155;
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    background-size: 12px;
+    transition: border-color 0.2s ease;
+}
+
+.pm-pagination__select:focus {
+    border-color: #3b82f6;
+}
+
+.pm-pagination__links {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.pm-pagination__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 6px;
+    text-decoration: none;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.pm-pagination__btn:hover:not(.pm-pagination__btn--disabled):not(.pm-pagination__btn--active) {
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+    color: #1e293b;
+}
+
+.pm-pagination__btn--active {
+    background-color: #3b82f6;
+    color: #ffffff;
+    border-color: #3b82f6;
+    font-weight: 600;
+    cursor: default;
+}
+
+.pm-pagination__btn--disabled {
+    color: #cbd5e1;
+    border-color: #e2e8f0;
+    background-color: #f8fafc;
+    cursor: not-allowed;
+}

@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ─── Generic Dropdown Toggle ───────────────────────────────────────────
+    //  generic function to toggle any dropdown by button and dropdown IDs
     function toggleDropdown(btnId, dropdownId) {
         const btn      = document.getElementById(btnId);
         const dropdown = document.getElementById(dropdownId);
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ─── Close All Dropdowns ───────────────────────────────────────────────
+    // close dropdowns and user menu
     function closeAll() {
         document.querySelectorAll('.nav-pill-dropdown').forEach(el => {
             el.classList.remove('show');
@@ -32,12 +32,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (userWrap) userWrap.classList.remove('open');
     }
 
-    // ─── Register Dropdowns ────────────────────────────────────────────────
+    // register dropdowns
     toggleDropdown('langBtn',  'langDropdown');
     toggleDropdown('posBtn',   'posDropdown');
     toggleDropdown('notifBtn', 'notifDropdown');
 
-    // ─── User Profile Dropdown (toggles class on wrapper, not dropdown) ────
+    // user menu is handled separately to also toggle the button state
     const userToggle   = document.getElementById('userDropdownToggle');
     const userDropdown = document.getElementById('userDropdown');
 
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ─── Language Flag Selection ───────────────────────────────────────────
+    // Handle language selection from dropdown
     const langDropdown = document.getElementById('langDropdown');
     if (langDropdown) {
         langDropdown.addEventListener('click', function (e) {
@@ -85,14 +85,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ─── Stop dropdown content clicks from bubbling ────────────────────────
+    // This prevents clicks inside dropdowns from closing them immediately
     document.querySelectorAll('.nav-pill-dropdown').forEach(el => {
         el.addEventListener('click', function (e) {
             e.stopPropagation();
         });
     });
 
-    // ─── Close all on outside click ────────────────────────────────────────
+    // close all dropdowns when clicking outside
     document.addEventListener('click', closeAll);
 
 });

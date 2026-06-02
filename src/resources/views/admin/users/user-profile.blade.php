@@ -36,16 +36,6 @@
                     <div class="info-label">Member Since</div>
                     <div class="info-value">{{ $user->created_at->format('M d, Y') }}</div>
                 </div>
-
-                <div class="info-box">
-                    <div class="info-label">Status</div>
-                    <div class="info-value">Active</div>
-                </div>
-            </div>
-
-            <div class="profile-actions">
-                <a href="#" class="btn btn-primary">Edit Profile</a>
-                <a href="#" class="btn btn-secondary">Change Password</a>
             </div>
         </div>
     </div>

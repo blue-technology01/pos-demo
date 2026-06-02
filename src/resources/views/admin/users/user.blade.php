@@ -3,24 +3,40 @@
 @section('title', 'User Management')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/user.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/dashboard/user.css') }}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
 @endpush
 
 @section('content')
-<div class="uw">
-    <div class="user-topbar">
-        <div class="search-wrap">
-            <i class="ti ti-search"></i>
-            <input type="text" id="searchInput" placeholder="Search users...">
-            <button class="btn-filter">Filter</button>
+<div class="um-page">
+
+    {{-- HEADER --}}
+    <div class="um-header">
+        <div>
+            <h1>User Management</h1>
+            <p>Manage system users and roles</p>
         </div>
-        <button class="btn-new" id="btnCreateUser">
-            <i class="ti ti-user-plus"></i> New User
+
+        <button class="btn btn-primary" id="btnCreateUser">
+            <span class="material-symbols-outlined" style="font-size:17px">person_add</span>
+            New User
         </button>
     </div>
 
-    <div class="table-wrap">
-        <table class="user-table" id="userTable">
+    {{-- STATS --}}
+    <div class="um-stats">
+        <div>Total Users: <strong>{{ $users->total() }}</strong></div>
+        <div>Admins:
+            <strong>{{ $users->getCollection()->filter(fn($u) => $u->hasRole('admin'))->count() }}</strong>
+        </div>
+        <div>Cashiers:
+            <strong>{{ $users->getCollection()->filter(fn($u) => $u->hasRole('cashier'))->count() }}</strong>
+        </div>
+    </div>
+
+    {{-- TABLE --}}
+    <div class="um-card">
+        <table class="um-table">
             <thead>
                 <tr>
                     <th>#</th>
@@ -31,121 +47,354 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="tbody"></tbody>
-        </table>
-    </div>
 
-    <div class="pm-pagination">
-        <div class="pm-pagination__meta">
-            <span class="pm-pagination__text"></span>
-            <div class="pm-pagination__per-page">
-                <label for="per-page-select">Show:</label>
-                <select id="per-page-select" class="pm-pagination__select">
-                    <option value="15">15</option>
-                    <option value="25" selected>25</option>
-                    <option value="50">50</option>
-                </select>
-            </div>
+            <tbody id="tbody">
+                @forelse($users as $index => $user)
+                <tr id="row-{{ $user->id }}">
+
+                    <td>{{ $users->firstItem() + $index }}</td>
+
+                    <td>
+                        <div class="user-cell">
+                            @if($user->avatar)
+                                <img src="{{ asset('storage/'.$user->avatar) }}" class="user-avatar">
+                            @else
+                                <div class="user-avatar-initials">
+                                    {{ strtoupper(substr($user->name,0,2)) }}
+                                </div>
+                            @endif
+
+                            <div>
+                                <div class="user-name">{{ $user->name }}</div>
+                                <div class="user-id">#{{ $user->id }}</div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>{{ $user->email }}</td>
+                    <td>{{ $user->phone ?? '—' }}</td>
+
+                    <td>
+                        @php $role = $user->roles->first()?->name ?? 'none'; @endphp
+                        <span class="role-badge">{{ ucfirst($role) }}</span>
+                    </td>
+
+                    <td>
+                        <button class="btn-edit"
+                            data-id="{{ $user->id }}"
+                            data-name="{{ $user->name }}"
+                            data-email="{{ $user->email }}"
+                            data-phone="{{ $user->phone }}"
+                            data-role="{{ $role }}">
+                            Edit
+                        </button>
+
+                        <button class="btn-delete"
+                            data-id="{{ $user->id }}"
+                            data-name="{{ $user->name }}">
+                            Delete
+                        </button>
+                    </td>
+
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="6">No users found</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+
+        <div class="um-pagination">
+            {{ $users->links() }}
         </div>
-        <div class="pm-pagination__links" id="paginationLinks"></div>
     </div>
 </div>
-<div id="createUserDialog" class="dialog-overlay">
-    <div class="dialog-box">
-        <div class="dialog-header">
-            <div class="dialog-title">
-                <i class="ti ti-user-plus" id="modalIcon"></i>
-                <span id="modalTitle">Create New User</span>
-            </div>
-            <button type="button" id="closeDialog" class="btn-close">
-                <i class="ti ti-x"></i>
-            </button>
-        </div>
 
-        <form id="registerForm" enctype="multipart/form-data">
+{{-- ================= MODAL ================= --}}
+<div class="modal-overlay" id="userModal">
+    <div class="modal-box">
+
+        <form id="userForm" enctype="multipart/form-data">
             @csrf
-            <input type="hidden" name="_method" id="formMethod" value="POST">
-            <input type="hidden" name="user_id" id="user_id" value="">
+            <input type="hidden" id="formMethod" value="POST">
 
-            <div class="form-avatar-wrap">
-                <div id="avatarPreview" class="avatar-preview">
-                    <i class="ti ti-user"></i>
-                </div>
-                <label for="profileInput" class="upload-label">
-                    <i class="ti ti-camera"></i> Upload Photo
-                </label>
-                <input type="file" id="profileInput" name="avatar" accept="image/*" hidden>
-            </div>
+            <h3 id="modalTitle">Create User</h3>
 
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Full Name <span class="req">*</span></label>
-                    <input type="text" name="name" placeholder="John Doe" required>
-                    <small class="text-error name-error"></small>
-                </div>
+            <div class="avatar-upload">
 
-                <div class="form-group">
-                    <label>Email <span class="req">*</span></label>
-                    <input type="email" name="email" placeholder="user@example.com" required>
-                    <small class="text-error email-error"></small>
-                </div>
+                <img id="avatarPreview"
+                    src="{{ asset('assets/img/default-avatar.png') }}"
+                    class="avatar-preview">
 
-                <div class="form-group">
-                    <label>Phone <span class="req">*</span></label>
-                    <input type="text" name="phone" placeholder="09xxxxxxxx" required>
-                    <small class="text-error phone-error"></small>
-                </div>
+                <div class="avatar-upload-info">
 
-                <div class="form-group">
-                    <label>Role <span class="req">*</span></label>
-                    <select name="role" required>
-                        <option value="">Select Role</option>
-                        @forelse ($roles as $role)
-                            <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
-                        @empty
-                            <option disabled>No roles available</option>
-                        @endforelse
-                    </select>
-                    <small class="text-error role-error"></small>
-                </div>
+                    <p>Profile Photo</p>
+                    <span>JPG, PNG up to 2MB</span>
 
-                <div class="form-group">
-                    <label>Password <span class="req" id="passwordReq">*</span></label>
-                    <input type="password" name="password" id="password" placeholder="Minimum 8 characters" minlength="8">
-                    <small class="text-error password-error"></small>
-                </div>
+                    <label for="avatarInput" class="avatar-upload-btn">
+                        Choose Photo
+                    </label>
 
-                <div class="form-group">
-                    <label>Confirm Password <span class="req" id="confirmReq">*</span></label>
-                    <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Confirm password">
-                    <small class="text-error password_confirmation-error"></small>
+                    <input type="file" name="avatar" id="avatarInput" accept="image/*">
                 </div>
             </div>
 
-            <div class="dialog-footer">
-                <button type="button" id="cancelDialog" class="btn-cancel">Cancel</button>
-                <button type="submit" id="btnSave" class="btn-save">
-                    <i class="ti ti-device-floppy"></i> Save User
-                </button>
-            </div>
+            <input type="text" name="name" id="fieldName" placeholder="Name">
+            <input type="email" name="email" id="fieldEmail" placeholder="Email">
+            <input type="text" name="phone" id="fieldPhone" placeholder="Phone">
+
+            <select name="role" id="fieldRole">
+                <option value="">Select Role</option>
+                @foreach($roles as $role)
+                    <option value="{{ $role->name }}">{{ $role->name }}</option>
+                @endforeach
+            </select>
+
+            <input type="password" name="password" id="fieldPassword" placeholder="Password">
+            <input type="password" name="password_confirmation" id="fieldPasswordConfirm" placeholder="Confirm">
+
+            <button type="submit">Save</button>
+            <button type="button" id="closeModal">Cancel</button>
         </form>
+
+    </div>
+</div>
+
+{{-- DELETE --}}
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+
+        <p>Delete <strong id="deleteUserName"></strong>?</p>
+
+        <form id="deleteForm">
+            @csrf
+            @method('DELETE')
+
+            <button type="submit">Yes Delete</button>
+            <button type="button" id="cancelDelete">Cancel</button>
+        </form>
+
     </div>
 </div>
 @endsection
 
+
 @push('scripts')
-    <script>
-        window.userRoutes = {
-            users: "{{ route('admin.users') }}",
-            register: "{{ route('admin.users.register') }}",
-            update: "{{ route('admin.users.update', ':id') }}",
-            destroy: "{{ route('admin.users.destroy', ':id') }}"
-        };
-    </script>
-    <script src="{{ asset('assets/js/dashboard/users/render-users.js') }}"></script>
-    <script src="{{ asset('assets/js/dashboard/users/fetch-users.js') }}"></script>
-    <script src="{{ asset('assets/js/dashboard/users/create-user.js') }}"></script>
-    <script src="{{ asset('assets/js/dashboard/users/delete-user.js') }}"></script>
-    <script src="{{ asset('assets/js/dashboard/users/modal.js') }}"></script>
-    <script src="{{ asset('assets/js/dashboard/users/index.js') }}"></script>
+<script>
+const URL_STORE = '{{ route("admin.users.register") }}';
+const URL_BASE  = '{{ url("admin/users") }}';
+
+const userModal   = document.getElementById('userModal');
+const deleteModal = document.getElementById('deleteModal');
+
+const userForm   = document.getElementById('userForm');
+const deleteForm = document.getElementById('deleteForm');
+
+const tbody = document.getElementById('tbody');
+
+/* ================= CREATE MODAL OPEN ================= */
+document.getElementById('btnCreateUser').addEventListener('click', () => {
+
+    userForm.reset();
+    userForm.action = URL_STORE;
+
+    document.getElementById('formMethod').value = 'POST';
+    document.getElementById('modalTitle').innerText = 'Create User';
+
+    userModal.classList.add('active');
+});
+
+/* ================= CLOSE MODALS ================= */
+document.getElementById('closeModal')?.addEventListener('click', () => {
+    userModal.classList.remove('active');
+});
+
+document.getElementById('cancelDelete')?.addEventListener('click', () => {
+    deleteModal.classList.remove('active');
+});
+
+/* ================= AVATAR PREVIEW ================= */
+document.getElementById('avatarInput')?.addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => {
+        document.getElementById('avatarPreview').src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+});
+
+
+/* ================= CREATE / UPDATE USER ================= */
+userForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const btn = userForm.querySelector('button[type="submit"]');
+    const oldText = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = "Saving...";
+
+    try {
+        const formData = new FormData(userForm);
+
+        // ⭐ IMPORTANT FIX (THIS FIXES YOUR ERROR)
+        formData.append('_method', document.getElementById('formMethod').value);
+
+        const res = await fetch(userForm.action, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "Accept": "application/json"
+            }
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.message || "Something went wrong");
+            return;
+        }
+
+        // ================= CREATE SUCCESS =================
+        if (document.getElementById('formMethod').value === 'POST') {
+
+            const u = data.user;
+
+            const avatarHTML = u.avatar
+                ? `<img src="/storage/${u.avatar}" class="user-avatar">`
+                : `<div class="user-avatar-initials">${u.name.substring(0,2).toUpperCase()}</div>`;
+
+            tbody.insertAdjacentHTML("afterbegin", `
+                <tr id="row-${u.id}">
+                    <td>New</td>
+
+                    <td>
+                        <div class="user-cell">
+                            ${avatarHTML}
+                            <div>
+                                <div class="user-name">${u.name}</div>
+                                <div class="user-id">#${u.id}</div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>${u.email}</td>
+                    <td>${u.phone ?? '—'}</td>
+                    <td>${u.roles?.[0]?.name ?? 'none'}</td>
+
+                    <td>
+                        <button class="btn-delete"
+                            data-id="${u.id}"
+                            data-name="${u.name}">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `);
+
+            userModal.classList.remove('active');
+            userForm.reset();
+        }
+
+        // ================= UPDATE SUCCESS =================
+        else {
+
+            const row = document.getElementById(`row-${data.user.id}`);
+
+            if (row) {
+                location.reload(); // simple safe fix
+            }
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Server error");
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = oldText;
+});
+
+
+/* ================= DELETE USER ================= */
+deleteForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const btn = deleteForm.querySelector('button[type="submit"]');
+    const oldText = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = "Deleting...";
+
+    try {
+        const formData = new FormData(deleteForm);
+        formData.append('_method', 'DELETE');
+
+        const res = await fetch(deleteForm.action, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "Accept": "application/json"
+            }
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            document.getElementById(`row-${data.id}`)?.remove();
+            deleteModal.classList.remove('active');
+        } else {
+            alert(data.message);
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Server error");
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = oldText;
+});
+
+
+/* ================= EDIT OPEN ================= */
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-edit');
+    if (!btn) return;
+
+    const d = btn.dataset;
+
+    userForm.reset();
+
+    userForm.action = `${URL_BASE}/${d.id}`;
+    document.getElementById('formMethod').value = 'PUT';
+
+    document.getElementById('modalTitle').innerText = "Edit User";
+
+    document.getElementById('fieldName').value  = d.name;
+    document.getElementById('fieldEmail').value = d.email;
+    document.getElementById('fieldPhone').value = d.phone;
+    document.getElementById('fieldRole').value  = d.role;
+
+    userModal.classList.add('active');
+});
+
+
+/* ================= DELETE OPEN ================= */
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-delete');
+    if (!btn) return;
+
+    document.getElementById('deleteUserName').innerText = btn.dataset.name;
+    deleteForm.action = `${URL_BASE}/${btn.dataset.id}`;
+
+    deleteModal.classList.add('active');
+});
+
+</script>
 @endpush

@@ -18,4 +18,22 @@ class LoginRequest extends FormRequest
             'password' => ['required', 'string', 'min:6', 'max:255']
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Email is required.',
+            'email.email' => 'Please enter a valid email address.',
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password must be at least 6 characters.',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'email' => 'email address',
+            'password' => 'password',
+        ];
+    }
 }

@@ -4,42 +4,44 @@
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="POS System - Dashboard">
-
     <title>@yield('title', 'Dashboard')</title>
 
-    {{-- Tabler Icons --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <!-- Critical CSS only -->
+    <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}" data-turbo-track="reload">
+    <link rel="stylesheet" href="{{ asset('assets/css/components/navbar.css') }}" data-turbo-track="reload">
+    <link rel="stylesheet" href="{{ asset('assets/css/components/sidebar.css') }}" data-turbo-track="reload">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
 
-    {{-- jQuery UI --}}
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.2/themes/base/jquery-ui.css">
-
-    {{-- Main CSS --}}
-    <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="{{ asset('assets/css/components/navbar.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/components/sidebar.css') }}">
-
+    <!-- Page-specific styles -->
     @stack('styles')
 </head>
-<body class="dashboard-body" x-data="sidebarApp()" :class="{ 'sidebar-open': open }">
+<body class="dashboard-body">
+
     @include('components.navbar')
+
     <div class="dashboard-wrapper" id="dashboard-wrapper">
         @include('components.sidebar')
         <main class="main-content">
-            {{-- @include('components.alert') --}}
             <div class="content-body">
                 @yield('content')
             </div>
         </main>
     </div>
 
-    {{-- Scripts --}}
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://code.jquery.com/ui/1.14.2/jquery-ui.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Core scripts (always needed) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="{{ asset('assets/js/app.js') }}"></script>
 
+    <!-- Turbo (after jQuery) -->
+    {{-- <script src="https://unpkg.com/@hotwired/turbo@8.0.4/dist/turbo.es2017-umd.js"></script> --}}
+
     @stack('scripts')
+
+    <script>
+        document.addEventListener('turbo:load', function () {
+            // Reinitialize Lucide on every Turbo navigation
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
 </body>
 </html>
