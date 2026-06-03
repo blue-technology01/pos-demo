@@ -59,32 +59,54 @@
         @endrole
 
         @role('admin')
-        <div class="menu-group {{ request()->routeIs('admin.products*') ? 'open' : '' }}">
+        <div class="menu-group {{ request()->routeIs('admin.products.*') ? 'open' : '' }}">
+
             <div class="menu-item has-sub" data-tooltip="Products">
-                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
                     <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
                     <line x1="12" y1="22.08" x2="12" y2="12"></line>
                 </svg>
+
                 <span class="menu-label">Products</span>
                 <i class="ti ti-chevron-right menu-arrow"></i>
             </div>
-            <div class="sub-menu">
-                <a href="{{ route('admin.productlist') }}"
-                   class="sub-item {{ request()->routeIs('admin.products.productlist') ? 'active' : '' }}">
-                    <i class="ti ti-point"></i> All products
-                </a>
-                <a href="{{ route('admin.category') }}"
-                   class="sub-item {{ request()->routeIs('admin.products.category') ? 'active' : '' }}">
-                    <i class="ti ti-point"></i> Category
-                </a>
-                <a href="{{ route('admin.unit') }}"
-                   class="sub-item {{ request()->routeIs('admin.products.unit') ? 'active' : '' }}">
-                    <i class="ti ti-point"></i> Units
-                </a>
-            </div>
-        </div>
 
+            <div class="sub-menu">
+
+                {{-- Products --}}
+                <a href="{{ route('admin.products.index') }}"
+                class="sub-item {{ request()->routeIs('admin.products.index', 'admin.products.create', 'admin.products.edit') ? 'active' : '' }}">
+                    <i class="ti ti-point"></i>
+                    All Products
+                </a>
+
+                {{-- Product UOM --}}
+                <a href="{{ route('admin.product-uom.index') }}"
+                    class="sub-item {{ request()->routeIs('admin.product-uom.*') ? 'active' : '' }}">
+                        <i class="ti ti-point"></i>
+                        Product UOM
+                </a>
+
+                {{-- Category --}}
+                <a href="{{ route('admin.category') }}"
+                class="sub-item {{ request()->routeIs('admin.category') ? 'active' : '' }}">
+                    <i class="ti ti-point"></i>
+                    Categories
+                </a>
+
+                {{-- Unit --}}
+                <a href="{{ route('admin.unit') }}"
+                class="sub-item {{ request()->routeIs('admin.unit') ? 'active' : '' }}">
+                    <i class="ti ti-point"></i>
+                    Units
+                </a>
+
+            </div>
+
+        </div>
         {{-- Customers --}}
         <div class="menu-group {{ request()->routeIs('admin.customer*') ? 'open' : '' }}">
             <div class="menu-item has-sub" data-tooltip="Customers">

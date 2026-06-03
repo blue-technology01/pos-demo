@@ -28,7 +28,7 @@ class Product extends Model
     public function category(){
         return $this->belongsTo(Category::class, 'category_code','code');
     }
-    public function uoms(){
-        return $this->hasMany(ProductUom::class, 'product_code', 'code');
-    }
+    // public function uoms(){
+    //     return $this->hasMany(ProductUom::class, 'product_code', 'code');
+    // }
 }

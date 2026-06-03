@@ -1,4 +1,3 @@
-
 // --------------------
 // STATIC DATA
 // --------------------
@@ -23,10 +22,18 @@ let customers = [
 // RENDER TABLE
 // --------------------
 function renderTable(data) {
+
     const tbody = document.getElementById("customer-table-body");
+
+    if (!tbody) {
+        console.warn("customer-table-body not found");
+        return;
+    }
+
     tbody.innerHTML = "";
 
     data.forEach((c, index) => {
+
         tbody.innerHTML += `
             <tr>
                 <td>${c.name}</td>
@@ -35,94 +42,167 @@ function renderTable(data) {
                 <td>${c.address}</td>
                 <td>${c.status}</td>
                 <td>
-                    <button class="btn btn-sm btn-primary" onclick="editCustomer(${index})">Edit</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteCustomer(${index})">Delete</button>
+                    <button class="btn btn-sm btn-primary" onclick="editCustomer(${index})">
+                        Edit
+                    </button>
+
+                    <button class="btn btn-sm btn-danger" onclick="deleteCustomer(${index})">
+                        Delete
+                    </button>
                 </td>
             </tr>
         `;
     });
 }
 
-// first load
-renderTable(customers);
-
 // --------------------
 // SEARCH
 // --------------------
-document.getElementById("customerSearchInput").addEventListener("input", function () {
-    let keyword = this.value.toLowerCase();
+function initializeSearch() {
 
-    let filtered = customers.filter(c =>
-        c.name.toLowerCase().includes(keyword) ||
-        c.email.toLowerCase().includes(keyword) ||
-        c.phone.includes(keyword)
-    );
+    const searchInput = document.getElementById("customerSearchInput");
 
-    renderTable(filtered);
-});
+    if (!searchInput) {
+        return;
+    }
+
+    searchInput.addEventListener("input", function () {
+
+        const keyword = this.value.toLowerCase();
+
+        const filtered = customers.filter(c =>
+            c.name.toLowerCase().includes(keyword) ||
+            c.email.toLowerCase().includes(keyword) ||
+            c.phone.toLowerCase().includes(keyword)
+        );
+
+        renderTable(filtered);
+    });
+}
 
 // --------------------
 // OPEN MODAL
 // --------------------
-document.getElementById("addCustomerBtn").addEventListener("click", function () {
-    document.getElementById("customerModal").style.display = "block";
-});
+function initializeAddCustomerButton() {
+
+    const addBtn = document.getElementById("addCustomerBtn");
+
+    if (!addBtn) {
+        return;
+    }
+
+    addBtn.addEventListener("click", function () {
+
+        const modal = document.getElementById("customerModal");
+
+        if (modal) {
+            modal.style.display = "block";
+        }
+    });
+}
 
 // --------------------
 // CLOSE MODAL
 // --------------------
 function closeModal() {
-    document.getElementById("customerModal").style.display = "none";
+
+    const modal = document.getElementById("customerModal");
+
+    if (modal) {
+        modal.style.display = "none";
+    }
 }
 
 // --------------------
 // SAVE CUSTOMER
 // --------------------
-document.getElementById("saveCustomerBtn").addEventListener("click", function () {
+function initializeSaveCustomer() {
 
-    let name = document.getElementById("name").value;
-    let email = document.getElementById("email").value;
-    let phone = document.getElementById("phone").value;
-    let address = document.getElementById("address").value;
+    const saveBtn = document.getElementById("saveCustomerBtn");
 
-    customers.push({
-        name,
-        email,
-        phone,
-        address,
-        status: "Active"
+    if (!saveBtn) {
+        return;
+    }
+
+    saveBtn.addEventListener("click", function () {
+
+        const name = document.getElementById("name");
+        const email = document.getElementById("email");
+        const phone = document.getElementById("phone");
+        const address = document.getElementById("address");
+
+        if (!name || !email || !phone || !address) {
+            return;
+        }
+
+        customers.push({
+            name: name.value,
+            email: email.value,
+            phone: phone.value,
+            address: address.value,
+            status: "Active"
+        });
+
+        renderTable(customers);
+
+        closeModal();
+
+        name.value = "";
+        email.value = "";
+        phone.value = "";
+        address.value = "";
     });
-
-    renderTable(customers);
-    closeModal();
-
-    // clear
-    document.getElementById("name").value = "";
-    document.getElementById("email").value = "";
-    document.getElementById("phone").value = "";
-    document.getElementById("address").value = "";
-});
+}
 
 // --------------------
 // DELETE
 // --------------------
 function deleteCustomer(index) {
+
     customers.splice(index, 1);
+
     renderTable(customers);
 }
 
 // --------------------
-// EDIT (simple demo)
+// EDIT
 // --------------------
 function editCustomer(index) {
-    let c = customers[index];
 
-    document.getElementById("name").value = c.name;
-    document.getElementById("email").value = c.email;
-    document.getElementById("phone").value = c.phone;
-    document.getElementById("address").value = c.address;
+    const customer = customers[index];
 
-    document.getElementById("customerModal").style.display = "block";
+    const name = document.getElementById("name");
+    const email = document.getElementById("email");
+    const phone = document.getElementById("phone");
+    const address = document.getElementById("address");
+    const modal = document.getElementById("customerModal");
+
+    if (!name || !email || !phone || !address || !modal) {
+        return;
+    }
+
+    name.value = customer.name;
+    email.value = customer.email;
+    phone.value = customer.phone;
+    address.value = customer.address;
+
+    modal.style.display = "block";
 
     deleteCustomer(index);
 }
+
+// --------------------
+// INITIALIZE
+// --------------------
+document.addEventListener("DOMContentLoaded", function () {
+
+    console.log("Customer JS Loaded");
+
+    renderTable(customers);
+
+    initializeSearch();
+
+    initializeAddCustomerButton();
+
+    initializeSaveCustomer();
+});

@@ -8,20 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-
-            $table->boolean('preview_receipt')
-                  ->default(false);
-
+        Schema::table('cash_registers', function (Blueprint $table) {
+            $table->timestamps(); // adds created_at + updated_at
         });
     }
 
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-
-            $table->dropColumn('preview_receipt');
-
+        Schema::table('cash_registers', function (Blueprint $table) {
+            $table->dropTimestamps();
         });
     }
 };

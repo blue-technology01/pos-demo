@@ -5,7 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Cash\CashController;
 use App\Http\Controllers\Product\CategoryController;
+use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Product\ProductUomController;
 use App\Http\Controllers\Product\UomController;
 
 Route::get('/', function () {
@@ -57,7 +60,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/users/{user}', [RegisterController::class, 'update'])->name('users.update');
         Route::delete('/users/{id}', [RegisterController::class, 'destroy'])->name('users.destroy');
         Route::post('/preview/update', [RegisterController::class, 'updatePreview']);
-        // product 
+        // category
         Route::get('/category',[CategoryController::class,'index'])->name('category');
         Route::post('/category', [CategoryController::class, 'store'])->name('category.store');
         Route::put('/category/{code}', [CategoryController::class, 'update'])->name('category.update');
@@ -67,6 +70,22 @@ Route::middleware('auth')->group(function () {
         Route::post('/unit', [UomController::class, 'store'])->name('unit.store');
         Route::put('/unit/{code}', [UomController::class, 'update'])->name('unit.update');
         Route::delete('/unit/{code}', [UomController::class, 'destroy'])->name('unit.destroy');
+        // product
+        Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+        Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+        Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+        Route::get('/products/{code}/edit', [ProductController::class, 'edit'])->name('products.edit');
+        Route::put('/products/{code}', [ProductController::class, 'update'])->name('products.update');
+        Route::delete('/products/{code}', [ProductController::class, 'destroy'])->name('products.destroy');
+        // product uom
+        Route::get('/product-uom', [ProductUomController::class, 'index'])->name('product-uom.index');
+        Route::get('/product-uom/create', [ProductUomController::class, 'create'])->name('product-uom.create');
+        Route::post('/product-uom', [ProductUomController::class, 'store'])->name('product-uom.store');
+        Route::get('/product-uom/{id}/edit', [ProductUomController::class, 'edit'])->name('product-uom.edit');
+        Route::put('/product-uom/{id}', [ProductUomController::class, 'update'])->name('product-uom.update');
+        Route::delete('/product-uom/{id}', [ProductUomController::class, 'destroy'])->name('product-uom.destroy');
+        // cashe register
+        Route::get('/shift', [CashController::class, 'index'])->name('shift');
 
         // setting funciton  route test
         Route::get('/profile', function () {
@@ -79,14 +98,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/preview-settings', function () {
             return view('admin.users.preview-settings');
         })->name('preview-settings');
-
-        // test show product
-        Route::get('/productlist', function () {
-            return view('admin.products.productlist');
-        })->name('productlist');
-        Route::get('/create-product', function () {
-            return view('admin.products.create-product');
-        })->name('create-product');
 
         // test show inventory
         Route::get('/stock-update',function(){
@@ -101,10 +112,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/sale-list',function(){
             return view('admin.sales.sale-list');
         })->name('sale-list');
-
-        Route::get('/shift',function(){
-            return view('admin.sales.shift');
-        })->name('shift');
 
         // report
         Route::get('/index',function(){
@@ -129,11 +136,13 @@ Route::middleware('auth')->group(function () {
 
     });
 
-    // pos
+    // pos for cashiar
     Route::prefix('cashier')->name('cashier.')->group(function () {
     // Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'role:cashier'])->group(function () {
         Route::get('/pos', function () {
             return view('cashier.pos.index');
         })->name('pos');
+        Route::post('/open', [CashController::class, 'open'])->name('open');
+        Route::post('/close', [CashController::class, 'close'])->name('close');
     });
 });

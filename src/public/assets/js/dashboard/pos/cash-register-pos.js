@@ -1,124 +1,231 @@
-let registerState = {
-    isOpen: false,
-    openingBalance: 1250.00,
-    totalSales: 845.50,
-    totalTransactions: 28,
-    openedAt: "2026-05-30 08:15:00",
-    expectedBalance: 2095.50,
+// ==============================
+// Cash Register POS
+// ==============================
+
+const registerState = {
+    isOpen: window.isShiftOpen ?? false,
+    expectedBalance: parseFloat(window.expectedShiftBalance ?? 0)
 };
 
+// ==============================
 // Open Popup
+// ==============================
 function openRegisterPopup() {
-    console.log("openRegisterPopup() called"); // For debugging
+    console.log("openRegisterPopup() called");
 
     updateDatetime();
+
+    const overlay = document.getElementById('register-overlay');
+
+    if (!overlay) {
+        console.error('register-overlay not found');
+        return;
+    }
+
+    overlay.style.display = 'flex';
 
     if (registerState.isOpen) {
         showCloseState();
     } else {
         showOpenState();
     }
-
-    document.getElementById('register-overlay').style.display = 'flex';
 }
 
+// ==============================
 // Close Popup
+// ==============================
 function closeRegisterPopup() {
-    document.getElementById('register-overlay').style.display = 'none';
+    const overlay = document.getElementById('register-overlay');
+
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
 }
 
-// Show Open State
+// ==============================
+// Open Register State
+// ==============================
 function showOpenState() {
-    document.getElementById('cr-title').textContent = 'Open Register';
-    document.getElementById('cr-subtitle').textContent = 'Enter opening cash to start your shift';
 
-    document.getElementById('cr-status-badge').textContent = 'Not opened';
-    document.getElementById('cr-status-badge').className = 'cr-status-badge none';
+    const title = document.getElementById('cr-title');
+    const subtitle = document.getElementById('cr-subtitle');
+    const badge = document.getElementById('cr-status-badge');
 
-    document.getElementById('cr-open-state').style.display = 'block';
-    document.getElementById('cr-close-state').style.display = 'none';
+    const openState = document.getElementById('cr-open-state');
+    const closeState = document.getElementById('cr-close-state');
+
+    if (title) {
+        title.textContent = 'Open Register';
+    }
+
+    if (subtitle) {
+        subtitle.textContent = 'Enter opening cash to start your shift';
+    }
+
+    if (badge) {
+        badge.textContent = 'CLOSED';
+        badge.style.background = '#f8d7da';
+        badge.style.color = '#721c24';
+    }
+
+    if (openState) {
+        openState.style.display = 'block';
+    }
+
+    if (closeState) {
+        closeState.style.display = 'none';
+    }
 }
 
-// Show Close State
+// ==============================
+// Close Register State
+// ==============================
 function showCloseState() {
-    document.getElementById('cr-title').textContent = 'Close Register';
-    document.getElementById('cr-subtitle').textContent = 'Review your shift before closing';
 
-    document.getElementById('cr-status-badge').textContent = 'Open';
-    document.getElementById('cr-status-badge').className = 'cr-status-badge open';
+    const title = document.getElementById('cr-title');
+    const subtitle = document.getElementById('cr-subtitle');
+    const badge = document.getElementById('cr-status-badge');
 
-    // Fill data
-    document.getElementById('cr-total-txn').textContent = registerState.totalTransactions;
-    document.getElementById('cr-total-sales').textContent = '$' + registerState.totalSales.toFixed(2);
-    document.getElementById('cr-show-opening').textContent = '$' + registerState.openingBalance.toFixed(2);
-    document.getElementById('cr-expected').textContent = '$' + registerState.expectedBalance.toFixed(2);
+    const openState = document.getElementById('cr-open-state');
+    const closeState = document.getElementById('cr-close-state');
 
-    const openedAt = new Date(registerState.openedAt).toLocaleString('en-US', {
+    if (title) {
+        title.textContent = 'Close Register';
+    }
+
+    if (subtitle) {
+        subtitle.textContent = 'Review your shift before closing';
+    }
+
+    if (badge) {
+        badge.textContent = 'OPEN';
+        badge.style.background = '#d4edda';
+        badge.style.color = '#155724';
+    }
+
+    if (openState) {
+        openState.style.display = 'none';
+    }
+
+    if (closeState) {
+        closeState.style.display = 'block';
+    }
+}
+
+// ==============================
+// Difference Calculator
+// ==============================
+function calcDifference() {
+
+    const closingInput = document.getElementById('cr-closing-input');
+    const diffValue = document.getElementById('cr-diff-value');
+    const diffBox = document.getElementById('cr-diff-box');
+
+    if (!closingInput || !diffValue) {
+        return;
+    }
+
+    const closing = parseFloat(closingInput.value || 0);
+    const expected = registerState.expectedBalance;
+
+    const diff = closing - expected;
+
+    diffValue.textContent =
+        (diff >= 0 ? '+' : '') +
+        '$' +
+        diff.toFixed(2);
+
+    if (diff > 0) {
+
+        diffValue.style.color = '#16a34a';
+
+        if (diffBox) {
+            diffBox.style.borderColor = '#16a34a';
+        }
+
+    } else if (diff < 0) {
+
+        diffValue.style.color = '#dc2626';
+
+        if (diffBox) {
+            diffBox.style.borderColor = '#dc2626';
+        }
+
+    } else {
+
+        diffValue.style.color = '#64748b';
+
+        if (diffBox) {
+            diffBox.style.borderColor = '#e5e7eb';
+        }
+    }
+}
+
+// ==============================
+// Backward Compatibility
+// ==============================
+function calcDifferenceLocal() {
+    calcDifference();
+}
+
+// ==============================
+// Datetime
+// ==============================
+function updateDatetime() {
+
+    const el = document.getElementById('cr-datetime');
+
+    if (!el) {
+        return;
+    }
+
+    el.textContent = new Date().toLocaleString('en-US', {
         dateStyle: 'medium',
         timeStyle: 'short'
     });
-    document.getElementById('cr-opened-at').textContent = openedAt;
-
-    document.getElementById('cr-open-state').style.display = 'none';
-    document.getElementById('cr-close-state').style.display = 'block';
 }
 
-// Calculate Difference
-function calcDifference() {
-    const closing = parseFloat(document.getElementById('cr-closing-input').value) || 0;
-    const expected = registerState.expectedBalance;
-    const diff = closing - expected;
+// ==============================
+// Close on overlay click
+// ==============================
+document.addEventListener('click', function (e) {
 
-    const el = document.getElementById('cr-diff-value');
-    el.textContent = (diff >= 0 ? '+' : '') + '$' + diff.toFixed(2);
+    const overlay = document.getElementById('register-overlay');
 
-    if (diff < 0) el.style.color = '#dc2626';
-    else if (diff > 0) el.style.color = '#16a34a';
-    else el.style.color = '#64748b';
-}
-
-// Update Date & Time
-function updateDatetime() {
-    const el = document.getElementById('cr-datetime');
-    if (el) {
-        el.textContent = new Date().toLocaleString('en-US', {
-            dateStyle: 'medium',
-            timeStyle: 'short'
-        });
+    if (
+        overlay &&
+        e.target === overlay
+    ) {
+        closeRegisterPopup();
     }
-}
+});
 
-// Submit Open Register (Static)
-function submitOpenRegister() {
-    const opening = parseFloat(document.getElementById('cr-opening-input').value);
-    if (isNaN(opening) || opening < 0) {
-        alert("Please enter a valid opening balance!");
-        return;
-    }
+// ==============================
+// Init
+// ==============================
+document.addEventListener('DOMContentLoaded', () => {
 
-    alert("Register Opened Successfully! (Static Test)");
-    registerState.isOpen = true;
-    closeRegisterPopup();
-}
+    console.log('Cash Register JS Loaded');
 
-// Submit Close Register (Static)
-function submitCloseRegister() {
-    const closing = parseFloat(document.getElementById('cr-closing-input').value);
-    if (isNaN(closing) || closing < 0) {
-        alert("❌ Please enter a valid closing balance!");
-        return;
-    }
-
-    alert("Register Closed Successfully! (Static Test)");
-    registerState.isOpen = false;
-    closeRegisterPopup();
-}
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Set initial dot color
     const dot = document.getElementById('register-dot');
-    if (dot) dot.classList.add('closed');
 
-    console.log("Cash Register JS Loaded");
+    if (dot) {
+
+        if (registerState.isOpen) {
+
+            dot.classList.add('open');
+            dot.style.background = '#16a34a';
+
+        } else {
+
+            dot.classList.add('closed');
+            dot.style.background = '#dc2626';
+        }
+    }
+
+    const closingInput = document.getElementById('cr-closing-input');
+
+    if (closingInput) {
+        closingInput.addEventListener('input', calcDifference);
+    }
 });

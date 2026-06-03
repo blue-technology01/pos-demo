@@ -3,9 +3,6 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/category.css') }}" data-turbo-track="reload">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-@endpush
-
-    {{-- Toast Animation --}}
     <style>
         @keyframes slideIn {
             from {
@@ -28,8 +25,9 @@
             }
         }
     </style>
+@endpush
 
-@section('title', 'Unit Management')
+@section('title', 'Product Category')
 
 @section('content')
 <div class="page">
@@ -40,7 +38,7 @@
             {{-- Search --}}
             <div class="search-box">
                 <i class="ti ti-search"></i>
-                <input type="text" id="searchInput" placeholder="Search units...">
+                <input type="text" id="searchInput" placeholder="Search categories...">
             </div>
 
             {{-- Status filter --}}
@@ -77,7 +75,7 @@
             </div>
 
             <button type="button" id="open-create-modal" class="btn-add">
-                <i class="ti ti-plus" style="font-size:15px"></i> Add Unit
+                <i class="ti ti-plus" style="font-size:15px"></i> Add Category
             </button>
         </div>
     </div>
@@ -89,45 +87,53 @@
                 <thead>
                     <tr>
                         <th data-col="code">Code <i class="ti ti-selector sort-icon"></i></th>
-                        <th data-col="name">Unit Name <i class="ti ti-selector sort-icon"></i></th>
+                        <th data-col="name">Name <i class="ti ti-selector sort-icon"></i></th>
+                        <th>Description</th>
+                        <th>Image</th>
                         <th data-col="status">Status <i class="ti ti-selector sort-icon"></i></th>
                         <th data-col="created">Created <i class="ti ti-selector sort-icon"></i></th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="categoryTableBody">
-                    @forelse ($uoms as $uom)
+                    @forelse ($categories as $category)
                     <tr
-                        data-code="{{ strtolower($uom->code) }}"
-                        data-name="{{ strtolower($uom->name) }}"
-                        data-status="{{ $uom->status }}"
-                        data-created="{{ $uom->created_at?->timestamp ?? 0 }}"
-                        {{-- data-created="{{ $uom->created_at->timestamp }}" --}}
+                        data-code="{{ strtolower($category->code) }}"
+                        data-name="{{ strtolower($category->name) }}"
+                        data-description="{{ strtolower($category->description ?? '') }}"
+                        data-status="{{ $category->status }}"
+                        data-created="{{ $category->created_at->timestamp }}"
                     >
-                        <td><strong>{{ $uom->code }}</strong></td>
-                        <td>{{ $uom->name }}</td>
+                        <td><strong>{{ $category->code }}</strong></td>
+                        <td>{{ $category->name }}</td>
+                        <td style="color:#9ca3af">{{ Str::limit($category->description, 50) ?? '—' }}</td>
                         <td>
-                            <span class="badge badge-{{ $uom->status }}">
-                                {{ ucfirst($uom->status) }}
+                            @if ($category->image)
+                                <img src="{{ Storage::url($category->image) }}" class="img-thumb" alt="">
+                            @else
+                                <div class="img-placeholder"><i class="ti ti-photo"></i></div>
+                            @endif
+                        </td>
+                        <td>
+                            <span class="badge badge-{{ $category->status }}">
+                                {{ ucfirst($category->status) }}
                             </span>
                         </td>
-                        <td style="color:#9ca3af">
-                            {{ $uom->created_at?->format('d M Y') ?? '-' }}
-                        </td>
-                        {{-- <td style="color:#9ca3af">{{ $uom->created_at->format('d M Y') }}</td> --}}
+                        <td style="color:#9ca3af">{{ $category->created_at->format('d M Y') }}</td>
                         <td class="actions-cell">
                             <button class="btn-icon btn-edit open-edit-modal"
-                                    data-code="{{ $uom->code }}"
-                                    data-name="{{ $uom->name }}"
-                                    data-status="{{ $uom->status }}"
-                                    title="Edit Unit">
+                                    data-code="{{ $category->code }}"
+                                    data-name="{{ $category->name }}"
+                                    data-description="{{ $category->description ?? '' }}"
+                                    data-status="{{ $category->status }}"
+                                    title="Edit Category">
                                 <span class="material-symbols-outlined">edit</span>
                             </button>
 
                             <button class="btn-icon btn-delete delete-btn"
-                                    data-code="{{ $uom->code }}"
-                                    data-name="{{ $uom->name }}"
-                                    title="Delete Unit">
+                                    data-code="{{ $category->code }}"
+                                    data-name="{{ $category->name }}"
+                                    title="Delete Category">
                                 <span class="material-symbols-outlined">delete</span>
                             </button>
                         </td>
@@ -136,7 +142,7 @@
                     <tr class="empty-row">
                         <td colspan="7">
                             <i class="ti ti-inbox" style="font-size:24px;display:block;margin:0 auto 8px;color:#d1d5db"></i>
-                            No units found
+                            No categories found
                         </td>
                     </tr>
                     @endforelse
@@ -157,20 +163,16 @@
 <div class="modal-overlay" id="createModal">
     <div class="modal">
         <div class="modal-header">
-            <span class="modal-title"><i class="ti ti-tag"></i> Add new unit</span>
+            <span class="modal-title"><i class="ti ti-tag"></i> Add new category</span>
             <button class="modal-close" data-close="createModal" aria-label="Close"><i class="ti ti-x"></i></button>
         </div>
-        <form action="{{ route('admin.unit.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.category.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="modal-body">
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Code <span class="req">*</span></label>
-                        <input type="text" name="code" class="form-control" placeholder="e.g. UNIT-001" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label"> Unit Name <span class="req">*</span></label>
-                        <input type="text" name="name" class="form-control" placeholder="Unit name" required>
+                        <input type="text" name="code" class="form-control" placeholder="e.g. CAT-001" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Status</label>
@@ -180,12 +182,27 @@
                         </select>
                     </div>
                 </div>
-
+                <div class="form-group">
+                    <label class="form-label">Name <span class="req">*</span></label>
+                    <input type="text" name="name" class="form-control" placeholder="Category name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" class="form-control" placeholder="Short description (optional)"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Image</label>
+                    <label class="file-upload" id="createFileLabel">
+                        <i class="ti ti-cloud-upload"></i>
+                        <span id="createFileName">Click to upload image</span>
+                        <input type="file" name="image" accept="image/*" id="createFileInput">
+                    </label>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-cancel" data-close="createModal">Cancel</button>
                 <button type="submit" class="btn-submit">
-                    <i class="ti ti-check" style="font-size:14px"></i> Save unit
+                    <i class="ti ti-check" style="font-size:14px"></i> Save category
                 </button>
             </div>
         </form>
@@ -196,11 +213,9 @@
 <div class="modal-overlay" id="editModal">
     <div class="modal">
         <div class="modal-header">
-            <span class="modal-title"><i class="ti ti-edit"></i> Edit unit</span>
+            <span class="modal-title"><i class="ti ti-edit"></i> Edit category</span>
             <button class="modal-close" data-close="editModal" aria-label="Close"><i class="ti ti-x"></i></button>
         </div>
-
-        {{-- edit form unit --}}
         <form id="editForm" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
@@ -214,11 +229,22 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Unit Name <span class="req">*</span></label>
+                    <label class="form-label">Name <span class="req">*</span></label>
                     <input type="text" name="name" id="edit_name" class="form-control" required>
                 </div>
-
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" id="edit_description" class="form-control"></textarea>
+                </div>
                 <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Image</label>
+                        <label class="file-upload" id="editFileLabel">
+                            <i class="ti ti-photo"></i>
+                            <span id="editFileName">Replace image</span>
+                            <input type="file" name="image" accept="image/*" id="editFileInput">
+                        </label>
+                    </div>
                     <div class="form-group">
                         <label class="form-label">Status</label>
                         <select name="status" id="edit_status" class="form-control">
@@ -237,6 +263,7 @@
         </form>
     </div>
 </div>
+
 @endsection
 
 @push('scripts')
@@ -277,9 +304,9 @@
             toast.addEventListener('animationend', () => toast.remove());
         }, 3000);
     }
-
     // slide in/out keyframes
     document.addEventListener('DOMContentLoaded', () => {
+
         @if(session('success'))
             showNotification(@json(session('success')), 'success');
         @endif
@@ -290,15 +317,15 @@
     });
 
     /* ── Modal ── */
-    function openModal(id)  {
-        document.getElementById(id).classList.add('open');
-        document.body.style.overflow = 'hidden';
+    function openModal(id)  { 
+        document.getElementById(id).classList.add('open');    
+        document.body.style.overflow = 'hidden'; 
     }
-    // close modal by id
-    function closeModal(id) {
-        document.getElementById(id).classList.remove('open');
-        document.body.style.overflow = '';
+    function closeModal(id) { 
+        document.getElementById(id).classList.remove('open'); 
+        document.body.style.overflow = ''; 
     }
+
     document.querySelectorAll('[data-close]').forEach(btn =>
         btn.addEventListener('click', () => closeModal(btn.dataset.close))
     );
@@ -311,30 +338,28 @@
     });
 
     document.getElementById('open-create-modal').addEventListener('click', () => openModal('createModal'));
-    // open edit modal and populate data
+
     document.querySelectorAll('.open-edit-modal').forEach(btn =>
-        btn.addEventListener('click', function() {
-            const code = this.dataset.code;
+        btn.addEventListener('click', () => {
+            const code = btn.dataset.code;
             document.getElementById('edit_code').value          = code;
-            document.getElementById('edit_name').value          = this.dataset.name;
-            document.getElementById('edit_status').value        = this.dataset.status;
-            document.getElementById('edit_chip_name').textContent = this.dataset.name;
+            document.getElementById('edit_name').value          = btn.dataset.name;
+            document.getElementById('edit_description').value   = btn.dataset.description || '';
+            document.getElementById('edit_status').value        = btn.dataset.status;
+            document.getElementById('edit_chip_name').textContent = btn.dataset.name;
             document.getElementById('edit_chip_code').textContent = code;
             document.getElementById('editForm').action =
-                '{{ route("admin.unit.update", ":code") }}'.replace(':code', code);
+                '{{ route("admin.category.update", ":code") }}'.replace(':code', code);
             openModal('editModal');
         })
     );
 
     /* File labels */
     function bindFile(inputId, spanId) {
-        const el = document.getElementById(inputId);
-        if (el) {
-            el.addEventListener('change', function () {
-                document.getElementById(spanId).textContent =
-                    this.files[0] ? this.files[0].name : 'Click to upload image';
-            });
-        }
+        document.getElementById(inputId).addEventListener('change', function () {
+            document.getElementById(spanId).textContent =
+                this.files[0] ? this.files[0].name : 'Click to upload image';
+        });
     }
     bindFile('createFileInput', 'createFileName');
     bindFile('editFileInput',   'editFileName');
@@ -344,10 +369,11 @@
             const code = this.dataset.code;
             const name = this.dataset.name;
 
-            if (confirm(`Are you sure you want to delete unit "${name}" (${code})?\n\nThis action cannot be undone.`)) {
+            if (confirm(`Are you sure you want to delete category "${name}" (${code})?\n\nThis action cannot be undone.`)) {
+                // Create and submit delete form
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = '{{ route("admin.unit.destroy", ":code") }}'.replace(':code', code);
+                form.action = '{{ route("admin.category.destroy", ":code") }}'.replace(':code', code);
                 form.style.display = 'none';
 
                 const csrf = document.createElement('input');
@@ -369,16 +395,15 @@
     });
 
     /* ── Filter + Sort + Pagination engine ── */
-    // Changed selection targeting from #unitTableBody to #categoryTableBody to match your blade template
     const allRows  = Array.from(document.querySelectorAll('#categoryTableBody tr[data-name]'));
     const tbody    = document.getElementById('categoryTableBody');
     const infoEl   = document.getElementById('tableInfo');
     const pagEl    = document.getElementById('pagination');
 
-    // state variables
     let currentPage = 1;
+    let sortCol     = 'created';
+    let sortDir     = 'desc';
 
-    // Get current filter values
     function getFilters() {
         return {
             search:  document.getElementById('searchInput').value.toLowerCase().trim(),
@@ -388,8 +413,7 @@
         };
     }
 
-    // function apply sort data
-    function applSort(rows, sort) {
+    function applySort(rows, sort) {
         return [...rows].sort((a, b) => {
             if (sort === 'newest')    return b.dataset.created - a.dataset.created;
             if (sort === 'oldest')    return a.dataset.created - b.dataset.created;
@@ -403,44 +427,40 @@
     function render() {
         const { search, status, sort, perPage } = getFilters();
 
-        // filter rows based on search and status filters
+        /* Filter */
         let visible = allRows.filter(row => {
-            const matchesSearch = !search ||
+            const matchSearch = !search ||
                 row.dataset.name.includes(search) ||
                 row.dataset.code.includes(search) ||
-                row.dataset.status.includes(search);
+                row.dataset.description.includes(search);
             const matchStatus = !status || row.dataset.status === status;
-            return matchesSearch && matchStatus; // Fix variable mismatch here
+            return matchSearch && matchStatus;
         });
 
-        // apply sorting
-        visible = applSort(visible, sort);
-        const total = visible.length;
+        /* Sort */
+        visible = applySort(visible, sort);
+
+        const total      = visible.length;
         const totalPages = Math.max(1, Math.ceil(total / perPage));
+        if (currentPage > totalPages) currentPage = totalPages;
 
-        // adjust current page if it exceeds total pages after filtering
-        if(currentPage > totalPages) currentPage = totalPages;
-
-        // paginate
         const start = (currentPage - 1) * perPage;
-        const end = Math.min(start + perPage, total);
+        const end   = Math.min(start + perPage, total);
         const paged = visible.slice(start, end);
 
-        // render rows
-        allRows.forEach(row => { row.style.display = 'none'; });
+        /* Render rows */
+        allRows.forEach(r => { r.style.display = 'none'; });
 
-        // Clear existing pagination or handle empty conditions
-        if(paged.length === 0) {
+        if (paged.length === 0) {
+            /* show empty state */
             let empty = tbody.querySelector('.js-empty');
-            if(!empty) {
+            if (!empty) {
                 empty = document.createElement('tr');
                 empty.className = 'empty-row js-empty';
-                empty.innerHTML = `
-                    <td colspan="5">
-                        <i class="ti ti-inbox" style="font-size:24px;display:block;margin:0 auto 8px;color:#d1d5db"></i>
-                        No units found
-                    </td>
-                `;
+                empty.innerHTML = `<td colspan="7">
+                    <i class="ti ti-inbox" style="font-size:24px;display:block;margin:0 auto 8px;color:#d1d5db"></i>
+                    No categories found
+                </td>`;
                 tbody.appendChild(empty);
             }
             empty.style.display = '';
@@ -453,24 +473,24 @@
             });
         }
 
-        // render info - Fixed variable name to infoEl
-        if(total > 0) {
-            infoEl.innerHTML = `Showing <strong>${start + 1}–${end}</strong> of <strong>${total}</strong> units`;
+        /* Info */
+        if (total === 0) {
+            infoEl.innerHTML = 'No results';
         } else {
-            infoEl.innerHTML = 'No units to display';
+            infoEl.innerHTML = `Showing <b>${start + 1}–${end}</b> of <b>${total}</b> categories`;
         }
 
-        // render pagination
-        renderPagination(currentPage, totalPages); // Correct arguments order: current, total
+        /* Pagination */
+        renderPagination(currentPage, totalPages);
 
-        // clear button visibility
+        /* Clear button visibility */
         const hasFilter = search || status;
         document.getElementById('btnClear').classList.toggle('visible', !!hasFilter);
         document.getElementById('filterStatus').classList.toggle('has-filter', !!status);
+        document.getElementById('searchInput').style.borderColor = search ? '#111827' : '';
     }
 
-    // function for render pagination
-    function renderPagination(current, total) {
+    function renderPagination(page, total) {
         pagEl.innerHTML = '';
         if (total <= 1) return;
 
@@ -484,9 +504,9 @@
             return b;
         };
 
-        pagEl.appendChild(btn('ti ti-chevron-left', current - 1, current === 1, false, true));
+        pagEl.appendChild(btn('ti ti-chevron-left',  page - 1, page === 1,     false, true));
 
-        const pages = getPageNumbers(current, total);
+        const pages = getPageNumbers(page, total);
         pages.forEach(p => {
             if (p === '...') {
                 const span = document.createElement('span');
@@ -494,19 +514,18 @@
                 span.textContent = '…';
                 pagEl.appendChild(span);
             } else {
-                pagEl.appendChild(btn(p, p, false, p === current));
+                pagEl.appendChild(btn(p, p, false, p === page));
             }
         });
 
-        pagEl.appendChild(btn('ti ti-chevron-right', current + 1, current === total, false, true));
+        pagEl.appendChild(btn('ti ti-chevron-right', page + 1, page === total, false, true));
     }
 
-    // function for get pagination number
     function getPageNumbers(current, total) {
         if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
         const pages = [];
         pages.push(1);
-        if (current > 3)         pages.push('...');
+        if (current > 3)        pages.push('...');
         for (let p = Math.max(2, current - 1); p <= Math.min(total - 1, current + 1); p++) pages.push(p);
         if (current < total - 2) pages.push('...');
         pages.push(total);
@@ -519,7 +538,6 @@
         document.getElementById(id).addEventListener('change', () => { currentPage = 1; render(); });
     });
 
-    // button clear
     document.getElementById('btnClear').addEventListener('click', () => {
         document.getElementById('searchInput').value  = '';
         document.getElementById('filterStatus').value = '';

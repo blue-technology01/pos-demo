@@ -30,7 +30,7 @@ class LoginController extends Controller
             ]);
         }
         $result = $this->loginService->login($request->validated());
-        
+
 
         if (!$result['success']) {
             return back()

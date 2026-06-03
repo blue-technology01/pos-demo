@@ -1,176 +1,151 @@
 @extends('layouts.app')
 
 @push('styles')
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/create.css') }}" data-turbo-track="reload" >
-    <style>
-        /* Scoped sizing to keep inline SVGs uniform */
-        .barcode-input-wrapper svg,
-        .image-uploader svg {
-            display: inline-block;
-            vertical-align: middle;
-            flex-shrink: 0;
-        }
-
-        /* Input field container adjustment */
-        .barcode-input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .barcode-icon-inline {
-            position: absolute;
-            right: 12px;
-            color: #9ca3af;
-            width: 18px;
-            height: 18px;
-            pointer-events: none;
-        }
-
-        /* Large file upload icon modifier */
-        .image-uploader-icon {
-            width: 40px;
-            height: 40px;
-            color: #9ca3af;
-            margin-bottom: 12px;
-        }
-    </style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+<link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/create.css') }}">
 @endpush
 
-@section('title', 'Dashboard Create Product')
+@section('title', 'Create Product')
+
 @section('content')
-    <div class="form-section">
 
-        {{-- Top Heading Header --}}
-        <div class="form-section__header">
-            <h1 class="form-section__title">Create New Product</h1>
-        </div>
-        <form action="#" method="POST" id="product-create-form" enctype="multipart/form-data">
-            @csrf
-
-            <div class="form-grid">
-
-                <div class="form-column">
-
-                    {{-- Identification Context info --}}
-                    <div class="form-card">
-                        <h2 class="form-card__title">General Details</h2>
-
-                        <div class="form-group">
-                            <label class="form-label" for="product_name">Product Name *</label>
-                            <input type="text" id="product_name" name="name" class="form-input" placeholder="e.g., Crispy Chicken Burger" required autocomplete="off">
-                        </div>
-
-                        <div class="form-row-2">
-                            <div class="form-group">
-                                <label class="form-label" for="product_barcode">Barcode / SKU *</label>
-                                <div class="barcode-input-wrapper">
-                                    <input type="text" id="product_barcode" name="barcode" class="form-input" placeholder="Scan or type barcode string" required>
-                                    <svg class="barcode-icon-inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 012-2h2m10 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M12 7v10m-4-10v10m8-10v10" />
-                                    </svg>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="product_category">Category *</label>
-                                <select id="product_category" name="category_id" class="form-select" required>
-                                    <option value="" disabled selected>Select Item Group Category</option>
-                                    <option value="drink">Drinks</option>
-                                    <option value="snack">Snacks / Appetizers</option>
-                                    <option value="pizza">Box</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Block 2: Financial Ledger Configurations --}}
-                    <div class="form-card">
-                        <h2 class="form-card__title">Pricing & Inventory Scales</h2>
-
-                        <div class="form-row-2">
-                            <div class="form-group">
-                                <label class="form-label" for="product_unit">Unit *</label>
-                                <select id="product_unit" name="unit_id" class="form-select" required>
-                                    <option value="" disabled selected>Select Scale Denominator</option>
-                                    <option value="pcs">Pieces (PCS)</option>
-                                    <option value="can">Can (CAN)</option>
-                                    <option value="kg">Kilograms (KG)</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="product_price">Base Retail Price ($) *</label>
-                                <input type="number" id="product_price" name="price" class="form-input" step="0.01" min="0.00" placeholder="0.00" required>
-                            </div>
-                        </div>
-
-                        <div class="form-row-2">
-                            <div class="form-group">
-                                <label class="form-label" for="product_stock">Initial Stock Quantity</label>
-                                <input type="number" id="product_stock" name="stock" class="form-input" min="0" value="0">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="stock_alert_threshold">Low Stock Warning Limit</label>
-                                <input type="number" id="stock_alert_threshold" name="alert_limit" class="form-input" min="0" value="5">
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="form-column">
-
-                    {{-- Media Selector Frame --}}
-                    <div class="form-card">
-                        <h2 class="form-card__title">Product Graphic Image</h2>
-
-                        <div class="form-group">
-                            <label class="form-label">Upload Presentation Image Thumbnail</label>
-                            <div class="image-uploader" id="dropzone-trigger">
-                                <svg class="image-uploader-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-8m0 0l-3 3m3-3l3 3M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <p class="uploader-text">Drag and drop file here or <span>browse local files</span></p>
-                                <input type="file" id="hidden-file-input" name="image" accept="image/*" style="display: none;">
-                            </div>
-                            <p class="uploader-hint">Supports high quality transparent PNG or JPEG structures up to 2MB maximum.</p>
-                        </div>
-                    </div>
-
-                    {{-- Status Switches Card Block --}}
-                    <div class="form-card">
-                        <h2 class="form-card__title">Visibility & Availability</h2>
-
-                        <div class="form-group form-group--switch">
-                            <label class="status-toggle">
-                                <input type="checkbox" name="status" value="active" checked>
-                                <div>
-                                    <div class="toggle-title">Publish Active Status</div>
-                                    <div class="toggle-desc">Immediately renders product viewable inside the cashier terminal selection grid.</div>
-                                </div>
-                            </label>
-
-                            <label class="status-toggle">
-                                <input type="checkbox" name="is_featured" value="1">
-                                <div>
-                                    <div class="toggle-title">Pin to Special Menu</div>
-                                    <div class="toggle-desc">Elevates visibility by anchoring card to the top category display section.</div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Form Action Drawer Trigger Footer Toolbar --}}
-            <div class="form-actions">
-                <button type="button" class="btn-form btn-form--cancel" onclick="window.history.back()">Cancel</button>
-                <button type="submit" class="btn-form btn-form--submit">Save & Register Product</button>
-            </div>
-
-        </form>
+<div class="form-section">
+    <div class="form-section__header">
+        <h1>Create New Product</h1>
     </div>
+    <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="form-grid">
+            {{-- LEFT --}}
+            <div class="form-column">
+                {{-- GENERAL --}}
+                <div class="form-card">
+                    <h2>General Details</h2>
+                    {{-- NAME --}}
+                    <div class="form-group">
+                        <label>Product Name *</label>
+                        <input type="text"
+                               name="name"
+                               value="{{ old('name') }}"
+                               class="form-input @error('name') is-invalid @enderror">
+                        @error('name')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
+                    {{-- CODE + BARCODE --}}
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Product Code *</label>
+                            <input type="text"
+                                   name="code"
+                                   value="{{ old('code') }}"
+                                   class="form-input @error('code') is-invalid @enderror">
+                            @error('code')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                        <div class="form-group">
+                            <label>Barcode</label>
+                            <input type="text"
+                                   name="barcode"
+                                   value="{{ old('barcode') }}"
+                                   class="form-input @error('barcode') is-invalid @enderror">
+                            @error('barcode')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    {{-- CATEGORY --}}
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text"
+                               name="category_code"
+                               value="{{ old('category_code') }}"
+                               class="form-input">
+                    </div>
+                </div>
+                {{-- PRICING --}}
+                <div class="form-card">
+                    <h2>Pricing & Stock</h2>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Cost Price *</label>
+                            <input type="number"
+                                   step="0.01"
+                                   name="cost_price"
+                                   value="{{ old('cost_price') }}"
+                                   class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Selling Price *</label>
+                            <input type="number"
+                                   step="0.01"
+                                   name="price"
+                                   value="{{ old('price') }}"
+                                   class="form-input">
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Stock</label>
+                            <input type="number"
+                                   name="stock"
+                                   value="{{ old('stock', 0) }}"
+                                   class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Min Stock</label>
+                            <input type="number"
+                                   name="min_stock"
+                                   value="{{ old('min_stock', 0) }}"
+                                   class="form-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- RIGHT --}}
+            <div class="form-column">
+                {{-- IMAGE --}}
+                <div class="form-card">
+                    <h2>Product Image</h2>
+                    <div class="form-group">
+                        <input type="file"
+                               name="image"
+                               accept="image/*"
+                               class="form-input">
+                    </div>
+                </div>
+                {{-- EXTRA --}}
+                <div class="form-card">
+                    <h2>Extra Information</h2>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description"
+                                  class="form-input">{{ old('description') }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Expiry Date</label>
+                        <input type="date"
+                               name="expiry_date"
+                               value="{{ old('expiry_date') }}"
+                               class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="status" class="form-select">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- ACTIONS --}}
+        <div class="form-actions">
+            <button type="button" onclick="window.history.back()">Cancel</button>
+            <button type="submit">Save Product</button>
+        </div>
+    </form>
+</div>
+
 @endsection

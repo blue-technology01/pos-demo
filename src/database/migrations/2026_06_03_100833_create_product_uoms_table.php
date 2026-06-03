@@ -13,26 +13,34 @@ return new class extends Migration
     {
         Schema::create('product_uoms', function (Blueprint $table) {
             $table->id();
+
             $table->string('product_code', 20);
             $table->string('uom_code', 20);
+
             $table->decimal('quantity_per_unit', 10, 2)->default(1);
-            $table->decimal('price', 10, 2)->default(0);
+
             $table->decimal('cost_price', 10, 2)->default(0);
+            $table->decimal('selling_price', 10, 2)->default(0);
+
             $table->string('barcode', 100)->nullable();
             $table->boolean('is_default')->default(false);
+
             $table->timestamps();
 
-            // Relationship with products table
+            $table->index('product_code');
+            $table->index('uom_code');
+
+            $table->unique(['product_code', 'uom_code']);
+
             $table->foreign('product_code')
                 ->references('code')
                 ->on('products')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
 
-            // Relationship with uoms table
             $table->foreign('uom_code')
                 ->references('code')
-                ->on('uoms') 
+                ->on('uoms')
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
         });

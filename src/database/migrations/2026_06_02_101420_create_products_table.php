@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('category_code',20)-> nullable();
             $table->decimal('cost_price',10,2)->default(0);
             $table->decimal('price',10,2)->default(0);
+            // stock
             $table->decimal('stock', 10, 2)->default(0);
             $table->decimal('min_stock', 10, 2)->default(0);
             $table->string('barcode', 100)->nullable();
