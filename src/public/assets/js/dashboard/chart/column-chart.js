@@ -1,67 +1,124 @@
-var columnOptions = {
-    series: [
-        {
-            name: 'Net Profit',
-            data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
+const CHART_COLORS = {
+    profit:  '#22c55e',
+    revenue: '#3b82f6',
+    cost:    '#ef4444',
+};
+
+let columnChart = null;
+
+function buildChartOptions() {
+
+    return {
+
+        series: [
+            { name: 'Net Profit', data: [] },
+            { name: 'Revenue',    data: [] },
+            { name: 'Cost',       data: [] },
+        ],
+
+        chart: {
+            type:       'bar',
+            height:     320,
+            toolbar:    { show: false },
+            animations: { enabled: true, speed: 400 },
+            fontFamily: 'inherit',
         },
-        {
-            name: 'Revenue',
-            data: [76, 85, 101, 98, 87, 105, 91, 114, 94],
-        },
-        {
-            name: 'Free Cash Flow',
-            data: [35, 41, 36, 26, 45, 48, 52, 53, 41],
-        },
-    ],
-    chart: {
-        type: 'bar',
-        height: 320,
-        toolbar: { show: false },
-    },
-    plotOptions: {
-        bar: {
-            horizontal: false,
-            columnWidth: '55%',
-            borderRadius: 5,
-            borderRadiusApplication: 'end',
-        },
-    },
-    dataLabels: {
-        enabled: false,
-    },
-    stroke: {
-        show: true,
-        width: 2,
-        colors: ['transparent'],
-    },
-    xaxis: {
-        categories: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
-        labels: { style: { colors: '#94a3b8', fontSize: '12px' } },
-    },
-    yaxis: {
-        title: { text: '$ (thousands)' },
-        labels: { style: { colors: '#94a3b8' } },
-    },
-    fill: {
-        opacity: 1,
-    },
-    tooltip: {
-        y: {
-            formatter: function (val) {
-                return '$ ' + val + ' thousands'
+
+        plotOptions: {
+            bar: {
+                horizontal:              false,
+                columnWidth:             '55%',
+                borderRadius:            5,
+                borderRadiusApplication: 'end',
             },
         },
-    },
-    grid: {
-        borderColor: '#f1f5f9',
-        strokeDashArray: 4,
-    },
-    legend: {
-        position: 'top',
-        horizontalAlign: 'right',
-    },
-    colors: ['#3b82f6', '#22c55e', '#a855f7'],
+
+        dataLabels: { enabled: false },
+
+        stroke: {
+            show:   true,
+            width:  2,
+            colors: ['transparent'],
+        },
+
+        xaxis: {
+            categories: [],
+            labels:     { style: AXIS_LABEL_STYLE },
+            axisBorder: { show: false },
+            axisTicks:  { show: false },
+        },
+
+        yaxis: {
+            labels: {
+                style:     AXIS_LABEL_STYLE,
+                formatter: formatUSD,
+            },
+        },
+
+        tooltip: {
+            shared:    true,
+            intersect: false,
+            y:         { formatter: formatUSD },
+        },
+
+        fill: { opacity: 1 },
+
+        grid: {
+            borderColor:     '#f1f5f9',
+            strokeDashArray: 4,
+            padding:         { left: 0, right: 0 },
+        },
+
+        legend: {
+            position:        'top',
+            horizontalAlign: 'right',
+        },
+
+        colors: [
+            CHART_COLORS.profit,
+            CHART_COLORS.revenue,
+            CHART_COLORS.cost,
+        ],
+
+        noData: {
+            text:  'No data for this period',
+            style: { color: '#94a3b8', fontSize: '14px' },
+        },
+
+    };
+
 }
 
-var columnChart = new ApexCharts(document.querySelector('#chart'), columnOptions)
-columnChart.render()
+function initChart() {
+
+    var el = document.querySelector('#chart');
+
+    if (!el) {
+        console.warn('[ColumnChart] #chart element not found.');
+        return;
+    }
+
+    columnChart = new ApexCharts(el, buildChartOptions());
+    columnChart.render();
+
+}
+
+function updateColumnChart(data) {
+
+    if (!columnChart) return;
+
+    columnChart.updateOptions(
+        {
+            xaxis:  { categories: data.categories || [] },
+
+            series: [
+                { name: 'Net Profit', data: data.profit  || [] },
+                { name: 'Revenue',    data: data.revenue || [] },
+                { name: 'Cost',       data: data.cost    || [] },
+            ],
+        },
+        false,
+        true
+    );
+
+}

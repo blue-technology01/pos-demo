@@ -51,6 +51,7 @@ services:
             - pos_app_network
 
     redis:
+        container_name: pos_redis
         image: redis:alpine
         ports:
             - "${REDIS_PORT:-6379}:6379"

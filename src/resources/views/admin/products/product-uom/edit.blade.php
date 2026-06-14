@@ -3,78 +3,8 @@
 @section('title', 'Edit Product UOM')
 
 @push('styles')
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-
-<style>
-.page-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
-}
-
-.page-title{
-    font-size:22px;
-    font-weight:600;
-}
-
-.card{
-    background:#fff;
-    padding:20px;
-    border-radius:12px;
-    box-shadow:0 2px 8px rgba(0,0,0,.05);
-    max-width:700px;
-}
-
-.form-group{
-    margin-bottom:15px;
-}
-
-label{
-    display:block;
-    font-weight:500;
-    margin-bottom:6px;
-}
-
-input, select{
-    width:100%;
-    padding:10px;
-    border:1px solid #e5e7eb;
-    border-radius:8px;
-    outline:none;
-}
-
-.row{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:15px;
-}
-
-.btn-group{
-    display:flex;
-    gap:10px;
-    margin-top:20px;
-}
-
-.btn-save{
-    background:#2563eb;
-    color:#fff;
-    padding:10px 16px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-}
-
-.btn-cancel{
-    background:#e5e7eb;
-    padding:10px 16px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    text-decoration:none;
-    color:#111;
-}
-</style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/edit-uom.css') }}">
 @endpush
 
 @section('content')

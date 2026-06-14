@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @push('styles')
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/report/index.css') }} " data-turbo-track="reload">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/report/index.css') }}" data-turbo-track="reload">
     <style>
         .report-date svg,
         .rnc-icon svg,
@@ -10,7 +10,6 @@
             vertical-align: middle;
             flex-shrink: 0;
         }
-
         .report-date svg {
             width: 16px;
             height: 16px;
@@ -21,7 +20,6 @@
             width: 20px;
             height: 20px;
         }
-
         .rnc-arrow {
             width: 18px;
             height: 18px;
@@ -40,6 +38,8 @@
             <h1 class="report-title">Reports</h1>
             <p class="report-subtitle">Summary of your POS performance</p>
         </div>
+
+        {{-- Date Filter --}}
         <div class="report-date">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -47,16 +47,26 @@
                 <line x1="8" y1="2" x2="8" y2="6"></line>
                 <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
-            <span>{{ now()->format('d M Y') }}</span>
+
+            <input type="date" id="start_date" value="{{ $startDate }}" max="{{ $endDate }}">
+            <span>-</span>
+            <input type="date" id="end_date" value="{{ $endDate }}" min="{{ $startDate }}" max="{{ now()->format('Y-m-d') }}">
+
+            <button id="filter-btn" type="button">Filter</button>
         </div>
     </div>
 
-    {{-- Revenue Overview Chart - Only ONE --}}
+    {{-- Revenue Overview Chart --}}
     <div class="report-chart">
         <div class="report-chart-header">
             <div>
                 <div class="report-chart-title">Revenue Overview</div>
-                <div class="report-chart-sub">Last 7 days performance</div>
+                {{-- Update summary via JS --}}
+                <div class="report-chart-sub" id="report-summary">
+                    Revenue: {{ number_format($summary['total_revenue'], 2) }}
+                    - Orders: {{ number_format($summary['total_orders']) }}
+                    - Avg Sale: {{ number_format($summary['average_sale'], 2) }}
+                </div>
             </div>
         </div>
         <div id="reportChart"></div>
@@ -64,7 +74,7 @@
 
     {{-- Report Navigation Cards --}}
     <div class="report-nav-grid">
-        <a href="{{ route('admin.revent-tracking') }}" class="report-nav-card">
+        <a href="{{ route('admin.revenue-tracking') }}" class="report-nav-card">
             <div class="rnc-icon icon-blue">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -123,30 +133,63 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="{{ asset('assets/js/dashboard/chart/report-chart.js') }}"></script>
-
     <script>
-        (function() {
-            // Prevent multiple initializations
-            if (window.reportPageInitialized) return;
-            window.reportPageInitialized = true;
-
-            function initializeReportPage() {
-                // Initialize the revenue chart
+        window.reportChartData = @json($chartData);
+    </script>
+    <script>
+        (function () {
+            function initPage() {
                 if (typeof initializeReportChart === 'function') {
-                    initializeReportChart();
+                    initializeReportChart(window.reportChartData);
                 }
             }
 
-            // Turbo compatibility (Hotwire)
-            document.addEventListener('turbo:load', initializeReportPage);
-            document.addEventListener('turbo:render', initializeReportPage);
+            document.addEventListener('turbo:load', initPage);
+            if (document.readyState === 'complete') initPage();
+            else document.addEventListener('DOMContentLoaded', initPage);
 
-            // Fallback for normal loads
-            if (document.readyState === 'complete') {
-                initializeReportPage();
-            } else {
-                document.addEventListener('DOMContentLoaded', initializeReportPage);
+            const filterBtn  = document.getElementById('filter-btn');
+            const startInput = document.getElementById('start_date');
+            const endInput   = document.getElementById('end_date');
+            const summaryEl  = document.getElementById('report-summary');
+
+            if (!filterBtn) return;
+
+            async function applyFilter() {
+                const startDate = startInput.value;
+                const endDate   = endInput.value;
+                if (!startDate || !endDate) return;
+
+                filterBtn.disabled    = true;
+                filterBtn.textContent = 'Loading...';
+
+                try {
+                    const url = `{{ route('admin.reports.index') }}?start_date=${startDate}&end_date=${endDate}`;
+                    const response = await fetch(url, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    initializeReportChart(data.chartData);
+
+                    summaryEl.textContent = `Revenue: ${Number(data.summary.total_revenue).toFixed(2)} - Orders: ${data.summary.total_orders} - Avg Sale: ${Number(data.summary.average_sale).toFixed(2)}`;
+
+                    window.history.pushState({}, '', url);
+
+                } catch (error) {
+                    console.error('Filter error:', error);
+                } finally {
+                    filterBtn.disabled    = false;
+                    filterBtn.textContent = 'Filter';
+                }
             }
+
+            filterBtn.addEventListener('click', applyFilter);
+            endInput.addEventListener('change', applyFilter);
         })();
     </script>
-@endpush q
+@endpush

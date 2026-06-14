@@ -1,87 +1,113 @@
-var donutOptions = {
-    series: [38, 27, 19, 10, 6],
-    chart: {
-        type: 'donut',
-        height: 320,
-    },
-    labels: ['Groceries', 'Beverages', 'Snacks & Bakery', 'Household', 'Personal Care'],
-    colors: ['#3b82f6', '#22c55e', '#f59e0b', '#a855f7', '#ef4444'],
-    legend: {
-        position: 'bottom',
-        fontSize: '13px',
-        fontFamily: 'Plus Jakarta Sans, sans-serif',
-        fontWeight: 500,
-        markers: {
-            width: 10,
-            height: 10,
-            radius: 3,
+var DONUT_COLORS = [
+    '#3b82f6',
+    '#22c55e',
+    '#f59e0b',
+    '#a855f7',
+    '#ef4444',
+    '#06b6d4',
+    '#84cc16',
+];
+
+var donutChart = null;
+
+function buildDonutOptions() {
+
+    return {
+
+        series: [],
+        labels: [],
+
+        chart: {
+            type:       'donut',
+            height:     320,
+            fontFamily: 'inherit',
+            animations: { enabled: true, speed: 400 },
         },
-        itemMargin: {
-            horizontal: 10,
-            vertical: 4,
+
+        colors: DONUT_COLORS,
+
+        legend: {
+            position:   'bottom',
+            fontSize:   '13px',
+            itemMargin: { horizontal: 8, vertical: 4 },
+            labels:     { colors: '#64748b' },
         },
-    },
-    plotOptions: {
-        pie: {
-            donut: {
-                size: '65%',
-                labels: {
-                    show: true,
-                    name: {
-                        show: true,
-                        fontSize: '13px',
-                        fontFamily: 'Plus Jakarta Sans, sans-serif',
-                        color: '#94a3b8',
-                    },
-                    value: {
-                        show: true,
-                        fontSize: '20px',
-                        fontFamily: 'Plus Jakarta Sans, sans-serif',
-                        fontWeight: 700,
-                        color: '#0f172a',
-                        formatter: function (val) {
-                            return '$' + Number(val).toLocaleString() + 'k'
+
+        dataLabels: { enabled: false },
+
+        stroke: {
+            width:  2,
+            colors: ['#ffffff'],
+        },
+
+        plotOptions: {
+            pie: {
+                donut: {
+                    size:   '65%',
+                    labels: {
+                        show:  true,
+                        value: {
+                            fontSize:   '18px',
+                            fontWeight: 600,
+                            color:      '#1e293b',
+                            formatter:  formatUSD,
                         },
-                    },
-                    total: {
-                        show: true,
-                        label: 'Total Income',
-                        fontSize: '12px',
-                        fontFamily: 'Plus Jakarta Sans, sans-serif',
-                        color: '#94a3b8',
-                        formatter: function (w) {
-                            var total = w.globals.seriesTotals.reduce((a, b) => a + b, 0)
-                            return '$' + total + 'k'
+                        total: {
+                            show:       true,
+                            showAlways: true,
+                            label:      'Total Revenue',
+                            fontSize:   '13px',
+                            color:      '#94a3b8',
+                            formatter:  function (w) {
+                                return formatUSD(
+                                    w.globals.seriesTotals.reduce(function (a, b) {
+                                        return a + b;
+                                    }, 0)
+                                );
+                            },
                         },
                     },
                 },
             },
         },
-    },
-    dataLabels: {
-        enabled: false,
-    },
-    stroke: {
-        width: 2,
-        colors: ['#ffffff'],
-    },
-    responsive: [
-        {
-            breakpoint: 480,
-            options: {
-                chart: { width: 260 },
-                legend: { position: 'bottom' },
-            },
+
+        tooltip: {
+            y: { formatter: formatUSD },
         },
-    ],
-    tooltip: {
-        y: {
-            formatter: function (val) {
-                return '$' + val + 'k this period'
-            },
+
+        noData: {
+            text:  'No data for this period',
+            style: { color: '#94a3b8', fontSize: '14px' },
         },
-    },
+
+    };
+
 }
 
-var donutChart = new ApexCharts(document.querySelector('#donutChart'), donutOptions)
-donutChart.render()
+function initDonutChart() {
+
+    var el = document.querySelector('#donutChart');
+
+    if (!el) {
+        console.warn('[DonutChart] #donutChart element not found.');
+        return;
+    }
+
+    donutChart = new ApexCharts(el, buildDonutOptions());
+    donutChart.render();
+
+}
+
+function updateDonutChart(data) {
+
+    if (!donutChart) return;
+
+    donutChart.updateOptions(
+        { labels: data.labels || [] },
+        false,
+        true
+    );
+
+    donutChart.updateSeries(data.series || []);
+
+}

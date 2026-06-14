@@ -3,28 +3,6 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/category.css') }}" data-turbo-track="reload">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-    <style>
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
-    </style>
 @endpush
 
 @section('title', 'Product Category')
@@ -121,20 +99,20 @@
                         </td>
                         <td style="color:#9ca3af">{{ $category->created_at->format('d M Y') }}</td>
                         <td class="actions-cell">
-                            <button class="btn-icon btn-edit open-edit-modal"
+                            <button class="btn-edit open-edit-modal"
                                     data-code="{{ $category->code }}"
                                     data-name="{{ $category->name }}"
                                     data-description="{{ $category->description ?? '' }}"
                                     data-status="{{ $category->status }}"
                                     title="Edit Category">
-                                <span class="material-symbols-outlined">edit</span>
+                                Edit
                             </button>
 
-                            <button class="btn-icon btn-delete delete-btn"
+                            <button class="btn-delete delete-btn"
                                     data-code="{{ $category->code }}"
                                     data-name="{{ $category->name }}"
                                     title="Delete Category">
-                                <span class="material-symbols-outlined">delete</span>
+                                Delete
                             </button>
                         </td>
                     </tr>
@@ -263,8 +241,8 @@
         </form>
     </div>
 </div>
-
 @endsection
+
 
 @push('scripts')
 <script>
@@ -317,13 +295,13 @@
     });
 
     /* ── Modal ── */
-    function openModal(id)  { 
-        document.getElementById(id).classList.add('open');    
-        document.body.style.overflow = 'hidden'; 
+    function openModal(id)  {
+        document.getElementById(id).classList.add('open');
+        document.body.style.overflow = 'hidden';
     }
-    function closeModal(id) { 
-        document.getElementById(id).classList.remove('open'); 
-        document.body.style.overflow = ''; 
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+        document.body.style.overflow = '';
     }
 
     document.querySelectorAll('[data-close]').forEach(btn =>

@@ -35,7 +35,7 @@
             <span class="menu-label">Dashboard</span>
         </a>
 
-        <div class="menu-group {{ request()->routeIs('admin.sales*') ? 'open' : '' }}">
+        <div class="menu-group {{ request()->routeIs('admin.sales.*', 'admin.shift') ? 'open' : '' }}">
             <div class="menu-item has-sub" data-tooltip="Sales">
                 <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -46,16 +46,17 @@
                 <i class="ti ti-chevron-right menu-arrow"></i>
             </div>
             <div class="sub-menu">
-                <a href="{{ route('admin.sale-list') }}"
-                   class="sub-item {{ request()->routeIs('admin.sales.sale-list') ? 'active' : '' }}">
-                    <i class="ti ti-point"></i> All sales
+                <a href="{{ route('admin.sales.index') }}"
+                   class="sub-item {{ request()->routeIs('admin.sales.*') ? 'active' : '' }}">
+                    <i class="ti ti-point"></i> Sale History
                 </a>
                 <a href="{{ route('admin.shift') }}"
-                   class="sub-item {{ request()->routeIs('admin.sales.shift') ? 'active' : '' }}">
-                    <i class="ti ti-point"></i> Cash register
+                   class="sub-item {{ request()->routeIs('admin.shift') ? 'active' : '' }}">
+                    <i class="ti ti-point"></i> Cash Register
                 </a>
             </div>
         </div>
+
         @endrole
 
         @role('admin')
@@ -107,19 +108,22 @@
             </div>
 
         </div>
+
         {{-- Customers --}}
-        <div class="menu-group {{ request()->routeIs('admin.customer*') ? 'open' : '' }}">
+        <div class="menu-group {{ request()->routeIs('admin.customers*') ? 'open' : '' }}">
             <div class="menu-item has-sub" data-tooltip="Customers">
                 <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
-                    <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
                 <span class="menu-label">Customer</span>
                 <i class="ti ti-chevron-right menu-arrow"></i>
             </div>
             <div class="sub-menu">
-                <a href="{{ route('admin.customer-list') }}"
-                    class="sub-item {{ request()->routeIs('admin.customer-list') ? 'active' : '' }}">
+                <a href="{{ route('admin.customers.index') }}"
+                   class="sub-item {{ request()->routeIs('admin.customers.index') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> All customers
                 </a>
             </div>
@@ -159,14 +163,14 @@
                 <i class="ti ti-chevron-right menu-arrow"></i>
             </div>
             <div class="sub-menu">
-                <a href="{{ route('admin.index') }}"
-                   class="sub-item {{ request()->routeIs('admin.reports.index') ? 'active' : '' }}">
+                <a href="{{ route('admin.reports.index') }}"
+                    class="sub-item {{ request()->routeIs('admin.reports.index') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> Daily Sale Report
                 </a>
-                <a href="{{ route('admin.revent-tracking') }}"
-                   class="sub-item {{ request()->routeIs('admin.reports.revent-tracking') ? 'active' : '' }}">
-                    <i class="ti ti-point"></i> Revenue Tracking
-                </a>
+                <a href="{{ route('admin.revenue-tracking') }}"
+                    class="sub-item {{ request()->routeIs('admin.revenue-tracking') ? 'active' : '' }}">
+                        <i class="ti ti-point"></i> Revenue Tracking
+                    </a>
                 <a href="{{ route('admin.sale-person') }}"
                    class="sub-item {{ request()->routeIs('admin.reports.sale-person') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> Top Sale
@@ -196,10 +200,10 @@
                    class="sub-item {{ request()->routeIs('admin.profile*') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> Profile
                 </a>
-                <a href="{{ route('admin.payment-method') }}"
+                {{-- <a href="{{ route('admin.payment-method') }}"
                    class="sub-item {{ request()->routeIs('admin.payment-method*') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> Payment Method
-                </a>
+                </a> --}}
                 <a href="{{ route('admin.preview-settings') }}"
                    class="sub-item {{ request()->routeIs('admin.preview-settings') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> Preview Settings

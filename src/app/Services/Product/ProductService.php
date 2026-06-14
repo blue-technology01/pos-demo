@@ -2,50 +2,101 @@
 
 namespace App\Services\Product;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
     /**
-     * Get all active products with pagination.
+     * Get products for Admin listing (keeps full Eloquent models)
      */
-    public function getAll(Request $request): LengthAwarePaginator
+    public function getForAdmin(Request $request)
+    {
+        $query = Product::query()
+            ->with(['category', 'uoms.uom'])   // Load needed relationships
+            ->orderBy('code');
+
+        // Text Search
+        if ($search = $request->get('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('code', 'like', "%{$search}%")
+                  ->orWhere('barcode', 'like', "%{$search}%");
+            });
+        }
+
+        // Date Range
+        if ($start = $request->get('start_date')) {
+            $query->whereDate('created_at', '>=', $start);
+        }
+        if ($end = $request->get('end_date')) {
+            $query->whereDate('created_at', '<=', $end);
+        }
+
+        // Category Filter
+        if ($categoryCode = $request->get('category_code')) {
+            $query->where('category_code', $categoryCode);
+        }
+
+        return $query->paginate($request->query('per_page', 15));
+    }
+
+    /**
+     * Get all active products with pagination returns arrays
+     */
+    public function getAll(Request $request)
     {
         return Product::query()
-            ->select(
-                'code',
-                'name',
-                'category_code',
-                'cost_price',
-                'price',
-                'stock',
-                'min_stock',
-                'barcode',
-                'description',
-                'image',
-                'expiry_date',
-                'status'
-            )
-            ->when($request->search, function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->search}%")
-                ->orWhere('code', 'like', "%{$request->search}%");
-            })
-            ->when($request->category_code, function ($q) use ($request) {
-                $q->where('category_code', $request->category_code);
-            })
-            ->when($request->start_date, function ($q) use ($request) {
-                $q->whereDate('created_at', '>=', $request->start_date);
-            })
-            ->when($request->end_date, function ($q) use ($request) {
-                $q->whereDate('created_at', '<=', $request->end_date);
-            })
+            ->with(['uoms.uom'])
             ->where('status', 'active')
             ->paginate($request->query('per_page', 15))
-            ->withQueryString();
+            ->through(function ($product) {
+
+                // get retail UOM for POS grid
+                $retailUom = $product->uoms->firstWhere('uom_role', 'retail')
+                    ?? $product->uoms->firstWhere('is_default', true)
+                    ?? $product->uoms->first();
+
+                return [
+                    'code' => $product->code,
+                    'name' => $product->name,
+                    'price' => (float) $product->price,
+                    'cost_price' => (float) $product->cost_price,
+                    'stock' => (float) $product->stock,
+                    'barcode' => $product->barcode,
+                    'category_code' => $product->category_code,
+                    'image' => $product->image,
+
+                    // FAST POS DISPLAY (ONLY ONE UOM)
+                    'uom' => [
+                        'uom_code'          => $retailUom->uom_code ?? null,
+                        'uom_name'          => $retailUom->uom->name ?? null,
+                        'quantity_per_unit' => (float) ($retailUom->quantity_per_unit ?? 1),
+                        'selling_price'     => (float) ($retailUom->selling_price ?? 0),
+                        'cost_price'        => (float) ($retailUom->cost_price ?? 0),
+                        'barcode'           => $retailUom->barcode ?? null,
+                        'is_default'        => (bool) ($retailUom->is_default ?? false),
+                        'uom_role'          => $retailUom->uom_role ?? 'retail',
+                    ],
+
+                    // FULL MATRIX (only for product detail page)
+                    'uom_matrix' => $product->uoms->map(function ($uom) {
+                        return [
+                            'uom_code'          => $uom->uom_code,
+                            'uom_name'          => $uom->uom->name ?? $uom->uom_code,
+                            'quantity_per_unit' => (float) $uom->quantity_per_unit,
+                            'cost_price'        => (float) $uom->cost_price,
+                            'selling_price'     => (float) $uom->selling_price,
+                            'is_default'        => (bool) $uom->is_default,
+                            'uom_role'          => $uom->uom_role ?? 'retail',
+                            'barcode'           => $uom->barcode,
+                        ];
+                    })->values()->toArray(),
+                ];
+            });
     }
 
     /**
@@ -53,7 +104,7 @@ class ProductService
      */
     public function findOrFail(string $code): Product
     {
-        return Product::findOrFail($code);
+        return Product::with(['uoms.uom'])->findOrFail($code);
     }
 
     /**
@@ -105,9 +156,11 @@ class ProductService
         return $product->fresh();
     }
 
-    public function getCategories(){
-
+    public function getCategories()
+    {
+        return Category::where('status', 'active')->orderBy('name')->get();
     }
+
     /**
      * Deactivate product (soft delete via status).
      */

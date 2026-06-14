@@ -177,6 +177,31 @@ body {
     line-height: 1;
 }
 
+.dashboard-loading .stat-value {
+    position: relative;
+    width: min(150px, 100%);
+    height: 26px;
+    color: transparent;
+    overflow: hidden;
+    border-radius: 7px;
+    background: #eef2f7;
+}
+
+.dashboard-loading .stat-value::after,
+.dashboard-loading .chart-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.75),
+        transparent
+    );
+    animation: dashboard-skeleton 1.15s infinite;
+}
+
 /* Stat Badge */
 .stat-badge {
     display: inline-flex;
@@ -215,6 +240,11 @@ body {
     border: 1px solid var(--border);
 }
 
+.chart-card {
+    position: relative;
+    overflow: hidden;
+}
+
 /* Card Header */
 .dash-card-header {
     display: flex;
@@ -251,6 +281,55 @@ body {
 .chart-card #chart,
 .chart-card #donutChart {
     width: 100%;
+    min-height: 320px;
+}
+
+.dashboard-loading .chart-card #chart,
+.dashboard-loading .chart-card #donutChart {
+    opacity: 0;
+}
+
+.dashboard-loading .chart-card::before {
+    content: "";
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    bottom: 22px;
+    height: 320px;
+    border-radius: 10px;
+    background:
+        linear-gradient(#eef2f7, #eef2f7) 0 86% / 12% 14% no-repeat,
+        linear-gradient(#eef2f7, #eef2f7) 16% 68% / 12% 32% no-repeat,
+        linear-gradient(#eef2f7, #eef2f7) 32% 52% / 12% 48% no-repeat,
+        linear-gradient(#eef2f7, #eef2f7) 48% 74% / 12% 26% no-repeat,
+        linear-gradient(#eef2f7, #eef2f7) 64% 42% / 12% 58% no-repeat,
+        linear-gradient(#eef2f7, #eef2f7) 80% 60% / 12% 40% no-repeat,
+        linear-gradient(#f8fafc, #f8fafc);
+}
+
+.dashboard-loading .chart-card:nth-child(2)::before {
+    background:
+        radial-gradient(circle at center, var(--surface) 0 34%, transparent 35%),
+        conic-gradient(
+            from 90deg,
+            #eef2f7 0 24%,
+            #f3f6fa 24% 46%,
+            #eef2f7 46% 72%,
+            #f3f6fa 72% 100%
+        );
+    left: 50%;
+    right: auto;
+    bottom: 58px;
+    width: 230px;
+    height: 230px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+}
+
+@keyframes dashboard-skeleton {
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 @media (max-width: 1200px) {

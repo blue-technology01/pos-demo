@@ -66,6 +66,11 @@
                     'nullable',
                     'boolean',
                 ],
+                'uom_role' => [
+                    'required',
+                    'string',
+                    Rule::in(['retail', 'bulk', 'alternative']),
+                ],
             ];
         }
 

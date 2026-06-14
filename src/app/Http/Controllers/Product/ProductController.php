@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Product;
 
-use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\Product\ProductService;
@@ -15,16 +14,16 @@ class ProductController extends Controller
         private readonly ProductService $productService
     ) {}
 
+    /**
+     * Display a listing of the products.
+     */
     public function index(Request $request)
     {
-        $products   = $this->productService->getAll($request);
-        $categories = Category::all();
+        $products = $this->productService->getForAdmin($request);
+        $categories = $this->productService->getCategories();
 
         if ($request->ajax()) {
-            return response()->json([
-                'table'      => view('admin.products._table', compact('products'))->render(),
-                'pagination' => view('pagination::bootstrap-5', ['paginator' => $products])->render(),
-            ]);
+            return response()->json($products);
         }
 
         return view('admin.products.index', compact('products', 'categories'));
@@ -33,7 +32,7 @@ class ProductController extends Controller
     public function create()
     {
         return view('admin.products.create', [
-            'categories' => Category::all(),
+            'categories' => $this->productService->getCategories(),
         ]);
     }
 
@@ -41,9 +40,9 @@ class ProductController extends Controller
     {
         $this->productService->create($request->validated());
 
-       return redirect()
-        ->route('admin.products.index')
-        ->with('success', 'Product created successfully.');
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', 'Product created successfully.');
     }
 
     public function edit(string $code)
@@ -52,7 +51,7 @@ class ProductController extends Controller
 
         return view('admin.products.edit', [
             'product' => $product,
-            'categories' => Category::all(),
+            'categories' => $this->productService->getCategories(),
         ]);
     }
 

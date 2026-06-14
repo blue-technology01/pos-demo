@@ -1,139 +1,477 @@
+/* ============================================================
+   Customer List — customer.css
+   ============================================================ */
+
+/* ---------- Page Container ---------- */
 .customer-list-container {
-    padding: 20px;
-    background: #f8f9fb;
-    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
+/* ---------- Page Title ---------- */
 .customer-list-container h1 {
-    font-size: 22px;
-    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: 600;
     color: #111827;
+    margin: 0;
 }
 
-/* Actions bar */
+/* ---------- Alert ---------- */
+.alert {
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.alert-success {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.alert-danger {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.alert-warning {
+    background: #fef9c3;
+    color: #a16207;
+    border: 1px solid #fef08a;
+}
+
+/* ---------- Toolbar (Search + Add) ---------- */
 .customer-list-actions {
     display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
-.customer-list-actions input {
+/* ---------- Search Form ---------- */
+.customer-search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     flex: 1;
-    padding: 10px 12px;
+    flex-wrap: wrap;
+}
+
+.customer-search-input {
+    height: 36px;
+    padding: 0 12px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
+    font-size: 13px;
+    color: #111827;
+    background: #fff;
     outline: none;
-    transition: 0.2s;
+    min-width: 220px;
+    flex: 1;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.customer-list-actions input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+.customer-search-input::placeholder {
+    color: #9ca3af;
 }
 
-.customer-list-actions .btn {
-    padding: 10px 14px;
-    border-radius: 8px;
+.customer-search-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ---------- Shared Button Base ---------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 500;
     border: none;
     cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
 }
 
-/* Card */
-.customer-list-card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    overflow: hidden;
-}
-
-/* Table */
-.customer-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-}
-
-/* Header */
-.customer-table thead {
+/* Search button */
+.btn-secondary {
     background: #f3f4f6;
-}
-
-.customer-table thead th {
-    text-align: left;
-    padding: 12px;
-    font-weight: 600;
     color: #374151;
-    border-bottom: 1px solid #e5e7eb;
+    border: 1px solid #e5e7eb;
 }
 
-/* Rows */
-.customer-table tbody td {
-    padding: 12px;
-    border-bottom: 1px solid #f1f5f9;
+.btn-secondary:hover {
+    background: #e5e7eb;
     color: #111827;
 }
 
-/* Hover effect */
-.customer-table tbody tr:hover {
+/* Clear / light button */
+.btn-light {
+    background: #fff;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+}
+
+.btn-light:hover {
     background: #f9fafb;
-    transition: 0.2s;
+    color: #374151;
 }
 
-/* Buttons */
-.btn {
-    padding: 6px 10px;
-    border-radius: 50px;
-    font-size: 13px;
-    cursor: pointer;
-    border: none;
-}
-
+/* Add Customer button */
 .btn-primary {
-    background: #3b82f6;
-    color: white;
+    background: darkcyan;
+    color: #fff;
 }
 
 .btn-primary:hover {
-    background: #2563eb;
+    background: #1d4ed8;
 }
 
-.btn-danger {
-    background: #ef4444;
-    color: white;
-}
-
-.btn-danger:hover {
-    background: #b91c1c;
-}
-
+/* Save button */
 .btn-success {
-    background: #10b981;
-    color: white;
+    background: #16a34a;
+    color: #fff;
 }
 
 .btn-success:hover {
-    background: #059669;
+    background: #15803d;
 }
 
-/* Status */
-.status-active {
-    color: #16a34a;
+.btn-search {
+    /* inherits .btn + .btn-secondary */
+}
+
+.btn-clear {
+    /* inherits .btn + .btn-light */
+}
+
+.btn-add-customer {
+    margin-left: auto;
+}
+
+/* ---------- Table Card ---------- */
+.customer-list-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+/* ---------- Table ---------- */
+.customer-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.customer-table thead {
+    background: #f9fafb;
+}
+
+.customer-table th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
     font-weight: 600;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
 }
 
-.status-inactive {
+.customer-table td {
+    padding: 11px 14px;
+    color: #111827;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.customer-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.customer-table tbody tr:hover td {
+    background: #f9fafb;
+}
+
+/* ---------- Name Cell ---------- */
+.customer-name-td {
+    font-weight: 500;
+    color: #111827;
+}
+
+/* ---------- Actions Cell ---------- */
+.customer-actions-td {
+    white-space: nowrap;
+    width: 1%;
+}
+
+/* ---------- Status Badge ---------- */
+.status-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.status-badge.active {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-badge.inactive {
+    background: #fee2e2;
     color: #dc2626;
-    font-weight: 600;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .customer-table {
-        font-size: 12px;
-    }
+/* ---------- Empty Row ---------- */
+.table-empty-td {
+    text-align: center;
+    padding: 32px 14px;
+    color: #9ca3af;
+    font-size: 13px;
+}
 
+/* ---------- Action Icon Buttons ---------- */
+.btn-action-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.1s;
+    line-height: 1.5;
+}
+
+.btn-action-edit{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #10b981;
+    color: white;
+    border:none;
+    border-radius: 50px;
+    padding: 5px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    line-height: 1.5;
+}
+    /* background: #10b981; */
+.btn-action-edit svg,
+.btn-action-delete svg {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    fill: none;
+}
+
+.btn-action-edit:active,
+.btn-action-delete:active {
+    transform: scale(0.96);
+}
+
+/* ---------- Pagination ---------- */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+}
+
+.pagination-container nav {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.pagination-container .page-link,
+.pagination-container span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    min-width: 32px;
+    padding: 0 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #374151;
+    background: #fff;
+    text-decoration: none;
+    transition: background 0.15s;
+    cursor: pointer;
+}
+
+.pagination-container .page-link:hover {
+    background: #f3f4f6;
+}
+
+.pagination-container [aria-current="page"] span {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
+/* ============================================================
+   Customer Modal
+   ============================================================ */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.modal[style*="flex"] {
+    display: flex;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+}
+
+/* ---------- Modal Title ---------- */
+.modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 4px;
+}
+
+/* ---------- Form Groups ---------- */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.required-star {
+    color: #dc2626;
+    margin-left: 2px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group select {
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #111827;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="email"]:focus,
+.form-group select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-group input::placeholder {
+    color: #9ca3af;
+}
+
+/* ---------- Modal Footer ---------- */
+.modal-footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 4px;
+}
+
+.btn-modal-close {
+    /* inherits .btn + .btn-secondary */
+}
+
+.btn-modal-save {
+    /* inherits .btn + .btn-success */
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (max-width: 768px) {
     .customer-list-actions {
         flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-add-customer {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 640px) {
+    .customer-search-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .customer-search-input,
+    .btn-search,
+    .btn-clear {
+        width: 100%;
+    }
+
+    .modal-content {
+        padding: 20px 16px;
+    }
+
+    .modal-footer-actions {
+        flex-direction: column-reverse;
+    }
+
+    .modal-footer-actions .btn {
+        width: 100%;
+        justify-content: center;
     }
 }

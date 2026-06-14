@@ -1,0 +1,661 @@
+/* ============================================================
+   Sales History — history.css
+   ============================================================ */
+
+/* ---------- Page Section ---------- */
+.unit-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ---------- Header ---------- */
+.unit-section__header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.page-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* ---------- Search & Filter Form ---------- */
+.search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    min-width: 200px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.search-box:focus-within {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.search-box .material-symbols-outlined {
+    font-size: 18px;
+    color: #9ca3af;
+}
+
+.filter-input {
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #111827;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.filter-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.search-box .filter-input {
+    border: none;
+    height: 100%;
+    padding: 0;
+    outline: none;
+    font-size: 13px;
+    color: #111827;
+    background: transparent;
+    min-width: 160px;
+}
+
+.search-box .filter-input::placeholder {
+    color: #9ca3af;
+}
+
+input[type="date"].filter-input {
+    cursor: pointer;
+    color-scheme: light;
+}
+
+/* ---------- Filter Button ---------- */
+.btn-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.btn-filter:hover {
+    background: #1d4ed8;
+}
+
+.btn-filter .material-symbols-outlined {
+    font-size: 16px;
+}
+
+/* ---------- Reset Button ---------- */
+.btn-reset {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid #e5e7eb;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.btn-reset:hover {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+/* ---------- Export Actions ---------- */
+.export-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.btn-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.btn-export .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.btn-excel {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.btn-excel:hover {
+    background: #bbf7d0;
+}
+
+.btn-pdf {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-pdf:hover {
+    background: #fecaca;
+}
+
+/* ---------- Alert ---------- */
+.alert {
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+}
+
+/* ---------- Table Card ---------- */
+.unit-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
+
+/* ---------- Table ---------- */
+.table-custom {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 680px;
+}
+
+.table-custom thead {
+    background: #f9fafb;
+}
+
+.table-custom th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.table-custom td {
+    padding: 11px 14px;
+    color: #111827;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.table-custom tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table-custom tbody tr:hover td {
+    background: #f9fafb;
+}
+
+/* ---------- Payment Method ---------- */
+.payment-method {
+    font-size: 11px;
+    font-weight: 600;
+    color: #374151;
+    background: #f3f4f6;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+/* ---------- Amount ---------- */
+.amount {
+    color: #111827;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Status Badge ---------- */
+.status-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.status-badge--completed {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-badge--pending {
+    background: #fef9c3;
+    color: #a16207;
+}
+
+.status-badge--voided,
+.status-badge--cancelled {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* ---------- Action Buttons ---------- */
+.action-flex {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* View button — blue pill */
+.btn-view {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.btn-view::before {
+    content: 'View';
+}
+
+.btn-view .material-symbols-outlined {
+    display: none;
+}
+
+.btn-view:hover {
+    background: #1d4ed8;
+}
+
+.btn-view:active {
+    transform: scale(0.97);
+}
+
+/* Cancel/Void button — red pill */
+.btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.btn-cancel::before {
+    content: 'Void';
+}
+
+.btn-cancel .material-symbols-outlined {
+    display: none;
+}
+
+.btn-cancel:hover {
+    background: #b91c1c;
+}
+
+.btn-cancel:active {
+    transform: scale(0.97);
+}
+
+/* ---------- Pagination ---------- */
+.unit-card > div:last-child nav {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.unit-card > div:last-child .page-link,
+.unit-card > div:last-child span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    min-width: 32px;
+    padding: 0 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #374151;
+    background: #fff;
+    text-decoration: none;
+    transition: background 0.15s;
+    cursor: pointer;
+}
+
+.unit-card > div:last-child .page-link:hover {
+    background: #f3f4f6;
+}
+
+.unit-card > div:last-child [aria-current="page"] span {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
+/* ============================================================
+   Invoice Modal
+   ============================================================ */
+
+.inv-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.inv-overlay.active {
+    display: flex;
+}
+
+.inv-modal {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ---------- Close Button ---------- */
+.inv-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #6b7280;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.inv-close-btn:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+/* ---------- Invoice Header ---------- */
+.inv-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.company-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: 0.5px;
+}
+
+.company-sub {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 3px;
+}
+
+.inv-title-block {
+    text-align: right;
+}
+
+.inv-word {
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b7280;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.inv-no {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2563eb;
+    margin-top: 3px;
+}
+
+/* ---------- Invoice Meta ---------- */
+.inv-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 12px 16px;
+    border: 1px solid #f3f4f6;
+}
+
+.inv-meta-cell .lbl {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 3px;
+}
+
+.inv-meta-cell .val {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* ---------- Invoice Items Table ---------- */
+.inv-body {
+    overflow-x: auto;
+}
+
+.inv-items {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.inv-items thead {
+    background: #f9fafb;
+}
+
+.inv-items th {
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.inv-items td {
+    padding: 10px 12px;
+    color: #111827;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.inv-items tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.pcode {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+/* ---------- Invoice Footer ---------- */
+.inv-foot {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f3f4f6;
+    flex-wrap: wrap;
+}
+
+.inv-note {
+    font-size: 12px;
+    color: #9ca3af;
+    font-style: italic;
+}
+
+.inv-totals {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 200px;
+}
+
+.t-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #6b7280;
+    gap: 32px;
+}
+
+.t-row.grand {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 8px;
+    margin-top: 2px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    .unit-section__header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .export-actions {
+        margin-left: 0;
+    }
+
+    .inv-meta {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .search-wrap {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box,
+    .filter-input,
+    .btn-filter,
+    .btn-reset {
+        width: 100%;
+    }
+
+    .export-actions {
+        width: 100%;
+    }
+
+    .btn-export {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .inv-modal {
+        padding: 20px 16px;
+    }
+
+    .inv-foot {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

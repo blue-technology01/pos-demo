@@ -15,18 +15,23 @@
     {{-- ========================================================= --}}
     <div class="header-actions">
         <form action="{{ route('admin.shift') }}" method="GET" class="search-wrap">
-            <span class="material-symbols-outlined">search</span>
-            <input type="text" name="search" id="searchInput" value="{{ request('search') }}"
-                placeholder="Search by cashier or invoice...">
 
-            <span class="search-label">Start date</span>
-            <input type="date" name="start_date" value="{{ request('start_date') }}" class="filter-date" id="startDate">
+            <div class="search-box">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" name="search" id="searchInput"
+                    value="{{ request('search') }}"
+                    placeholder="Search by cashier or invoice...">
+            </div>
 
-            <span class="search-label">End date</span>
-            <input type="date" name="end_date" value="{{ request('end_date') }}" class="filter-date" id="endDate">
+            <input type="date" name="start_date" value="{{ request('start_date') }}"
+                class="filter-date" id="startDate">
 
-            <button type="submit" class="btn-filter" id="filter-btn">Filter</button>
-            <a href="{{ route('admin.shift') }}" class="btn-reset" id="reset-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Reset</a>
+            <input type="date" name="end_date" value="{{ request('end_date') }}"
+                class="filter-date" id="endDate">
+
+            <button type="submit" class="btn-filter">Filter</button>
+            <a href="{{ route('admin.shift') }}" class="btn-reset">Reset</a>
+
         </form>
     </div>
 
@@ -141,7 +146,6 @@
                                 </span>
                             </td>
                             <td>
-                                {{-- រុញទិន្នន័យ Dynamic ចូលទៅក្នុង dataset ដើម្បីឱ្យ JavaScript ចាប់យកទៅបង្ហាញលើ Popup --}}
                                 <button class="btn-view"
                                     data-id="{{ $reg->id }}"
                                     data-cashier="{{ $reg->user->name ?? 'N/A' }}"
@@ -267,6 +271,7 @@
 
 @push('scripts')
     <script>
+
         function closeModal(id) {
             document.getElementById(id).style.display = 'none';
         }

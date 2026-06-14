@@ -2,28 +2,28 @@
 
 namespace App\Http\Controllers\Product;
 
-use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\ProductUomStoreRequest;
 use App\Http\Requests\Product\ProductUomUpdateRequest;
 use App\Models\Product;
+use App\Models\ProductUom;
 use App\Models\Uom;
 use App\Services\Product\ProductUomService;
 
 class ProductUomController extends Controller
 {
-    // service injection
     public function __construct(
         private readonly ProductUomService $productUomService
     ) {}
 
-    // index
     public function index(Request $request)
     {
         $productUoms = $this->productUomService->getAll($request);
-        $products = Product::all();
-        $uoms = Uom::all();
+
+        // Fixed queries
+        $products = Product::select('code', 'name')->orderBy('name')->get();
+        $uoms = Uom::select('code', 'name')->orderBy('name')->get();   // Changed 'id' to 'code'
 
         if ($request->ajax()) {
             return response()->json([
@@ -39,16 +39,16 @@ class ProductUomController extends Controller
         ));
     }
 
-    // show form create
-    public function create() {
+    public function create()
+    {
         return view('admin.products.product-uom.create', [
-            'products' => Product::all(),
-            'uoms' => Uom::all(),
+            'products' => Product::select('code', 'name')->orderBy('name')->get(),
+            'uoms'     => Uom::select('code', 'name')->orderBy('name')->get(),   // Fixed
         ]);
     }
 
-    // for store data
-    public function store(ProductUomStoreRequest $request) {
+    public function store(ProductUomStoreRequest $request)
+    {
         $this->productUomService->create($request->validated());
 
         return redirect()
@@ -56,30 +56,50 @@ class ProductUomController extends Controller
             ->with('success', 'Product UOM created successfully.');
     }
 
-    // function for edit
-    public function edit(string $id) {
+    public function edit(string $id)
+    {
         $productUom = $this->productUomService->findOrFail($id);
 
         return view('admin.products.product-uom.edit', [
             'productUom' => $productUom,
-            'products' => Product::all(),
-            'uoms' => Uom::all(),
+            'products'   => Product::select('code', 'name')->orderBy('name')->get(),
+            'uoms'       => Uom::select('code', 'name')->orderBy('name')->get(),
         ]);
     }
 
-    public function update(ProductUomUpdateRequest $request, string $id) {
+    public function update(ProductUomUpdateRequest $request, string $id)
+    {
         $this->productUomService->update($id, $request->validated());
 
         return redirect()
             ->route('admin.product-uom.index')
-            ->with('success', 'Update product uom success.');
+            ->with('success', 'Product UOM updated successfully.');
     }
 
-    public function destroy(string $id) {
+    public function destroy(string $id)
+    {
         $this->productUomService->delete($id);
 
         return redirect()
             ->route('admin.product-uom.index')
-            ->with('success', 'Product deleted successfully.');
+            ->with('success', 'Product UOM deleted successfully.');
+    }
+
+    public function getByProduct(string $productCode)
+    {
+        // Call the Service method instead of writing the mapping logic here
+        $uoms = $this->productUomService->getByProduct($productCode);
+
+        return response()->json($uoms);
+    }
+
+    public function posProducts(Request $request)
+    {
+        $products = $this->productUomService->getPOSProducts($request);
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $products,
+        ]);
     }
 }

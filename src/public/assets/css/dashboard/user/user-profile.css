@@ -1,134 +1,189 @@
+/* ============================================================
+   User Profile — user-profile.css
+   ============================================================ */
+
+/* ---------- Page wrapper ---------- */
 .profile-wrapper {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    min-height: calc(100vh - 100px);
-    background: #f8fafc;
+    padding: 40px 16px;
 }
 
+/* ---------- Card ---------- */
 .profile-card {
     width: 100%;
-    max-width: 460px;
-    background: #ffffff;
+    max-width: 400px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.12);
-    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
 }
 
-/* Header Gradient */
+/* ---------- Banner ---------- */
 .profile-header {
-    height: 160px;
-    background: cornflowerblue;
+    height: 110px;
+    background: darkcyan;
     position: relative;
+    overflow: hidden;
 }
 
-/* Avatar */
-.profile-avatar {
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    border: 6px solid #ffffff;
-    object-fit: cover;
+.profile-header::after {
+    content: '';
     position: absolute;
-    top: 95px;
-    left: 50%;
-    transform: translateX(-50%);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    background: #e2e8f0;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
+    background-size: 16px 16px;
 }
 
-/* Body */
+/* ---------- Body (centered column) ---------- */
 .profile-body {
-    padding: 75px 30px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 28px 28px;
+    margin-top: -44px; /* pull body up so avatar overlaps banner */
+}
+
+/* ---------- Avatar ---------- */
+.profile-avatar {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    background: #dbeafe;
+    flex-shrink: 0;
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- Role badge ---------- */
+.profile-role-badge {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+    text-transform: capitalize;
+    /* default */
+    background: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+}
+
+.profile-role-badge--admin {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+
+.profile-role-badge--cashier {
+    background: #dcfce7;
+    color: #15803d;
+    border-color: #bbf7d0;
+}
+
+.profile-role-badge--none {
+    background: #f3f4f6;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+}
+
+/* ---------- Name & email ---------- */
+.profile-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 10px 0 2px;
     text-align: center;
 }
 
-.profile-name {
-    font-size: 26px;
-    font-weight: 700;
-    color: #1e2937;
-    margin-bottom: 6px;
-    line-height: 1.2;
-}
-
-.profile-role {
-    font-size: 15px;
-    font-weight: 600;
-    color: #6366f1;
-    text-transform: capitalize;
-    letter-spacing: 0.6px;
-    margin-bottom: 32px;
-}
-
-/* Info Grid */
-.profile-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 10px;
-}
-
-.info-box {
-    background: #f8fafc;
-    padding: 16px 18px;
-    border-radius: 14px;
-    text-align: left;
-    border: 1px solid #f1f5f9;
-    transition: all 0.3s ease;
-}
-
-.info-box:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
-}
-
-.info-label {
+.profile-email-hint {
     font-size: 13px;
-    font-weight: 500;
-    color: #64748b;
-    margin-bottom: 4px;
-}
-
-.info-value {
-    font-size: 15.5px;
-    font-weight: 600;
-    color: #1e2937;
+    color: #9ca3af;
+    margin: 0 0 20px;
+    text-align: center;
     word-break: break-all;
 }
 
-/* Responsive */
+/* ---------- Divider ---------- */
+.profile-divider {
+    width: 100%;
+    border: none;
+    border-top: 1px solid #f3f4f6;
+    margin: 0 0 18px;
+}
+
+/* ---------- Info list ---------- */
+.profile-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.info-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.info-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.info-value {
+    font-size: 13px;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---------- Responsive ---------- */
 @media (max-width: 480px) {
     .profile-wrapper {
-        padding: 20px 15px;
-        min-height: calc(100vh - 80px);
+        padding: 20px 12px;
     }
 
     .profile-card {
-        max-width: 100%;
+        border-radius: 16px;
     }
 
     .profile-body {
-        padding: 75px 20px 35px;
+        padding: 0 18px 22px;
     }
 
-    .profile-info {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Optional: Add subtle animation */
-.profile-card {
-    animation: fadeInUp 0.6s ease forwards;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    .profile-name {
+        font-size: 16px;
     }
 }

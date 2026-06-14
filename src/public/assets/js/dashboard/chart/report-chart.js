@@ -1,93 +1,92 @@
 let reportChartInstance = null;
 
 function initializeReportChart(data = null) {
-    // Destroy existing instance to prevent memory leaks (Turbo/Hotwire)
     if (reportChartInstance) {
         reportChartInstance.destroy();
         reportChartInstance = null;
     }
 
-    const chartElement = document.querySelector("#reportChart");
-
+    const chartElement = document.querySelector('#reportChart');
     if (!chartElement) {
-        console.warn("Report chart element (#reportChart) not found");
-        return null;
+        console.warn('Report chart element (#reportChart) not found');
+        return;
     }
+    chartElement.innerHTML = '';
 
-    // Default data (for demo/fallback)
-    const defaultData = {
-        series: [{
-            name: "Revenue",
-            data: [1200, 1900, 3000, 2500, 4200, 3800, 5000]
-        }],
-        categories: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    const chartData = data || {
+        categories: [],
+        series: [{ name: 'Revenue', data: [] }]
     };
 
-    const chartData = data || defaultData;
-
     const options = {
-        series: chartData.series,
-
+        series: Array.isArray(chartData.series) ? chartData.series : [chartData.series],
         chart: {
             type: 'area',
-            height: 380,           // Slightly taller for better visuals
+            height: 380,
             toolbar: { show: false },
             zoom: { enabled: false }
         },
-
         xaxis: {
             categories: chartData.categories,
             axisBorder: { show: false },
             axisTicks: { show: false }
         },
-
+        yaxis: {
+            labels: {
+                formatter: function (value) {
+                    return '$' + Number(value).toLocaleString();
+                }
+            }
+        },
         stroke: {
             curve: 'smooth',
             width: 3
         },
-
         fill: {
             type: 'gradient',
             gradient: {
                 shadeIntensity: 1,
-                opacityFrom: 0.65,
-                opacityTo: 0.25,
+                opacityFrom: 0.55,
+                opacityTo: 0.10,
                 stops: [0, 90]
             }
         },
-
+        markers: {
+            size: 4,
+            hover: { size: 6 }
+        },
         dataLabels: { enabled: false },
         colors: ['#3b82f6'],
-
         tooltip: {
             theme: 'light',
             y: {
-                formatter: function (val) {
-                    return "$ " + val.toLocaleString();
+                formatter: function (value) {
+                    return '$' + Number(value).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
                 }
             }
         },
-
         grid: {
             borderColor: '#e2e8f0',
-            strokeDashArray: 4,
-        }
+            strokeDashArray: 4
+        },
+        noData: {
+            text: 'No revenue data found'
+        },
     };
 
-        reportChartInstance = new ApexCharts(chartElement, options);
-        reportChartInstance.render();
-
-    return reportChartInstance;
+    reportChartInstance = new ApexCharts(chartElement, options);
+    reportChartInstance.render();
 }
 
-// Make it globally available
 window.initializeReportChart = initializeReportChart;
 
-// Auto-initialize if script loads after DOM
-if (document.readyState === 'complete') {
-    setTimeout(() => {
-        if (typeof initializeReportChart === 'function') {
-            initializeReportChart();
-        }
-    }, 100);
-}
+document.addEventListener('turbo:load', () => {
+    initializeReportChart(window.reportChartData);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    initializeReportChart(window.reportChartData);
+});

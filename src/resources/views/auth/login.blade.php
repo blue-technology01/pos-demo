@@ -14,6 +14,8 @@
             width: 100%;
         }
     </style>
+@endpush
+
 @section('content')
   <div class="panel-form">
     <div class="form-center">
@@ -21,10 +23,8 @@
         <h1>Welcome Back</h1>
         <p>Sign in to POS System</p>
       </div>
-
       <form method="POST" action="{{ route('auth.login.post') }}">
         @csrf
-
         <!-- Email -->
         <div class="field-group">
           <label class="field-label" for="email">Email</label>

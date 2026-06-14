@@ -3,6 +3,7 @@
 namespace App\Services\Cash;
 
 use App\Models\CashRegister;
+use App\Models\Sale;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -50,7 +51,7 @@ class CashRegisterService
             throw new \Exception('Have older user open shift ready!');
         }
 
-        // ប្រើប្រាស់ CashRegister::create ត្រឹមត្រូវតាមស្ដង់ដារ Laravel
+        // CashRegister::create
         return CashRegister::create([
             'user_id'            => Auth::id(),  // cashier user id that login
             'opening_balance'    => $data['opening_balance'] ?? 0.00,

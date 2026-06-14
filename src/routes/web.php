@@ -6,10 +6,18 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Cash\CashController;
+use App\Http\Controllers\Customer\CustomerController;
+use App\Http\Controllers\Dashboard\DashboardController;
+// use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Product\CategoryController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Product\ProductUomController;
 use App\Http\Controllers\Product\UomController;
+use App\Http\Controllers\Report\ReportIndexController;
+use App\Http\Controllers\Report\RevenueTrackingController;
+use App\Http\Controllers\Sale\PosController;
+use App\Http\Controllers\Sale\SaleController;
+use App\Http\Controllers\Sale\SaleItemController;
 
 Route::get('/', function () {
     return redirect()->route('auth.login');
@@ -43,18 +51,20 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])
         ->name('auth.reset-password.post');
 
-
 });
 
 Route::middleware('auth')->group(function () {
 
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('auth.logout');
-
     Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard.index');
-        })->name('dashboard');
+
+        Route::get('/customers/search', [CustomerController::class, 'searchAjax'])->name('customers.search.ajax');
+        // Route::get('/admin/sales/{id}/pdf', [InvoiceController::class, 'exportSingleInvoicePdf'])->name('admin.sales.single-pdf');
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/data', [DashboardController::class, 'data'])->name('dashboard.data');
+
         Route::get('/users', [RegisterController::class, 'showFormRegister'])->name('users');
         Route::post('/users/register', [RegisterController::class, 'register'])->name('users.register');
         Route::put('/users/{user}', [RegisterController::class, 'update'])->name('users.update');
@@ -86,15 +96,28 @@ Route::middleware('auth')->group(function () {
         Route::delete('/product-uom/{id}', [ProductUomController::class, 'destroy'])->name('product-uom.destroy');
         // cashe register
         Route::get('/shift', [CashController::class, 'index'])->name('shift');
+        // customer
+        Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
+        Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
+        Route::put('/customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
+        Route::delete('/customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
+        // sale history
+        Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
+        Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
+        Route::get('/sales/{id}', [SaleController::class, 'show'])->name('sales.show');
+        Route::get('/sales/{id}/edit', [SaleController::class, 'edit'])->name('sales.edit');
+        Route::put('/sales/{id}', [SaleController::class, 'update'])->name('sales.update');
+        Route::patch('/sales/{id}/cancel', [SaleController::class, 'cancel'])->name('sales.cancel');
+        // sale item
 
         // setting funciton  route test
         Route::get('/profile', function () {
             return view('admin.users.user-profile');
         })->name('profile');
 
-        Route::get('/payment-method', function () {
-            return view('admin.users.payment-method');
-        })->name('payment-method');
+        // Route::get('/payment-method', function () {
+        //     return view('admin.users.payment-method');
+        // })->name('payment-method');
         Route::get('/preview-settings', function () {
             return view('admin.users.preview-settings');
         })->name('preview-settings');
@@ -108,20 +131,10 @@ Route::middleware('auth')->group(function () {
             return view('admin.stocks.stock-validation');
         })->name('stock-validation');
 
-        // show sale
-        Route::get('/sale-list',function(){
-            return view('admin.sales.sale-list');
-        })->name('sale-list');
-
         // report
-        Route::get('/index',function(){
-            return view('admin.reports.index');
-        })->name('index');
-
-        Route::get('/revent-tracking',function(){
-            return view('admin.reports.revent-tracking');
-        })->name('revent-tracking');
-
+        Route::get('/reports', [ReportIndexController::class, 'index'])->name('reports.index');
+        // Route::get('/revenue-tracking', [RevenueTrackingController::class, 'index'])->name('revenue-tracking');
+        Route::get('/revenue-tracking', [RevenueTrackingController::class, 'index'])->name('revenue-tracking');
         Route::get('/sale-person',function(){
             return view('admin.reports.sale-person');
         })->name('sale-person');
@@ -130,19 +143,27 @@ Route::middleware('auth')->group(function () {
             return view('admin.reports.top-product');
         })->name('top-product');
 
-        Route::get('/customer-list',function(){
-            return view('admin.customers.customer-list');
-        })->name('customer-list');
-
     });
 
     // pos for cashiar
     Route::prefix('cashier')->name('cashier.')->group(function () {
-    // Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'role:cashier'])->group(function () {
         Route::get('/pos', function () {
             return view('cashier.pos.index');
         })->name('pos');
         Route::post('/open', [CashController::class, 'open'])->name('open');
         Route::post('/close', [CashController::class, 'close'])->name('close');
+        Route::get('/current-shift-details', [CashController::class, 'getCurrentShiftDetails'])->name('shift-details');
+
+        Route::get('/pos', [PosController::class, 'index'])->name('pos');
+        Route::get('/pos/products', [ProductUomController::class, 'posProducts'])->name('pos.products');
+        Route::get('/pos/products/{productCode}/uoms', [ProductUomController::class, 'getByProduct'])->name('pos.products.uoms');
+        Route::prefix('sale-items')->name('sale-items.')->group(function () {
+
+            Route::post('/',            [SaleItemController::class, 'store'])->name('store');
+            Route::put('/{rowId}',      [SaleItemController::class, 'update'])->name('update');
+            Route::delete('/{rowId}',   [SaleItemController::class, 'destroy'])->name('destroy');
+            Route::delete('/',          [SaleItemController::class, 'clear'])->name('clear');
+            Route::post('/confirm',     [SaleItemController::class, 'confirm'])->name('confirm');
+        });
     });
 });

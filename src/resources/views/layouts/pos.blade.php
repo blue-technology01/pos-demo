@@ -17,6 +17,7 @@
 
     <!-- Scripts at bottom + defer -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
     <script src="https://code.jquery.com/ui/1.14.2/jquery-ui.min.js" defer></script>
 
     @stack('scripts')

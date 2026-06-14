@@ -21,8 +21,7 @@ class LoginController extends Controller
 
     public function login(LoginRequest $request)
     {
-        $ip = $request->ip();
-        $key = "login-attempt:{$ip}:" . $request->input('email');
+        $key = $this->throttleKey($request);
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
             return back()->withErrors([
@@ -33,6 +32,8 @@ class LoginController extends Controller
 
 
         if (!$result['success']) {
+            RateLimiter::hit($key, 60);
+
             return back()
                 ->withInput()
                 ->withErrors([
@@ -54,5 +55,10 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('auth.login');
+    }
+
+    private function throttleKey(Request $request): string
+    {
+        return 'login-attempt:' . $request->ip() . ':' . strtolower((string) $request->input('email'));
     }
 }

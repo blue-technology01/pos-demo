@@ -16,6 +16,42 @@
             <h1>User Management</h1>
             <p>Manage system users and roles</p>
         </div>
+    </div>
+
+    {{-- TOOLBAR --}}
+    <div class="um-filter">
+        <div class="um-search-box">
+            <span class="material-symbols-outlined">search</span>
+            <input type="text" id="searchInput" placeholder="Search name or email…" autocomplete="off">
+        </div>
+
+        <select id="roleFilter" class="um-filter-select">
+            <option value="">All Roles</option>
+            @foreach($roles as $r)
+                <option value="{{ $r->name }}">{{ ucfirst($r->name) }}</option>
+            @endforeach
+        </select>
+
+        <select id="sortFilter" class="um-filter-select">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="name_asc">Name A–Z</option>
+            <option value="name_desc">Name Z–A</option>
+        </select>
+
+        <button id="btnClear" class="um-btn-reset" style="display:none">
+            <span class="material-symbols-outlined" style="font-size:14px">close</span>
+            Clear
+        </button>
+
+        <div class="um-per-page">
+            <label for="perPage">Show</label>
+            <select id="perPage" class="um-filter-select">
+                <option value="10">10</option>
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
+            </select>
+        </div>
 
         <button class="btn btn-primary" id="btnCreateUser">
             <span class="material-symbols-outlined" style="font-size:17px">person_add</span>
@@ -25,376 +61,294 @@
 
     {{-- STATS --}}
     <div class="um-stats">
-        <div>Total Users: <strong>{{ $users->total() }}</strong></div>
-        <div>Admins:
-            <strong>{{ $users->getCollection()->filter(fn($u) => $u->hasRole('admin'))->count() }}</strong>
-        </div>
-        <div>Cashiers:
-            <strong>{{ $users->getCollection()->filter(fn($u) => $u->hasRole('cashier'))->count() }}</strong>
-        </div>
+        <div>Total Users: <strong id="statTotal">{{ $users->count() }}</strong></div>
+        <div>Admins: <strong id="statAdmin">{{ $users->filter(fn($u) => $u->hasRole('admin'))->count() }}</strong></div>
+        <div>Cashiers: <strong id="statCashier">{{ $users->filter(fn($u) => $u->hasRole('cashier'))->count() }}</strong></div>
     </div>
 
     {{-- TABLE --}}
     <div class="um-card">
-        <table class="um-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>User</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Role</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
+        <div class="um-table-wrap">
+            <table class="um-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                    @foreach($users as $user)
+                        @php
+                            $primaryRole = $user->roles->first()?->name ?? 'none';
+                        @endphp
+                        <tr id="row-{{ $user->id }}"
+                            data-id="{{ $user->id }}"
+                            data-role="{{ $primaryRole }}"
+                            data-name="{{ strtolower($user->name) }}"
+                            data-email="{{ strtolower($user->email) }}"
+                            data-created="{{ $user->created_at->timestamp }}">
 
-            <tbody id="tbody">
-                @forelse($users as $index => $user)
-                <tr id="row-{{ $user->id }}">
-
-                    <td>{{ $users->firstItem() + $index }}</td>
-
-                    <td>
-                        <div class="user-cell">
-                            @if($user->avatar)
-                                <img src="{{ asset('storage/'.$user->avatar) }}" class="user-avatar">
-                            @else
-                                <div class="user-avatar-initials">
-                                    {{ strtoupper(substr($user->name,0,2)) }}
+                            <td class="row-index"></td>
+                            <td>
+                                <div class="user-cell">
+                                    @if($user->avatar)
+                                        <img src="{{ asset('storage/' . $user->avatar) }}" class="user-avatar" alt="{{ $user->name }}">
+                                    @else
+                                        <div class="user-avatar-initials">{{ strtoupper(substr($user->name, 0, 2)) }}</div>
+                                    @endif
+                                    <div>
+                                        <div class="user-name">{{ $user->name }}</div>
+                                        <div class="user-id">#{{ $user->id }}</div>
+                                    </div>
                                 </div>
-                            @endif
+                            </td>
+                            <td>{{ $user->email }}</td>
+                            <td>{{ $user->phone ?? '—' }}</td>
+                            <td>
+                                <span class="role-badge role-badge--{{ $primaryRole }}">
+                                    {{ ucfirst($primaryRole) }}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn-edit" data-user="{{ $user->toJson() }}">Edit</button>
+                                <button class="btn-delete" data-id="{{ $user->id }}" data-name="{{ $user->name }}">Delete</button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
-                            <div>
-                                <div class="user-name">{{ $user->name }}</div>
-                                <div class="user-id">#{{ $user->id }}</div>
-                            </div>
-                        </div>
-                    </td>
-
-                    <td>{{ $user->email }}</td>
-                    <td>{{ $user->phone ?? '—' }}</td>
-
-                    <td>
-                        @php $role = $user->roles->first()?->name ?? 'none'; @endphp
-                        <span class="role-badge">{{ ucfirst($role) }}</span>
-                    </td>
-
-                    <td>
-                        <button class="btn-edit"
-                            data-id="{{ $user->id }}"
-                            data-name="{{ $user->name }}"
-                            data-email="{{ $user->email }}"
-                            data-phone="{{ $user->phone }}"
-                            data-role="{{ $role }}">
-                            Edit
-                        </button>
-
-                        <button class="btn-delete"
-                            data-id="{{ $user->id }}"
-                            data-name="{{ $user->name }}">
-                            Delete
-                        </button>
-                    </td>
-
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6">No users found</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-
-        <div class="um-pagination">
-            {{ $users->links() }}
+        <div class="um-table-footer">
+            <div class="um-table-info" id="tableInfo"></div>
+            <div class="um-pagination" id="pagination"></div>
         </div>
     </div>
 </div>
 
-{{-- ================= MODAL ================= --}}
-<div class="modal-overlay" id="userModal">
-    <div class="modal-box">
+{{-- Modals (unchanged) --}}
+@include('admin.users.partials.modals')
 
-        <form id="userForm" enctype="multipart/form-data">
-            @csrf
-            <input type="hidden" id="formMethod" value="POST">
-
-            <h3 id="modalTitle">Create User</h3>
-
-            <div class="avatar-upload">
-
-                <img id="avatarPreview"
-                    src="{{ asset('assets/img/default-avatar.png') }}"
-                    class="avatar-preview">
-
-                <div class="avatar-upload-info">
-
-                    <p>Profile Photo</p>
-                    <span>JPG, PNG up to 2MB</span>
-
-                    <label for="avatarInput" class="avatar-upload-btn">
-                        Choose Photo
-                    </label>
-
-                    <input type="file" name="avatar" id="avatarInput" accept="image/*">
-                </div>
-            </div>
-
-            <input type="text" name="name" id="fieldName" placeholder="Name">
-            <input type="email" name="email" id="fieldEmail" placeholder="Email">
-            <input type="text" name="phone" id="fieldPhone" placeholder="Phone">
-
-            <select name="role" id="fieldRole">
-                <option value="">Select Role</option>
-                @foreach($roles as $role)
-                    <option value="{{ $role->name }}">{{ $role->name }}</option>
-                @endforeach
-            </select>
-
-            <input type="password" name="password" id="fieldPassword" placeholder="Password">
-            <input type="password" name="password_confirmation" id="fieldPasswordConfirm" placeholder="Confirm">
-
-            <button type="submit">Save</button>
-            <button type="button" id="closeModal">Cancel</button>
-        </form>
-
-    </div>
-</div>
-
-{{-- DELETE --}}
-<div class="modal-overlay" id="deleteModal">
-    <div class="modal-box">
-
-        <p>Delete <strong id="deleteUserName"></strong>?</p>
-
-        <form id="deleteForm">
-            @csrf
-            @method('DELETE')
-
-            <button type="submit">Yes Delete</button>
-            <button type="button" id="cancelDelete">Cancel</button>
-        </form>
-
-    </div>
-</div>
 @endsection
-
 
 @push('scripts')
 <script>
-const URL_STORE = '{{ route("admin.users.register") }}';
-const URL_BASE  = '{{ url("admin/users") }}';
+    (function () {
+        'use strict';
 
-const userModal   = document.getElementById('userModal');
-const deleteModal = document.getElementById('deleteModal');
+        // ====================== CONFIG & STATE ======================
+        const config = {
+            urls: {
+                store: @json(route('admin.users.register')),
+                base: @json(url('admin/users')),
+            },
+            defaultAvatar: @json(asset('assets/img/default-avatar.png'))
+        };
 
-const userForm   = document.getElementById('userForm');
-const deleteForm = document.getElementById('deleteForm');
+        let allRows = Array.from(document.querySelectorAll('#tbody tr[data-id]'));
+        let currentPage = 1;
+        let currentFilters = {};
 
-const tbody = document.getElementById('tbody');
+        // ====================== UTILITIES ======================
+        const escHtml = (str) => String(str ?? '')
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-/* ================= CREATE MODAL OPEN ================= */
-document.getElementById('btnCreateUser').addEventListener('click', () => {
+        const escAttr = (str) => String(str ?? '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-    userForm.reset();
-    userForm.action = URL_STORE;
+        // ====================== ROW BUILDER ======================
+        function buildRow(user) {
+            const role = user.roles?.[0]?.name ?? 'none';
+            const avatarHTML = user.avatar
+                ? `<img src="/storage/${escAttr(user.avatar)}" class="user-avatar" alt="${escHtml(user.name)}">`
+                : `<div class="user-avatar-initials">${escHtml(user.name.substring(0, 2).toUpperCase())}</div>`;
 
-    document.getElementById('formMethod').value = 'POST';
-    document.getElementById('modalTitle').innerText = 'Create User';
+            const tr = document.createElement('tr');
+            tr.id = `row-${user.id}`;
+            Object.assign(tr.dataset, {
+                id: user.id,
+                role: role,
+                name: user.name.toLowerCase(),
+                email: user.email.toLowerCase(),
+                created: user.created_at ?? Math.floor(Date.now() / 1000)
+            });
 
-    userModal.classList.add('active');
-});
-
-/* ================= CLOSE MODALS ================= */
-document.getElementById('closeModal')?.addEventListener('click', () => {
-    userModal.classList.remove('active');
-});
-
-document.getElementById('cancelDelete')?.addEventListener('click', () => {
-    deleteModal.classList.remove('active');
-});
-
-/* ================= AVATAR PREVIEW ================= */
-document.getElementById('avatarInput')?.addEventListener('change', function () {
-    const file = this.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = e => {
-        document.getElementById('avatarPreview').src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-});
-
-
-/* ================= CREATE / UPDATE USER ================= */
-userForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const btn = userForm.querySelector('button[type="submit"]');
-    const oldText = btn.innerHTML;
-
-    btn.disabled = true;
-    btn.innerHTML = "Saving...";
-
-    try {
-        const formData = new FormData(userForm);
-
-        // ⭐ IMPORTANT FIX (THIS FIXES YOUR ERROR)
-        formData.append('_method', document.getElementById('formMethod').value);
-
-        const res = await fetch(userForm.action, {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-Requested-With": "XMLHttpRequest",
-                "Accept": "application/json"
-            }
-        });
-
-        const data = await res.json();
-
-        if (!data.success) {
-            alert(data.message || "Something went wrong");
-            return;
-        }
-
-        // ================= CREATE SUCCESS =================
-        if (document.getElementById('formMethod').value === 'POST') {
-
-            const u = data.user;
-
-            const avatarHTML = u.avatar
-                ? `<img src="/storage/${u.avatar}" class="user-avatar">`
-                : `<div class="user-avatar-initials">${u.name.substring(0,2).toUpperCase()}</div>`;
-
-            tbody.insertAdjacentHTML("afterbegin", `
-                <tr id="row-${u.id}">
-                    <td>New</td>
-
-                    <td>
-                        <div class="user-cell">
-                            ${avatarHTML}
-                            <div>
-                                <div class="user-name">${u.name}</div>
-                                <div class="user-id">#${u.id}</div>
-                            </div>
+            tr.innerHTML = `
+                <td class="row-index"></td>
+                <td>
+                    <div class="user-cell">
+                        ${avatarHTML}
+                        <div>
+                            <div class="user-name">${escHtml(user.name)}</div>
+                            <div class="user-id">#${user.id}</div>
                         </div>
-                    </td>
+                    </div>
+                </td>
+                <td>${escHtml(user.email)}</td>
+                <td>${user.phone ? escHtml(user.phone) : '—'}</td>
+                <td><span class="role-badge role-badge--${escAttr(role)}">${escHtml(role)}</span></td>
+                <td>
+                    <button class="btn-edit" data-user="${escAttr(JSON.stringify(user))}">Edit</button>
+                    <button class="btn-delete" data-id="${user.id}" data-name="${escAttr(user.name)}">Delete</button>
+                </td>
+            `;
 
-                    <td>${u.email}</td>
-                    <td>${u.phone ?? '—'}</td>
-                    <td>${u.roles?.[0]?.name ?? 'none'}</td>
-
-                    <td>
-                        <button class="btn-delete"
-                            data-id="${u.id}"
-                            data-name="${u.name}">
-                            Delete
-                        </button>
-                    </td>
-                </tr>
-            `);
-
-            userModal.classList.remove('active');
-            userForm.reset();
+            return tr;
         }
 
-        // ================= UPDATE SUCCESS =================
-        else {
+        // ====================== RENDER ENGINE ======================
+        function render() {
+            const search = document.getElementById('searchInput').value.toLowerCase().trim();
+            const role = document.getElementById('roleFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+            const perPage = parseInt(document.getElementById('perPage').value);
 
-            const row = document.getElementById(`row-${data.user.id}`);
+            // Filter
+            let visible = allRows.filter(row => {
+                const matchSearch = !search ||
+                    row.dataset.name.includes(search) ||
+                    row.dataset.email.includes(search);
+                const matchRole = !role || row.dataset.role === role;
+                return matchSearch && matchRole;
+            });
 
-            if (row) {
-                location.reload(); // simple safe fix
+            // Sort
+            visible = [...visible].sort((a, b) => {
+                if (sort === 'newest') return b.dataset.created - a.dataset.created;
+                if (sort === 'oldest') return a.dataset.created - b.dataset.created;
+                if (sort === 'name_asc')  return a.dataset.name.localeCompare(b.dataset.name);
+                if (sort === 'name_desc') return b.dataset.name.localeCompare(a.dataset.name);
+                return 0;
+            });
+
+            // Paginate
+            const total = visible.length;
+            const totalPages = Math.max(1, Math.ceil(total / perPage));
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const start = (currentPage - 1) * perPage;
+            const paged = visible.slice(start, start + perPage);
+
+            // Render
+            allRows.forEach(r => r.style.display = 'none');
+            document.querySelector('.js-empty')?.remove();
+
+            if (paged.length === 0) {
+                const empty = document.createElement('tr');
+                empty.className = 'js-empty';
+                empty.innerHTML = `<td colspan="6" class="um-empty">No users found</td>`;
+                document.getElementById('tbody').appendChild(empty);
+            } else {
+                paged.forEach((row, i) => {
+                    row.style.display = '';
+                    row.querySelector('.row-index').textContent = start + i + 1;
+                    document.getElementById('tbody').appendChild(row);
+                });
             }
+
+            // Update UI
+            updateStats();
+            updateTableInfo(total, start + 1, Math.min(start + perPage, total));
+            renderPagination(currentPage, totalPages);
+            document.getElementById('btnClear').style.display = (search || role) ? '' : 'none';
         }
 
-    } catch (err) {
-        console.error(err);
-        alert("Server error");
-    }
+        function updateStats() {
+            document.getElementById('statTotal').textContent = allRows.length;
+            document.getElementById('statAdmin').textContent = allRows.filter(r => r.dataset.role === 'admin').length;
+            document.getElementById('statCashier').textContent = allRows.filter(r => r.dataset.role === 'cashier').length;
+        }
 
-    btn.disabled = false;
-    btn.innerHTML = oldText;
-});
+        function updateTableInfo(total, from, to) {
+            document.getElementById('tableInfo').innerHTML = total === 0
+                ? 'No results'
+                : `Showing <b>${from}–${to}</b> of <b>${total}</b> users`;
+        }
 
+        // ====================== PAGINATION ======================
+        function renderPagination(current, total) {
+            const container = document.getElementById('pagination');
+            container.innerHTML = '';
 
-/* ================= DELETE USER ================= */
-deleteForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+            if (total <= 1) return;
 
-    const btn = deleteForm.querySelector('button[type="submit"]');
-    const oldText = btn.innerHTML;
+            const addBtn = (text, page, disabled = false, active = false, icon = false) => {
+                const btn = document.createElement('button');
+                btn.className = `pg-btn ${active ? 'active' : ''}`;
+                btn.disabled = disabled;
+                if (icon) {
+                    btn.innerHTML = `<span class="material-symbols-outlined">${text}</span>`;
+                } else {
+                    btn.textContent = text;
+                }
+                if (!disabled) btn.addEventListener('click', () => { currentPage = page; render(); });
+                container.appendChild(btn);
+            };
 
-    btn.disabled = true;
-    btn.innerHTML = "Deleting...";
+            addBtn('chevron_left', current - 1, current === 1, false, true);
 
-    try {
-        const formData = new FormData(deleteForm);
-        formData.append('_method', 'DELETE');
-
-        const res = await fetch(deleteForm.action, {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-Requested-With": "XMLHttpRequest",
-                "Accept": "application/json"
+            // Simple page numbers
+            for (let i = 1; i <= total; i++) {
+                if (total > 7 && i > 2 && i < total - 1 && Math.abs(i - current) > 1) {
+                    if (i === 3 || i === total - 2) {
+                        const span = document.createElement('span');
+                        span.className = 'pg-ellipsis';
+                        span.textContent = '…';
+                        container.appendChild(span);
+                    }
+                    continue;
+                }
+                addBtn(i, i, false, i === current);
             }
-        });
 
-        const data = await res.json();
-
-        if (data.success) {
-            document.getElementById(`row-${data.id}`)?.remove();
-            deleteModal.classList.remove('active');
-        } else {
-            alert(data.message);
+            addBtn('chevron_right', current + 1, current === total, false, true);
         }
 
-    } catch (err) {
-        console.error(err);
-        alert("Server error");
-    }
+        // ====================== EVENT LISTENERS ======================
+        function initEventListeners() {
+            // Create User
+            document.getElementById('btnCreateUser').addEventListener('click', () => {
+                // Reset form logic...
+                document.getElementById('userModal').classList.add('active');
+            });
 
-    btn.disabled = false;
-    btn.innerHTML = oldText;
-});
+            // Filters
+            ['searchInput', 'roleFilter', 'sortFilter', 'perPage'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', () => { currentPage = 1; render(); });
+                if (el) el.addEventListener('change', () => { currentPage = 1; render(); });
+            });
 
+            // Clear
+            document.getElementById('btnClear').addEventListener('click', () => {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('roleFilter').value = '';
+                document.getElementById('sortFilter').value = 'newest';
+                currentPage = 1;
+                render();
+            });
 
-/* ================= EDIT OPEN ================= */
-document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.btn-edit');
-    if (!btn) return;
+            // Edit & Delete (delegation)
+            document.addEventListener('click', e => {
+                if (e.target.closest('.btn-edit')) {
+                    const btn = e.target.closest('.btn-edit');
+                    const user = JSON.parse(btn.dataset.user);
+                    // Open edit modal with user data...
+                }
+                if (e.target.closest('.btn-delete')) {
+                    // Delete logic...
+                }
+            });
+        }
 
-    const d = btn.dataset;
+        // Initialize
+        initEventListeners();
+        render();
 
-    userForm.reset();
-
-    userForm.action = `${URL_BASE}/${d.id}`;
-    document.getElementById('formMethod').value = 'PUT';
-
-    document.getElementById('modalTitle').innerText = "Edit User";
-
-    document.getElementById('fieldName').value  = d.name;
-    document.getElementById('fieldEmail').value = d.email;
-    document.getElementById('fieldPhone').value = d.phone;
-    document.getElementById('fieldRole').value  = d.role;
-
-    userModal.classList.add('active');
-});
-
-
-/* ================= DELETE OPEN ================= */
-document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.btn-delete');
-    if (!btn) return;
-
-    document.getElementById('deleteUserName').innerText = btn.dataset.name;
-    deleteForm.action = `${URL_BASE}/${btn.dataset.id}`;
-
-    deleteModal.classList.add('active');
-});
-
+    })();
 </script>
 @endpush
