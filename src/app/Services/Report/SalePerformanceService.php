@@ -7,56 +7,86 @@ use Illuminate\Support\Collection;
 
 class SalePerformanceService
 {
-    // paginated staff performance rows
+    /**
+     * Paginated staff performance rows.
+     * Uses DB-level pagination for scalability.
+     */
     public function getStaffPerformance(
         string $startDate,
         string $endDate,
-        string $search   = '',
-        int    $perPage  = 15,
-        int    $page     = 1
+        string $search  = '',
+        int    $perPage = 15,
+        int    $page    = 1
     ): array {
-        $query = DB::table('sales')
+        // Guard: prevent division by zero
+        $perPage = max(1, $perPage);
+
+        // Guard: swap dates if inverted
+        if ($startDate > $endDate) {
+            [$startDate, $endDate] = [$endDate, $startDate];
+        }
+
+        // Base query builder (reused for count + maxRevenue + rows)
+        $baseQuery = DB::table('sales')
             ->join('users', 'users.id', '=', 'sales.user_id')
             ->whereBetween('sales.sale_date', [$startDate, $endDate])
             ->where('sales.status', 'completed')
-            ->when($search, fn($q) => $q->where('users.name', 'like', "%{$search}%"))
+            ->when(
+                $search,
+                fn($q) => $q->where('users.name', 'like', "%{$search}%")
+            );
+
+        // Total count for pagination (DB-level, no full fetch)
+        $total = (clone $baseQuery)
+            ->groupBy('users.id', 'users.name', 'users.avatar')
+            ->select('users.id')
+            ->get()
+            ->count();
+
+        // Max revenue across ALL matching staff (for performance %)
+        // Separate query so pagination doesn't affect it
+        $maxRevenue = (clone $baseQuery)
+            ->groupBy('users.id')
+            ->selectRaw('SUM(sales.total_amount) as total_revenue')
+            ->orderByDesc('total_revenue')
+            ->value('total_revenue') ?: 1;
+
+        // Paginated rows from DB
+        $offset = ($page - 1) * $perPage;
+
+        $rows = (clone $baseQuery)
             ->groupBy('users.id', 'users.name', 'users.avatar')
             ->select(
                 'users.id',
-                'users.name   as staff_name',
+                DB::raw('users.name    as staff_name'),
                 'users.avatar',
-                DB::raw('COUNT(sales.id)              as total_orders'),
-                DB::raw('SUM(sales.total_amount)      as total_revenue'),
-                DB::raw('AVG(sales.total_amount)      as avg_per_order'),
-                DB::raw('SUM(sales.discount_amount)   as total_discount'),
+                DB::raw('COUNT(sales.id)            as total_orders'),
+                DB::raw('SUM(sales.total_amount)    as total_revenue'),
+                DB::raw('AVG(sales.total_amount)    as avg_per_order'),
+                DB::raw('SUM(sales.discount_amount) as total_discount'),
             )
-            ->orderByDesc('total_revenue');
+            ->orderByDesc('total_revenue')
+            ->offset($offset)
+            ->limit($perPage)
+            ->get()
+            ->map(fn($row) => [
+                'id'             => $row->id,
+                'staff_name'     => $row->staff_name,
+                'avatar'         => $row->avatar,
+                'total_orders'   => (int)   $row->total_orders,
+                'total_revenue'  => (float) $row->total_revenue,
+                'avg_per_order'  => (float) $row->avg_per_order,
+                'total_discount' => (float) $row->total_discount,
+                'performance'    => (int) round(
+                    (float) $row->total_revenue / $maxRevenue * 100
+                ),
+            ])
+            ->toArray(); // Ensure clean JSON serialization
 
-        $allRows    = $query->get();
-        $total      = $allRows->count();
-        $maxRevenue = $allRows->max('total_revenue') ?: 1;
-
-        // Map + calculate performance %
-        $allRows = $allRows->map(fn($row) => [
-            'id'            => $row->id,
-            'staff_name'    => $row->staff_name,
-            'avatar'        => $row->avatar,
-            'total_orders'  => (int)   $row->total_orders,
-            'total_revenue' => (float) $row->total_revenue,
-            'avg_per_order' => (float) $row->avg_per_order,
-            'total_discount'=> (float) $row->total_discount,
-            'performance'   => (int) round(
-                (float) $row->total_revenue / $maxRevenue * 100
-            ),
-        ]);
-
-        // Manual pagination
-        $offset   = ($page - 1) * $perPage;
-        $rows     = $allRows->slice($offset, $perPage)->values();
         $lastPage = (int) ceil($total / $perPage) ?: 1;
 
         return [
-            'rows' => $rows,
+            'rows'       => $rows,
             'pagination' => [
                 'total'        => $total,
                 'per_page'     => $perPage,
@@ -68,7 +98,9 @@ class SalePerformanceService
         ];
     }
 
-    // KPI SUMMARY — total revenue, orders, avg for header cards
+    /**
+     * KPI summary — total revenue, orders, avg for header cards.
+     */
     public function getSummary(string $startDate, string $endDate): array
     {
         $result = DB::table('sales')
@@ -92,7 +124,9 @@ class SalePerformanceService
         ];
     }
 
-    // TOP PERFORMER — single best staff this period
+    /**
+     * Top performer — single best staff member this period.
+     */
     public function getTopPerformer(string $startDate, string $endDate): ?object
     {
         return DB::table('sales')
@@ -102,7 +136,7 @@ class SalePerformanceService
             ->groupBy('users.id', 'users.name', 'users.avatar')
             ->select(
                 'users.id',
-                'users.name   as staff_name',
+                DB::raw('users.name    as staff_name'),
                 'users.avatar',
                 DB::raw('COUNT(sales.id)          as total_orders'),
                 DB::raw('SUM(sales.total_amount)  as total_revenue'),
@@ -112,7 +146,9 @@ class SalePerformanceService
             ->first();
     }
 
-    // CHART DATA — top 6 staff for donut chart
+    /**
+     * Chart data — top 6 staff for donut chart.
+     */
     public function getChartData(string $startDate, string $endDate): Collection
     {
         return DB::table('sales')
@@ -121,7 +157,7 @@ class SalePerformanceService
             ->where('sales.status', 'completed')
             ->groupBy('users.id', 'users.name')
             ->select(
-                'users.name as staff_name',
+                DB::raw('users.name as staff_name'),
                 DB::raw('SUM(sales.total_amount) as total_revenue'),
             )
             ->orderByDesc('total_revenue')
@@ -133,7 +169,9 @@ class SalePerformanceService
             ]);
     }
 
-    // PAYMENT METHOD BREAKDOWN PER STAFF
+    /**
+     * Payment method breakdown per staff.
+     */
     public function getPaymentBreakdown(string $startDate, string $endDate): Collection
     {
         return DB::table('sales')
@@ -142,7 +180,7 @@ class SalePerformanceService
             ->where('sales.status', 'completed')
             ->groupBy('users.id', 'users.name', 'sales.payment_method')
             ->select(
-                'users.name             as staff_name',
+                DB::raw('users.name             as staff_name'),
                 'sales.payment_method',
                 DB::raw('COUNT(sales.id)            as total_orders'),
                 DB::raw('SUM(sales.total_amount)    as total_revenue'),
@@ -152,7 +190,9 @@ class SalePerformanceService
             ->get();
     }
 
-    // VOIDED / REFUNDED — audit per staff
+    /**
+     * Voided / refunded sales — audit per staff.
+     */
     public function getVoidedSales(string $startDate, string $endDate): Collection
     {
         return DB::table('sales')
@@ -161,7 +201,7 @@ class SalePerformanceService
             ->whereIn('sales.status', ['voided', 'refunded'])
             ->groupBy('users.id', 'users.name', 'sales.status')
             ->select(
-                'users.name             as staff_name',
+                DB::raw('users.name             as staff_name'),
                 'sales.status',
                 DB::raw('COUNT(sales.id)            as total_count'),
                 DB::raw('SUM(sales.total_amount)    as total_amount'),

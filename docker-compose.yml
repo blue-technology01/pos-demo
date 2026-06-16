@@ -49,7 +49,6 @@ services:
             - ./docker/mariadb/my.cnf:/etc/mysql/conf.d/my.cnf:ro
         networks:
             - pos_app_network
-
     redis:
         container_name: pos_redis
         image: redis:alpine

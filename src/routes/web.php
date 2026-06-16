@@ -1,20 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-// use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Cash\CashController;
 use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\Dashboard\DashboardController;
-// use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Product\CategoryController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Product\ProductUomController;
 use App\Http\Controllers\Product\UomController;
 use App\Http\Controllers\Report\ReportIndexController;
 use App\Http\Controllers\Report\RevenueTrackingController;
+use App\Http\Controllers\Report\SalePerformanceController;
+use App\Http\Controllers\Report\TopProductController;
+use App\Http\Controllers\Sale\InventoryController;
 use App\Http\Controllers\Sale\PosController;
 use App\Http\Controllers\Sale\SaleController;
 use App\Http\Controllers\Sale\SaleItemController;
@@ -24,19 +25,16 @@ Route::get('/', function () {
 });
 
 Route::middleware('guest')->group(function () {
-
     // step 1 login
     Route::get('/login', [LoginController::class, 'index'])
     ->name('auth.login');
     Route::post('/login', [LoginController::class, 'login'])
         ->name('auth.login.post');
-
     // step 2 forgot password
     Route::get('/forgot-password', [ForgotPasswordController::class, 'index'])
         ->name('auth.forgot-password');
     Route::post('/forgot-password/send-otp', [ForgotPasswordController::class,'sendOtp'])
     ->name('auth.forgot-password.send-otp');
-
     // step 3 OTP verifycation.
     Route::get('/forgot-password/otp', [ForgotPasswordController::class, 'otpForm'])
         ->name('auth.otp.show');
@@ -44,27 +42,22 @@ Route::middleware('guest')->group(function () {
         ->name('auth.otp.verify');
     Route::post('/forgot-password/otp/resend', [ForgotPasswordController::class, 'resendOtp'])
         ->name('auth.otp.resend');
-
     //step 4 reset password
     Route::get('/reset-password', [ForgotPasswordController::class, 'resetForm'])
         ->name('auth.reset-password.show');
     Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])
         ->name('auth.reset-password.post');
-
 });
 
 Route::middleware('auth')->group(function () {
-
-
     Route::post('/logout', [LoginController::class, 'logout'])->name('auth.logout');
     Route::prefix('admin')->name('admin.')->group(function () {
-
         Route::get('/customers/search', [CustomerController::class, 'searchAjax'])->name('customers.search.ajax');
         // Route::get('/admin/sales/{id}/pdf', [InvoiceController::class, 'exportSingleInvoicePdf'])->name('admin.sales.single-pdf');
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/data', [DashboardController::class, 'data'])->name('dashboard.data');
-
+        //user
         Route::get('/users', [RegisterController::class, 'showFormRegister'])->name('users');
         Route::post('/users/register', [RegisterController::class, 'register'])->name('users.register');
         Route::put('/users/{user}', [RegisterController::class, 'update'])->name('users.update');
@@ -109,39 +102,24 @@ Route::middleware('auth')->group(function () {
         Route::put('/sales/{id}', [SaleController::class, 'update'])->name('sales.update');
         Route::patch('/sales/{id}/cancel', [SaleController::class, 'cancel'])->name('sales.cancel');
         // sale item
-
-        // setting funciton  route test
         Route::get('/profile', function () {
             return view('admin.users.user-profile');
         })->name('profile');
 
-        // Route::get('/payment-method', function () {
-        //     return view('admin.users.payment-method');
-        // })->name('payment-method');
         Route::get('/preview-settings', function () {
             return view('admin.users.preview-settings');
         })->name('preview-settings');
-
-        // test show inventory
-        Route::get('/stock-update',function(){
-            return view('admin.stocks.stock-update');
-        })->name('stock-update');
+        // inventory
+        Route::get('/stock-update', [InventoryController::class, 'index'])->name('stock-update');
 
         Route::get('/stock-validation',function(){
             return view('admin.stocks.stock-validation');
         })->name('stock-validation');
-
         // report
         Route::get('/reports', [ReportIndexController::class, 'index'])->name('reports.index');
-        // Route::get('/revenue-tracking', [RevenueTrackingController::class, 'index'])->name('revenue-tracking');
         Route::get('/revenue-tracking', [RevenueTrackingController::class, 'index'])->name('revenue-tracking');
-        Route::get('/sale-person',function(){
-            return view('admin.reports.sale-person');
-        })->name('sale-person');
-
-        Route::get('/top-product',function(){
-            return view('admin.reports.top-product');
-        })->name('top-product');
+        Route::get('/sale-person', [SalePerformanceController::class, 'index'])->name('sale-person');
+        Route::get('/top-product', [TopProductController::class, 'index'])->name('top-product');
 
     });
 
@@ -153,7 +131,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/open', [CashController::class, 'open'])->name('open');
         Route::post('/close', [CashController::class, 'close'])->name('close');
         Route::get('/current-shift-details', [CashController::class, 'getCurrentShiftDetails'])->name('shift-details');
-
         Route::get('/pos', [PosController::class, 'index'])->name('pos');
         Route::get('/pos/products', [ProductUomController::class, 'posProducts'])->name('pos.products');
         Route::get('/pos/products/{productCode}/uoms', [ProductUomController::class, 'getByProduct'])->name('pos.products.uoms');

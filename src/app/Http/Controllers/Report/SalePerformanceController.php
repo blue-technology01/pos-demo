@@ -13,15 +13,16 @@ class SalePerformanceController extends Controller
     public function __construct(
         protected SalePerformanceService $salePerformanceService
     ) {}
-    //
-    public function index(Request $request): View | JsonResponse {
-        $startDate = $request->get('start_date', now()->subDays(29)->format('Y-m-d'));
-        $endDate   = $request->get('end_date',   now()->format('Y-m-d'));
-        $search    = $request->get('search',   '');
-        $perPage   = (int) $request->get('per_page', 15);
-        $page      = (int) $request->get('page',     1);
 
-        // Fetch all data
+    public function index(Request $request): View|JsonResponse
+    {
+        // Always fall back to last 30 days — reset sends DEFAULT_START/END, not empty
+        $startDate = $request->get('start_date') ?: now()->subDays(29)->format('Y-m-d');
+        $endDate   = $request->get('end_date')   ?: now()->format('Y-m-d');
+        $search    = (string) $request->get('search', '');
+        $perPage   = max(1, (int) $request->get('per_page', 15));
+        $page      = max(1, (int) $request->get('page', 1));
+
         $performance  = $this->salePerformanceService->getStaffPerformance($startDate, $endDate, $search, $perPage, $page);
         $summary      = $this->salePerformanceService->getSummary($startDate, $endDate);
         $topPerformer = $this->salePerformanceService->getTopPerformer($startDate, $endDate);
@@ -30,7 +31,6 @@ class SalePerformanceController extends Controller
         $rows       = $performance['rows'];
         $pagination = $performance['pagination'];
 
-        // AJAX request — return JSON for dynamic filter/pagination
         if ($request->ajax()) {
             return response()->json([
                 'rows'         => $rows,
@@ -40,8 +40,8 @@ class SalePerformanceController extends Controller
                 'chartData'    => $chartData,
             ]);
         }
-        // Full page load
-        return view('dashboard.report.sale-person', compact(
+
+        return view('admin.reports.sale-person', compact(
             'rows',
             'summary',
             'pagination',
@@ -49,6 +49,8 @@ class SalePerformanceController extends Controller
             'chartData',
             'startDate',
             'endDate',
+            'search',
+            'perPage',
         ));
     }
 }

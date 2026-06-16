@@ -43,7 +43,7 @@ namespace App\Services\Customer;
                 });
             }
 
-            // ប្រសិនបើ $keyword ទំនេរ (null/'') វានឹងរត់ទាញយកអតិថិជន ២០ នាក់ដំបូងមកបង្ហាញភ្លាមៗ
+            // if it null it will get first user 20
             return $query->orderBy('name')
                 ->limit(20)
                 ->get();

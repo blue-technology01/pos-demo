@@ -128,7 +128,7 @@
                 </a>
             </div>
         </div>
-
+        {{-- Inventory --}}
         <div class="menu-group {{ request()->routeIs('admin.stocks*') ? 'open' : '' }}">
             <div class="menu-item has-sub" data-tooltip="Inventory">
                 <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -140,7 +140,7 @@
             </div>
             <div class="sub-menu">
                 <a href="{{ route('admin.stock-update') }}"
-                   class="sub-item {{ request()->routeIs('admin.stocks.stock-update') ? 'active' : '' }}">
+                    class="sub-item {{ request()->routeIs('admin.stock-update') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> Stock History
                 </a>
                 <a href="{{ route('admin.stock-validation') }}"
@@ -172,11 +172,11 @@
                         <i class="ti ti-point"></i> Revenue Tracking
                     </a>
                 <a href="{{ route('admin.sale-person') }}"
-                   class="sub-item {{ request()->routeIs('admin.reports.sale-person') ? 'active' : '' }}">
+                   class="sub-item {{ request()->routeIs('admin.sale-person') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> Top Sale
                 </a>
                 <a href="{{ route('admin.top-product') }}"
-                   class="sub-item {{ request()->routeIs('admin.reports.top-product') ? 'active' : '' }}">
+                   class="sub-item {{ request()->routeIs('admin.top-product') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> Top Products
                 </a>
             </div>
@@ -200,10 +200,6 @@
                    class="sub-item {{ request()->routeIs('admin.profile*') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> Profile
                 </a>
-                {{-- <a href="{{ route('admin.payment-method') }}"
-                   class="sub-item {{ request()->routeIs('admin.payment-method*') ? 'active' : '' }}">
-                    <i class="ti ti-point"></i> Payment Method
-                </a> --}}
                 <a href="{{ route('admin.preview-settings') }}"
                    class="sub-item {{ request()->routeIs('admin.preview-settings') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> Preview Settings
@@ -211,7 +207,6 @@
             </div>
         </div>
         @endrole
-
     </div>
 </nav>
 

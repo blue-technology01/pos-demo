@@ -530,7 +530,7 @@
         isEmpty() { return state.cart.length === 0; },
 
         renderSidebarTotals() {
-            // ✅ FIX 2: one computeTotals() call instead of four separate reduce loops
+            // one computeTotals() call instead of four separate reduce loops
             const { subtotal, discount, tax, total, count } = this.computeTotals();
 
             $('#receipt-subtotal').text(utils.formatCurrency(subtotal));
@@ -647,7 +647,7 @@
             if (!item) return;
             const $row = $(`#cart-list [data-cart-id="${cartItemId}"]`);
             if (!$row.length) return;
-            // ✅ update both qty display and the ×qty label in the price line
+            // update both qty display and the ×qty label in the price line
             $row.find('.js-qty-display').text(item.quantity);
             $row.find('.js-qty-label').text(`×${item.quantity}`);
         },
@@ -655,7 +655,7 @@
         bindEvents() {
             const $list = $('#cart-list');
 
-            // ✅ only fires for products with multiple UOMs
+            //  only fires for products with multiple UOMs
             $list.on('change', '.js-cart-uom-select', (e) => {
                 cartManager.switchItemUOM(
                     $(e.currentTarget).data('item-id'),
@@ -776,13 +776,13 @@
                 discount_amount:     item.discount_amount     || 0,
             }));
 
-            // ✅ show receipt immediately with placeholder invoice number
+            // show receipt immediately with placeholder invoice number
             this.showReceiptModal('...', paymentData, { subtotal, discount, tax, total }, cartSnapshot);
 
-            // ✅ clear cart now — cashier can start next sale while server processes
+            // clear cart now — cashier can start next sale while server processes
             cartManager.clear(true);
 
-            // ✅ POST to server in background — only update invoice number when done
+            // POST to server in background — only update invoice number when done
             try {
                 const data = await utils.fetchJson(window.ROUTES.confirmSale, {
                     method: 'POST',
