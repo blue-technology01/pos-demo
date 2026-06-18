@@ -1,150 +1,175 @@
 @extends('layouts.app')
+
 @push('styles')
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard/stock/validate-stock.css') }}">
-    <style>
-        /* Scoped sizing to keep inline SVGs uniform */
-        .search-wrap svg {
-            width: 16px;
-            height: 16px;
-            display: inline-block;
-            vertical-align: middle;
-            flex-shrink: 0;
-        }
-
-        .pm-search-box {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .search-wrap {
-            position: relative;
-            display: flex;
-            align-items: center;
-            flex: 1; /* Allows the search input wrapper to expand naturally */
-        }
-
-        .search-icon-inline {
-            position: absolute;
-            left: 12px;
-            color: #9ca3af;
-            pointer-events: none;
-        }
-
-        #product-search {
-            width: 100%;
-            padding-left: 36px; /* Offsets input placeholder text for the search icon */
-        }
-    </style>
 @endpush
 
-@section('title', 'Stock Validate')
+@section('title', 'Stock Validation')
+
 @section('content')
-    <div class="pm-wrapper">
-        <div class="pm-search-box">
-            <div class="search-wrap">
-                <svg class="search-icon-inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <input type="text" placeholder="Search product..." id="product-search">
-            </div>
-            <button class="btn-filter" >Filter</button>
+
+<div class="pm-wrapper">
+
+    {{-- ── Page Header ── --}}
+    <div class="pm-page-header">
+        <div>
+            <h1 class="pm-page-title">Stock validation</h1>
+            <p class="pm-page-subtitle">Monitor product availability checks and blocked sale attempts.</p>
         </div>
-
-        <div class="pm-table-wrap">
-            <table class="pm-table">
-                <thead>
-                    <tr>
-                        <th>Product Name</th>
-                        <th>Current Stock</th>
-                        <th>Requested Qty</th>
-                        <th>Status</th>
-                        <th>System Action</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr>
-                        <td>Koka Kola</td>
-                        <td>500</td>
-                        <td>10</td>
-                        <td><span class="status-badge status-badge--allowed">Allowed</span></td>
-                        <td>Process Sale</td>
-                    </tr>
-                    <tr>
-                        <td>Sting</td>
-                        <td>400</td>
-                        <td>5</td>
-                        <td><span class="status-badge status-badge--allowed">Allowed</span></td>
-                        <td>Block Sale</td>
-                    </tr>
-                    <tr>
-                        <td>Pepsi</td>
-                        <td>300</td>
-                        <td>20</td>
-                        <td><span class="status-badge status-badge--blocked">Blocked</span></td>
-                        <td>Block Sale</td>
-                    </tr>
-                    <tr>
-                        <td>Sprite</td>
-                        <td>150</td>
-                        <td>8</td>
-                        <td><span class="status-badge status-badge--allowed">Allowed</span></td>
-                        <td>Process Sale</td>
-                    </tr>
-                    <tr>
-                        <td>Fanta</td>
-                        <td>220</td>
-                        <td>15</td>
-                        <td><span class="status-badge status-badge--blocked">Blocked</span></td>
-                        <td>Block Sale</td>
-                    </tr>
-                   @for ($i = 0; $i < 10; $i++)
-                        <tr>
-                            <td>Fanta</td>
-                            <td>220</td>
-                            <td>15</td>
-                            <td><span class="status-badge status-badge--blocked">Blocked</span></td>
-                            <td>Block Sale</td>
-                        </tr>
-                    @endfor
-                </tbody>
-            </table>
-        </div>
-
-        <div class="pm-pagination">
-            {{-- Left: result summary & Per Page Selector --}}
-            <div class="pm-pagination__meta">
-                <span class="pm-pagination__text">
-                    Showing <strong>1</strong> - <strong>5</strong> of <strong>24</strong> results
-                </span>
-                <div class="pm-pagination__per-page">
-                    <label for="per-page-select">Show:</label>
-                    <select id="per-page-select" class="pm-pagination__select">
-                        <option value="15">15</option>
-                        <option value="24" selected>24</option>
-                        <option value="50">50</option>
-                    </select>
-                </div>
-            </div>
-
-            {{-- Right: page links --}}
-            <div class="pm-pagination__links">
-                <span class="pm-pagination__btn pm-pagination__btn--disabled">&laquo;</span>
-                <span class="pm-pagination__btn pm-pagination__btn--active">1</span>
-                <a href="#" class="pm-pagination__btn">2</a>
-                <a href="#" class="pm-pagination__btn">3</a>
-                <a href="#" class="pm-pagination__btn">4</a>
-                <a href="#" class="pm-pagination__btn">5</a>
-                <a href="#" class="pm-pagination__btn">&raquo;</a>
-            </div>
-        </div>
-
     </div>
+
+    {{-- ── Search / Filter Bar ── --}}
+    <form method="GET" action="{{ route('admin.stock-validation') }}" class="pm-search-box">
+
+        {{-- Search --}}
+        <div class="pm-search-wrap">
+            <i class="ti ti-search pm-search-icon" aria-hidden="true"></i>
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Search product..."
+                autocomplete="off"
+            >
+        </div>
+
+        {{-- Status filter --}}
+        <div class="filter-wrap">
+            <select name="status">
+                <option value="">All status</option>
+                <option value="allowed"  {{ request('status') === 'allowed'  ? 'selected' : '' }}>Allowed</option>
+                <option value="blocked"  {{ request('status') === 'blocked'  ? 'selected' : '' }}>Blocked</option>
+            </select>
+        </div>
+
+        {{-- Per page --}}
+        <div class="filter-wrap">
+            <select name="per_page">
+                <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15 / page</option>
+                <option value="24" {{ request('per_page', 15) == 24 ? 'selected' : '' }}>24 / page</option>
+                <option value="50" {{ request('per_page', 15) == 50 ? 'selected' : '' }}>50 / page</option>
+            </select>
+        </div>
+
+        {{-- Filter button --}}
+        <button type="submit" class="pm-btn-filter">
+            <i class="ti ti-filter" aria-hidden="true"></i> Filter
+        </button>
+
+        {{-- Reset --}}
+        @if(request('search') || request('status'))
+            <a href="{{ route('admin.stock-validation') }}" class="pm-btn-reset">
+                <i class="ti ti-refresh" aria-hidden="true"></i> Reset
+            </a>
+        @endif
+
+    </form>
+
+    {{-- ── Table ── --}}
+    <div class="pm-table-wrap">
+        <table class="pm-table">
+            <thead>
+                <tr>
+                    <th>Product name</th>
+                    <th>Current stock</th>
+                    <th>Requested qty</th>
+                    <th>Status</th>
+                    <th>System action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($attempts as $attempt)
+                    @php $isBlocked = $attempt->reason !== 'available'; @endphp
+                    <tr>
+                        <td>
+                            <div class="pm-product-cell">
+                                <div class="pm-product-icon">
+                                    <i class="ti ti-package" aria-hidden="true"></i>
+                                </div>
+                                {{ $attempt->productUom?->product?->name ?? '—' }}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:6px">
+                                <i class="ti ti-stack-2" aria-hidden="true" style="color:#9ca3af;font-size:14px"></i>
+                                {{ number_format($attempt->available_stock) }}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:6px">
+                                <i class="ti ti-shopping-cart" aria-hidden="true" style="color:#9ca3af;font-size:14px"></i>
+                                {{ number_format($attempt->requested_qty) }}
+                            </div>
+                        </td>
+                        <td>
+                            @if ($isBlocked)
+                                <span class="pm-badge pm-badge--blocked">
+                                    <i class="ti ti-circle-x" aria-hidden="true"></i> Blocked
+                                </span>
+                            @else
+                                <span class="pm-badge pm-badge--allowed">
+                                    <i class="ti ti-circle-check" aria-hidden="true"></i> Allowed
+                                </span>
+                            @endif
+                        </td>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:6px">
+                                <i class="ti ti-info-circle" aria-hidden="true" style="color:#9ca3af;font-size:14px"></i>
+                                {{ ucwords(str_replace('_', ' ', $attempt->reason)) }}
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="pm-empty-cell">
+                            <i class="ti ti-inbox" aria-hidden="true" style="font-size:28px;display:block;margin:0 auto 8px;color:#d1d5db"></i>
+                            No records found
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    {{-- ── Pagination ── --}}
+    <div class="pm-pagination">
+        <div class="pm-pagination__info">
+            <i class="ti ti-list-numbers" aria-hidden="true"></i>
+            Showing
+            <strong>{{ $attempts->firstItem() ?? 0 }}</strong>
+            –
+            <strong>{{ $attempts->lastItem() ?? 0 }}</strong>
+            of
+            <strong>{{ $attempts->total() }}</strong>
+            records
+        </div>
+        <div class="pm-pagination__links">
+            {{ $attempts->links() }}
+        </div>
+    </div>
+
+</div>
+
 @endsection
 
 @push('scripts')
-    {{-- script --}}
+<script>
+(function () {
+    // Filter dropdown toggle (if needed in future)
+    const filterBtn      = document.getElementById('filter-btn');
+    const filterDropdown = document.getElementById('filter-dropdown');
+
+    if (filterBtn && filterDropdown) {
+        filterBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            filterDropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', () => {
+            filterDropdown.classList.remove('open');
+        });
+    }
+})();
+</script>
 @endpush

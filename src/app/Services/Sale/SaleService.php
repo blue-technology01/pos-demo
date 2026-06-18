@@ -20,15 +20,17 @@ class SaleService
 {
     protected $cashRegisterService;
     protected $inventoryService;
+    protected $stockGuardService;
 
     // Cache schema checks to avoid running inside every transaction
     private static ?bool $hasCashSalesColumn       = null;
     private static ?bool $hasExpectedBalanceColumn = null;
 
-    public function __construct(CashRegisterService $cashRegisterService, InventoryService $inventoryService)
+    public function __construct(CashRegisterService $cashRegisterService, InventoryService $inventoryService, StockGuardService $stockGuardService)
     {
         $this->cashRegisterService = $cashRegisterService;
         $this->inventoryService = $inventoryService;
+        $this->stockGuardService = $stockGuardService;
     }
     // check column helper
     private function hasCashSalesColumn(): bool
@@ -117,6 +119,7 @@ class SaleService
             ]);
             // Process each sale item
             foreach ($data['items'] as $item) {
+
                 $product = Product::where('code', $item['product_code'])
                     ->lockForUpdate()
                     ->first();
@@ -125,22 +128,37 @@ class SaleService
                     throw new \Exception("Product not found: {$item['product_code']}");
                 }
 
-                // Delegate to InventoryService — handles check + deduct + log
+                $productUom = $this->getProductUom(
+                    $item['product_code'],
+                    $item['uom_code']
+                );
+
+                if (!$productUom) {
+                    throw new \Exception("UOM not found: {$item['uom_code']}");
+                }
+
+                // Check stock first
+                $check = $this->stockGuardService->checkAndBlock($productUom->id, $item['quantity']);
+
+                if (!$check['allowed']) {
+                    throw new \Exception("{$check['product_name']} blocked: {$check['reason']}");
+                }
+
+                // Deduct stock only after passing validation
                 $this->inventoryService->deductStockWithCheck(
                     $item['product_code'],
                     $item['uom_code'],
                     $item['quantity']
                 );
 
-                $productUom = $this->getProductUom($item['product_code'], $item['uom_code']);
-
+                // Create sale item
                 $sale->items()->create([
                     'product_id'   => $product->id,
                     'product_code' => $product->code,
                     'product_name' => $product->name,
                     'quantity'     => $item['quantity'],
                     'uom_code'     => $item['uom_code'],
-                    'cost_price'   => $productUom ? $productUom->cost_price : $product->cost_price,
+                    'cost_price'   => $productUom->cost_price ?? $product->cost_price,
                     'unit_price'   => $item['unit_price'],
                     'amount'       => $item['quantity'] * $item['unit_price'],
                 ]);
@@ -191,6 +209,7 @@ class SaleService
             $sale->items()->delete();
             // Insert new items and deduct new stock
             foreach ($data['items'] as $item) {
+                // get product with lock
                 $product = Product::where('code', $item['product_code'])
                     ->lockForUpdate()
                     ->first();
@@ -198,11 +217,30 @@ class SaleService
                 if (!$product) {
                     throw new \Exception("Product not found: {$item['product_code']}");
                 }
+                // get product uom
+                $productUom = $this->getproductUom(
+                    $item['product_code'],
+                    $item['uom_code']
+                );
+                if(!$productUom) {
+                    throw new \Exception("UOM not found: {$item['uom_code']}");
+                }
+                // stock check
+                $check = $this->stockGuardService->checkAndBlock(
+                    $productUom->id,
+                    $item['quantity'],
+                );
+
                 $this->inventoryService->deductStockWithCheck(
                     $item['product_code'],
                     $item['uom_code'],
                     $item['quantity']
                 );
+
+                if(!$check['allowed']) {
+
+                }
+
                 $productUom = $this->getProductUom($item['product_code'], $item['uom_code']);
 
                 $sale->items()->create([

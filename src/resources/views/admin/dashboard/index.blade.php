@@ -3,17 +3,18 @@
 @section('title', 'Admin Dashboard')
 
 @push('styles')
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard/dashboard.css') }}">
 @endpush
 
 @section('content')
 
-    @php
-        $stats = $dashboardData['stats'] ?? [];
-    @endphp
+@php $stats = $dashboardData['stats'] ?? []; @endphp
 
-    {{-- ─── Header ──────────────────────────────────────────────────────────── --}}
+<div class="dash-wrapper">
+
+    {{-- ─── Header ──────────────────────────────────────────── --}}
     <div class="dash-header">
 
         <div>
@@ -31,61 +32,95 @@
 
     </div>
 
+    {{-- ─── Stat Cards ──────────────────────────────────────── --}}
     <div class="dash-grid">
 
         <div class="stat-card">
+            <div class="stat-icon">
+                <span class="material-symbols-outlined">payments</span>
+            </div>
             <div class="stat-label">Total Revenue</div>
             <div class="stat-value" id="stat-revenue">—</div>
+            <span class="stat-badge up" id="stat-revenue-badge"></span>
         </div>
 
         <div class="stat-card">
+            <div class="stat-icon">
+                <span class="material-symbols-outlined">shopping_bag</span>
+            </div>
             <div class="stat-label">Total Orders</div>
             <div class="stat-value" id="stat-orders">—</div>
+            <span class="stat-badge up" id="stat-orders-badge"></span>
         </div>
 
         <div class="stat-card">
+            <div class="stat-icon">
+                <span class="material-symbols-outlined">group</span>
+            </div>
             <div class="stat-label">Customers</div>
             <div class="stat-value" id="stat-customers">—</div>
+            <span class="stat-badge up" id="stat-customers-badge"></span>
         </div>
 
         <div class="stat-card">
+            <div class="stat-icon">
+                <span class="material-symbols-outlined">inventory_2</span>
+            </div>
             <div class="stat-label">Products</div>
             <div class="stat-value" id="stat-products">—</div>
+            <span class="stat-badge up" id="stat-products-badge"></span>
         </div>
 
     </div>
 
+    {{-- ─── Charts Row ──────────────────────────────────────── --}}
     <div class="dash-row-2">
 
+        {{-- Sales Analytics --}}
         <div class="dash-card chart-card">
             <div class="dash-card-header">
-                <div class="dash-card-title">Sales Analytics</div>
+                <div>
+                    <div class="dash-card-title">Sales Analytics</div>
+                    <div class="dash-card-sub">Analyses success & management</div>
+                </div>
+                <div class="chart-tabs">
+                    <button class="chart-tab active" data-chart="revenue">Revenue</button>
+                    <button class="chart-tab" data-chart="orders">Orders</button>
+                    <button class="chart-tab" data-chart="customers">Customers</button>
+                </div>
             </div>
             <div id="chart"></div>
         </div>
 
+        {{-- Sales by Category / Donut --}}
         <div class="dash-card chart-card">
             <div class="dash-card-header">
-                <div class="dash-card-title">Sales by Category</div>
+                <div>
+                    <div class="dash-card-title">Product Statistic</div>
+                    <div class="dash-card-sub">Track your product sales</div>
+                </div>
             </div>
             <div id="donutChart"></div>
+            <ul class="product-stat-list" id="product-stat-list">
+                {{-- Populated by JS --}}
+            </ul>
         </div>
 
     </div>
 
+</div>
+
 @endsection
 
 @push('scripts')
-
     <script>
-        window.DASHBOARD_DATA_URL = @json(route('admin.dashboard.data'));
+        window.DASHBOARD_DATA_URL     = @json(route('admin.dashboard.data'));
         window.INITIAL_DASHBOARD_PERIOD = @json($initialPeriod ?? 'today');
-        window.INITIAL_DASHBOARD_DATA = @json($dashboardData ?? null);
+        window.INITIAL_DASHBOARD_DATA   = @json($dashboardData ?? null);
     </script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.2/dist/apexcharts.min.js"></script>
     <script src="{{ asset('assets/js/dashboard/chart/dashboard-utils.js') }}"></script>
     <script src="{{ asset('assets/js/dashboard/chart/column-chart.js') }}"></script>
     <script src="{{ asset('assets/js/dashboard/chart/donut-chart.js') }}"></script>
     <script src="{{ asset('assets/js/dashboard/chart/dashboard.js') }}"></script>
-
 @endpush

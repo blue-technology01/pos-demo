@@ -24,6 +24,13 @@ class RegisterController extends Controller
         return view('admin.users.user', compact('users', 'roles'));
     }
 
+    // show user profile
+    public function userProfile() {
+        $users = $this->registerService->getAllUsers();
+        $roles = $this->registerService->getRoles();
+        return view('admin.users.user-profile',compact('users','roles'));
+    }
+
     public function register(RegisterRequest $request)
     {
         $key = 'register:' . $request->ip();

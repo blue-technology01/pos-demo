@@ -12,7 +12,11 @@
   --slide-dur: .7s;
 }
 
-html, body { height: 100%; overflow: hidden; }
+html, body { 
+    height: 100%; 
+    overflow: hidden; 
+    
+}
 
 body {
   font-family: 'DM Sans', sans-serif;

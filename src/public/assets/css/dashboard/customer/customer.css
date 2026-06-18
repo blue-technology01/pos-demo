@@ -1,391 +1,402 @@
 /* ============================================================
    Customer List — customer.css
+   Primary: #2563eb  |  Border-radius pills: 50px
+   Font: System  |  Consistent with report pages
    ============================================================ */
 
-/* ---------- Page Container ---------- */
+/* ---------- Page shell ---------- */
 .customer-list-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-/* ---------- Page Title ---------- */
-.customer-list-container h1 {
-    font-size: 20px;
-    font-weight: 600;
-    color: #111827;
-    margin: 0;
-}
-
-/* ---------- Alert ---------- */
-.alert {
-    border-radius: 8px;
-    padding: 12px 16px;
+    padding: 1.75rem 0;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    color: var(--color-text-primary, #111);
 }
 
-.alert-success {
-    background: #dcfce7;
-    color: #15803d;
-    border: 1px solid #bbf7d0;
+/* ---------- Page title ---------- */
+.customer-list-container > h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
+    color: var(--color-text-primary, #111);
+    margin: 0 0 1.5rem;
+    line-height: 1.2;
 }
 
-.alert-danger {
-    background: #fee2e2;
-    color: #dc2626;
-    border: 1px solid #fecaca;
+/* ---------- Alert (x-alert component) ---------- */
+.customer-list-container .alert {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    border-radius: 12px;
+    border: none;
+    padding: 12px 16px;
+    margin-bottom: 1.25rem;
 }
 
-.alert-warning {
-    background: #fef9c3;
-    color: #a16207;
-    border: 1px solid #fef08a;
-}
-
-/* ---------- Toolbar (Search + Add) ---------- */
+/* ---------- Actions bar ---------- */
 .customer-list-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
     flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 1.25rem;
 }
 
-/* ---------- Search Form ---------- */
+/* Search form */
 .customer-search-form {
     display: flex;
     align-items: center;
     gap: 8px;
-    flex: 1;
     flex-wrap: wrap;
 }
 
 .customer-search-input {
-    height: 36px;
-    padding: 0 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
-    color: #111827;
-    background: #fff;
+    font-weight: 400;
+    padding: 8px 16px;
+    border-radius: 50px;
+    border: 0.5px solid var(--color-border-secondary, #d1d5db);
+    background: var(--color-background-primary, #fff);
+    color: var(--color-text-primary, #111);
     outline: none;
-    min-width: 220px;
-    flex: 1;
+    min-width: 240px;
     transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.customer-search-input::placeholder {
-    color: #9ca3af;
 }
 
 .customer-search-input:focus {
     border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* ---------- Shared Button Base ---------- */
+.customer-search-input::placeholder {
+    color: var(--color-text-tertiary, #9ca3af);
+}
+
+/* ---------- Shared button base ---------- */
 .btn {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 5px;
-    height: 36px;
-    padding: 0 16px;
-    border-radius: 50px;
+    gap: 6px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
     font-size: 13px;
     font-weight: 500;
+    padding: 8px 20px;
+    border-radius: 50px;
     border: none;
     cursor: pointer;
-    white-space: nowrap;
     text-decoration: none;
-    transition: background 0.15s, color 0.15s;
+    transition: opacity 0.15s, background 0.15s, color 0.15s;
+    line-height: 1;
+    white-space: nowrap;
 }
 
-/* Search button */
+.btn:hover { opacity: 0.88; }
+
+/* Variants */
+.btn-primary {
+    background: #2563eb;
+    color: #fff;
+}
+
 .btn-secondary {
-    background: #f3f4f6;
-    color: #374151;
-    border: 1px solid #e5e7eb;
+    background: var(--color-background-secondary, #f3f4f6);
+    color: var(--color-text-primary, #111);
+    border: 0.5px solid var(--color-border-secondary, #d1d5db);
 }
 
 .btn-secondary:hover {
-    background: #e5e7eb;
-    color: #111827;
+    background: var(--color-background-primary, #e5e7eb);
+    opacity: 1;
 }
 
-/* Clear / light button */
+.btn-success {
+    background: #059669;
+    color: #fff;
+}
+
 .btn-light {
-    background: #fff;
-    color: #6b7280;
-    border: 1px solid #e5e7eb;
+    background: transparent;
+    color: var(--color-text-secondary, #6b7280);
+    border: 0.5px solid var(--color-border-secondary, #d1d5db);
 }
 
 .btn-light:hover {
-    background: #f9fafb;
-    color: #374151;
+    background: var(--color-background-secondary, #f3f4f6);
+    opacity: 1;
 }
 
-/* Add Customer button */
-.btn-primary {
-    background: darkcyan;
+/* Add customer button */
+.btn-add-customer {
+    background: #2563eb;
     color: #fff;
+    padding: 8px 20px;
 }
 
-.btn-primary:hover {
-    background: #1d4ed8;
-}
-
-/* Save button */
-.btn-success {
-    background: #16a34a;
-    color: #fff;
-}
-
-.btn-success:hover {
-    background: #15803d;
-}
-
+/* Search / clear buttons */
 .btn-search {
-    /* inherits .btn + .btn-secondary */
+    background: #2563eb;
+    color: #fff;
 }
 
 .btn-clear {
-    /* inherits .btn + .btn-light */
+    background: transparent;
+    color: var(--color-text-secondary, #6b7280);
+    border: 0.5px solid var(--color-border-secondary, #d1d5db);
 }
 
-.btn-add-customer {
-    margin-left: auto;
+.btn-clear:hover {
+    background: var(--color-background-secondary, #f3f4f6);
+    opacity: 1;
 }
 
-/* ---------- Table Card ---------- */
+/* ---------- Table card ---------- */
 .customer-list-card {
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
+    background: var(--color-background-primary, #fff);
+    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    border-radius: 16px;
+    padding: 0;
     overflow: hidden;
+    margin-bottom: 1rem;
 }
 
 /* ---------- Table ---------- */
 .customer-table {
     width: 100%;
     border-collapse: collapse;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 13px;
 }
 
 .customer-table thead {
-    background: #f9fafb;
+    background: var(--color-background-secondary, #f9fafb);
 }
 
 .customer-table th {
-    padding: 10px 14px;
     text-align: left;
     font-size: 11px;
     font-weight: 600;
-    color: #6b7280;
-    border-bottom: 1px solid #e5e7eb;
-    white-space: nowrap;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
+    color: var(--color-text-secondary, #6b7280);
+    padding: 11px 16px;
+    border-bottom: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    white-space: nowrap;
 }
 
 .customer-table td {
-    padding: 11px 14px;
-    color: #111827;
-    border-bottom: 1px solid #f3f4f6;
+    padding: 13px 16px;
+    border-bottom: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    color: var(--color-text-primary, #111);
+    font-size: 13px;
+    font-weight: 400;
     vertical-align: middle;
+    line-height: 1.4;
 }
 
 .customer-table tbody tr:last-child td {
     border-bottom: none;
 }
 
-.customer-table tbody tr:hover td {
-    background: #f9fafb;
+.customer-table tbody tr {
+    transition: background 0.1s;
 }
 
-/* ---------- Name Cell ---------- */
+.customer-table tbody tr:hover td {
+    background: #f8faff;
+}
+
+/* Customer name cell */
 .customer-name-td {
     font-weight: 500;
-    color: #111827;
+    color: var(--color-text-primary, #111);
 }
 
-/* ---------- Actions Cell ---------- */
+/* Actions cell */
 .customer-actions-td {
+    text-align: right;
     white-space: nowrap;
-    width: 1%;
 }
 
-/* ---------- Status Badge ---------- */
+/* Empty state */
+.table-empty-td {
+    text-align: center;
+    padding: 2.5rem 1rem !important;
+    color: var(--color-text-secondary, #6b7280);
+    font-size: 13px;
+}
+
+/* ---------- Status badge ---------- */
 .status-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 500;
     padding: 3px 10px;
-    border-radius: 20px;
+    border-radius: 50px;
     white-space: nowrap;
 }
 
 .status-badge.active {
     background: #dcfce7;
-    color: #15803d;
+    color: #166534;
 }
 
 .status-badge.inactive {
     background: #fee2e2;
-    color: #dc2626;
+    color: #991b1b;
 }
 
-/* ---------- Empty Row ---------- */
-.table-empty-td {
-    text-align: center;
-    padding: 32px 14px;
-    color: #9ca3af;
-    font-size: 13px;
-}
-
-/* ---------- Action Icon Buttons ---------- */
+/* ---------- Row action buttons ---------- */
+.btn-action-edit,
 .btn-action-delete {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    background: #dc2626;
-    color: #fff;
+    gap: 4px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 50px;
     border: none;
-    border-radius: 50px;
-    padding: 6px 16px;
-    font-size: 12px;
-    font-weight: 500;
     cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.15s, transform 0.1s;
-    line-height: 1.5;
+    transition: opacity 0.15s;
+    line-height: 1;
 }
 
-.btn-action-edit{
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: #10b981;
-    color: white;
-    border:none;
-    border-radius: 50px;
-    padding: 5px 16px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    white-space: nowrap;
-    line-height: 1.5;
-}
-    /* background: #10b981; */
-.btn-action-edit svg,
-.btn-action-delete svg {
-    width: 15px;
-    height: 15px;
-    stroke: currentColor;
-    fill: none;
+.btn-action-edit {
+    background: #eff6ff;
+    color: #2563eb;
+    margin-right: 6px;
 }
 
-.btn-action-edit:active,
-.btn-action-delete:active {
-    transform: scale(0.96);
+.btn-action-edit:hover {
+    background: #dbeafe;
+    opacity: 1;
+}
+
+.btn-action-delete {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-action-delete:hover {
+    background: #fecaca;
+    opacity: 1;
 }
 
 /* ---------- Pagination ---------- */
 .pagination-container {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
+    margin-top: 1rem;
 }
 
+/* Laravel default pagination — override to match pill style */
 .pagination-container nav {
     display: flex;
+    align-items: center;
     gap: 4px;
-    flex-wrap: wrap;
-    justify-content: center;
 }
 
-.pagination-container .page-link,
-.pagination-container span {
-    display: inline-flex;
+.pagination-container .pagination {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pagination-container .page-item .page-link {
+    display: flex;
     align-items: center;
     justify-content: center;
-    height: 32px;
-    min-width: 32px;
+    min-width: 30px;
+    height: 30px;
     padding: 0 8px;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    font-size: 13px;
-    color: #374151;
-    background: #fff;
+    border-radius: 50px;
+    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    background: var(--color-background-primary, #fff);
+    color: var(--color-text-primary, #111);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
     text-decoration: none;
-    transition: background 0.15s;
-    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-.pagination-container .page-link:hover {
-    background: #f3f4f6;
-}
-
-.pagination-container [aria-current="page"] span {
+.pagination-container .page-item.active .page-link {
     background: #2563eb;
     color: #fff;
     border-color: #2563eb;
+    font-weight: 600;
 }
 
-/* ============================================================
-   Customer Modal
-   ============================================================ */
+.pagination-container .page-item.disabled .page-link {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+}
 
+.pagination-container .page-item:not(.active):not(.disabled) .page-link:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #2563eb;
+}
+
+/* ---------- Modal overlay ---------- */
 .modal {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(17, 24, 39, 0.5);
-    z-index: 200;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 1000;
     align-items: center;
     justify-content: center;
-    padding: 16px;
+    padding: 1rem;
 }
 
-.modal[style*="flex"] {
-    display: flex;
-}
-
+/* ---------- Modal box ---------- */
 .modal-content {
-    background: #fff;
-    border-radius: 14px;
-    border: 1px solid #e5e7eb;
+    background: var(--color-background-primary, #fff);
+    border-radius: 20px;
+    padding: 1.75rem 2rem;
     width: 100%;
-    max-width: 480px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    position: relative;
+    max-width: 460px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+    animation: modalIn 0.2s ease;
 }
 
-/* ---------- Modal Title ---------- */
+@keyframes modalIn {
+    from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Modal title */
 .modal-title {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
-    color: #111827;
-    margin: 0 0 4px;
+    letter-spacing: -0.3px;
+    color: var(--color-text-primary, #111);
+    margin: 0 0 1.5rem;
 }
 
-/* ---------- Form Groups ---------- */
+/* ---------- Form groups ---------- */
 .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    margin-bottom: 1rem;
 }
 
 .form-group label {
-    font-size: 13px;
+    display: block;
+    font-size: 12px;
     font-weight: 500;
-    color: #374151;
+    color: var(--color-text-secondary, #6b7280);
+    margin-bottom: 5px;
+    letter-spacing: 0.01em;
 }
 
 .required-star {
@@ -396,82 +407,117 @@
 .form-group input[type="text"],
 .form-group input[type="email"],
 .form-group select {
-    height: 36px;
-    padding: 0 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    width: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 13px;
-    color: #111827;
-    background: #fff;
+    font-weight: 400;
+    padding: 9px 14px;
+    border-radius: 10px;
+    border: 0.5px solid var(--color-border-secondary, #d1d5db);
+    background: var(--color-background-primary, #fff);
+    color: var(--color-text-primary, #111);
     outline: none;
     transition: border-color 0.15s, box-shadow 0.15s;
-    width: 100%;
+    box-sizing: border-box;
 }
 
-.form-group input[type="text"]:focus,
-.form-group input[type="email"]:focus,
+.form-group input:focus,
 .form-group select:focus {
     border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 .form-group input::placeholder {
-    color: #9ca3af;
+    color: var(--color-text-tertiary, #9ca3af);
+    font-weight: 400;
 }
 
-/* ---------- Modal Footer ---------- */
+.form-group select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+}
+
+/* ---------- Modal footer ---------- */
 .modal-footer-actions {
     display: flex;
+    align-items: center;
     justify-content: flex-end;
     gap: 8px;
-    padding-top: 4px;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 0.5px solid var(--color-border-tertiary, #e5e7eb);
 }
 
 .btn-modal-close {
-    /* inherits .btn + .btn-secondary */
+    background: transparent;
+    color: var(--color-text-secondary, #6b7280);
+    border: 0.5px solid var(--color-border-secondary, #d1d5db);
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    line-height: 1;
+}
+
+.btn-modal-close:hover {
+    background: var(--color-background-secondary, #f3f4f6);
+    color: var(--color-text-primary, #111);
 }
 
 .btn-modal-save {
-    /* inherits .btn + .btn-success */
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 8px 22px;
+    border-radius: 50px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    line-height: 1;
 }
 
-/* ============================================================
-   Responsive
-   ============================================================ */
+.btn-modal-save:hover { opacity: 0.88; }
 
-@media (max-width: 768px) {
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
     .customer-list-actions {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .btn-add-customer {
-        margin-left: 0;
-    }
-}
-
-@media (max-width: 640px) {
     .customer-search-form {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .customer-search-input,
+    .customer-search-input {
+        min-width: unset;
+        width: 100%;
+    }
+
+    .btn-add-customer,
     .btn-search,
     .btn-clear {
         width: 100%;
+        justify-content: center;
     }
 
     .modal-content {
-        padding: 20px 16px;
+        padding: 1.25rem 1.25rem;
+        border-radius: 16px;
     }
 
-    .modal-footer-actions {
-        flex-direction: column-reverse;
-    }
-
-    .modal-footer-actions .btn {
-        width: 100%;
-        justify-content: center;
+    .customer-actions-td {
+        text-align: left;
     }
 }

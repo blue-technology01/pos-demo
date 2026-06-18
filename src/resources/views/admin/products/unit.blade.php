@@ -1,23 +1,25 @@
 @extends('layouts.app')
 
 @push('styles')
-    {{-- <link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/category.css') }}" data-turbo-track="reload"> --}}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/unit.css') }}" data-turbo-track="reload">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
 @endpush
 
 @section('title', 'Unit Management')
 
 @section('content')
+
 <div class="page">
-    {{-- Toolbar --}}
+
+    {{-- ── Toolbar ── --}}
     <div class="toolbar">
         <div class="toolbar-left">
 
             {{-- Search --}}
             <div class="search-box">
-                <i class="ti ti-search"></i>
-                <input type="text" id="searchInput" placeholder="Search units...">
+                <i class="ti ti-search" aria-hidden="true"></i>
+                <input type="text" id="searchInput" placeholder="Search units..." autocomplete="off">
             </div>
 
             {{-- Status filter --}}
@@ -36,92 +38,121 @@
                 <option value="code_asc">Code A–Z</option>
             </select>
 
-            {{-- Clear filters button --}}
-            <button id="btnClear" class="btn-clear">
-                <i class="ti ti-x" style="font-size:12px"></i> Clear filters
+            {{-- Clear filters --}}
+            <button id="btnClear" class="btn-clear" type="button">
+                <i class="ti ti-x" aria-hidden="true"></i> Clear filters
             </button>
 
         </div>
         <div class="toolbar-right">
+
             {{-- Per page --}}
             <div class="per-page-wrap">
                 <label for="perPage">Show</label>
-                <select id="perPage" class="filter-select" style="width:70px">
+                <select id="perPage" class="filter-select" style="width:72px">
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
                 </select>
             </div>
 
+            {{-- Add unit --}}
             <button type="button" id="open-create-modal" class="btn-add">
-                <i class="ti ti-plus" style="font-size:15px"></i> Add Unit
+                <i class="ti ti-plus" aria-hidden="true"></i> Add unit
             </button>
+
         </div>
     </div>
 
-    {{-- Table --}}
+    {{-- ── Table card ── --}}
     <div class="table-card">
         <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
-                        <th data-col="code">Code <i class="ti ti-selector sort-icon"></i></th>
-                        <th data-col="name">Unit Name <i class="ti ti-selector sort-icon"></i></th>
-                        <th data-col="status">Status <i class="ti ti-selector sort-icon"></i></th>
-                        <th data-col="created">Created <i class="ti ti-selector sort-icon"></i></th>
+                        <th data-col="code">
+                            Code <i class="ti ti-selector sort-icon" aria-hidden="true"></i>
+                        </th>
+                        <th data-col="name">
+                            Unit name <i class="ti ti-selector sort-icon" aria-hidden="true"></i>
+                        </th>
+                        <th data-col="status">
+                            Status <i class="ti ti-selector sort-icon" aria-hidden="true"></i>
+                        </th>
+                        <th data-col="created">
+                            Created <i class="ti ti-selector sort-icon" aria-hidden="true"></i>
+                        </th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="categoryTableBody">
                     @forelse ($uoms as $uom)
-                    <tr
-                        data-code="{{ strtolower($uom->code) }}"
-                        data-name="{{ strtolower($uom->name) }}"
-                        data-status="{{ $uom->status }}"
-                        data-created="{{ $uom->created_at?->timestamp ?? 0 }}"
-                        {{-- data-created="{{ $uom->created_at->timestamp }}" --}}
-                    >
-                        <td><strong>{{ $uom->code }}</strong></td>
-                        <td>{{ $uom->name }}</td>
-                        <td>
-                            <span class="badge badge-{{ $uom->status }}">
-                                {{ ucfirst($uom->status) }}
-                            </span>
-                        </td>
-                        <td style="color:#9ca3af">
-                            {{ $uom->created_at?->format('d M Y') ?? '-' }}
-                        </td>
-                        {{-- <td style="color:#9ca3af">{{ $uom->created_at->format('d M Y') }}</td> --}}
-                        <td class="actions-cell">
-                            <button class="btn-edit open-edit-modal"
+                        <tr
+                            data-code="{{ strtolower($uom->code) }}"
+                            data-name="{{ strtolower($uom->name) }}"
+                            data-status="{{ $uom->status }}"
+                            data-created="{{ $uom->created_at?->timestamp ?? 0 }}"
+                        >
+                            <td>
+                                <div style="display:flex;align-items:center;gap:7px">
+                                    <span style="width:28px;height:28px;border-radius:8px;background:#eff6ff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">
+                                        <i class="ti ti-tag" style="color:#2563eb;font-size:14px" aria-hidden="true"></i>
+                                    </span>
+                                    <strong>{{ $uom->code }}</strong>
+                                </div>
+                            </td>
+                            <td>{{ $uom->name }}</td>
+                            <td>
+                                <span class="badge badge-{{ $uom->status }}">
+                                    @if($uom->status === 'active')
+                                        <i class="ti ti-circle-check" aria-hidden="true" style="font-size:11px"></i>
+                                    @else
+                                        <i class="ti ti-circle-x" aria-hidden="true" style="font-size:11px"></i>
+                                    @endif
+                                    {{ ucfirst($uom->status) }}
+                                </span>
+                            </td>
+                            <td style="color:#9ca3af">
+                                <div style="display:flex;align-items:center;gap:6px">
+                                    <i class="ti ti-calendar" aria-hidden="true" style="font-size:13px"></i>
+                                    {{ $uom->created_at?->format('d M Y') ?? '—' }}
+                                </div>
+                            </td>
+                            <td class="actions-cell">
+                                <button
+                                    class="btn-edit open-edit-modal"
                                     data-code="{{ $uom->code }}"
                                     data-name="{{ $uom->name }}"
                                     data-status="{{ $uom->status }}"
-                                    title="Edit Unit">
-                                Edit
-                            </button>
-
-                            <button class="btn-delete delete-btn"
+                                    title="Edit unit"
+                                    type="button"
+                                >
+                                    <i class="ti ti-pencil" aria-hidden="true"></i> Edit
+                                </button>
+                                <button
+                                    class="btn-delete delete-btn"
                                     data-code="{{ $uom->code }}"
                                     data-name="{{ $uom->name }}"
-                                    title="Delete Unit">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
+                                    title="Delete unit"
+                                    type="button"
+                                >
+                                    <i class="ti ti-trash" aria-hidden="true"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
                     @empty
-                    <tr class="empty-row">
-                        <td colspan="7">
-                            <i class="ti ti-inbox" style="font-size:24px;display:block;margin:0 auto 8px;color:#d1d5db"></i>
-                            No units found
-                        </td>
-                    </tr>
+                        <tr class="empty-row">
+                            <td colspan="5">
+                                <i class="ti ti-inbox" aria-hidden="true" style="font-size:28px;display:block;margin:0 auto 8px;color:#d1d5db"></i>
+                                No units found
+                            </td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-        {{-- Table footer: info + pagination --}}
+        {{-- Table footer --}}
         <div class="table-footer" id="tableFooter">
             <div class="table-info" id="tableInfo"></div>
             <div class="pagination" id="pagination"></div>
@@ -131,38 +162,63 @@
 </div>
 
 {{-- ══ Create Modal ══ --}}
-<div class="modal-overlay" id="createModal">
+<div class="modal-overlay" id="createModal" role="dialog" aria-modal="true" aria-labelledby="createModalTitle">
     <div class="modal">
         <div class="modal-header">
-            <span class="modal-title"><i class="ti ti-tag"></i> Add new unit</span>
-            <button class="modal-close" data-close="createModal" aria-label="Close"><i class="ti ti-x"></i></button>
+            <span class="modal-title" id="createModalTitle">
+                <i class="ti ti-tag" aria-hidden="true"></i> Add new unit
+            </span>
+            <button class="modal-close" data-close="createModal" aria-label="Close">
+                <i class="ti ti-x" aria-hidden="true"></i>
+            </button>
         </div>
-        <form action="{{ route('admin.unit.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.unit.store') }}" method="POST">
             @csrf
             <div class="modal-body">
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Code <span class="req">*</span></label>
-                        <input type="text" name="code" class="form-control" placeholder="e.g. UNIT-001" required>
+                        <label class="form-label" for="create_code">
+                            Code <span class="req">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="create_code"
+                            name="code"
+                            class="form-control"
+                            placeholder="e.g. KG, PCS, BOX"
+                            required
+                            autocomplete="off"
+                        >
                     </div>
                     <div class="form-group">
-                        <label class="form-label"> Unit Name <span class="req">*</span></label>
-                        <input type="text" name="name" class="form-control" placeholder="Unit name" required>
+                        <label class="form-label" for="create_name">
+                            Unit name <span class="req">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="create_name"
+                            name="name"
+                            class="form-control"
+                            placeholder="e.g. Kilogram"
+                            required
+                            autocomplete="off"
+                        >
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Status</label>
-                        <select name="status" class="form-control">
+                        <label class="form-label" for="create_status">Status</label>
+                        <select id="create_status" name="status" class="form-control">
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                         </select>
                     </div>
                 </div>
-
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-cancel" data-close="createModal">Cancel</button>
+                <button type="button" class="btn-cancel" data-close="createModal">
+                    <i class="ti ti-x" aria-hidden="true"></i> Cancel
+                </button>
                 <button type="submit" class="btn-submit">
-                    <i class="ti ti-check" style="font-size:14px"></i> Save unit
+                    <i class="ti ti-device-floppy" aria-hidden="true"></i> Save unit
                 </button>
             </div>
         </form>
@@ -170,203 +226,212 @@
 </div>
 
 {{-- ══ Edit Modal ══ --}}
-<div class="modal-overlay" id="editModal">
+<div class="modal-overlay" id="editModal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
     <div class="modal">
         <div class="modal-header">
-            <span class="modal-title"><i class="ti ti-edit"></i> Edit unit</span>
-            <button class="modal-close" data-close="editModal" aria-label="Close"><i class="ti ti-x"></i></button>
+            <span class="modal-title" id="editModalTitle">
+                <i class="ti ti-pencil" aria-hidden="true"></i> Edit unit
+            </span>
+            <button class="modal-close" data-close="editModal" aria-label="Close">
+                <i class="ti ti-x" aria-hidden="true"></i>
+            </button>
         </div>
-
-        {{-- edit form unit --}}
-        <form id="editForm" method="POST" enctype="multipart/form-data">
+        <form id="editForm" method="POST">
             @csrf
             @method('PUT')
             <input type="hidden" name="code" id="edit_code">
             <div class="modal-body">
+
+                {{-- Unit preview chip --}}
                 <div class="edit-chip">
-                    <i class="ti ti-tag" style="font-size:18px;color:#9ca3af"></i>
+                    <i class="ti ti-tag" aria-hidden="true" style="font-size:20px;color:#9ca3af;flex-shrink:0"></i>
                     <div class="edit-chip-info">
                         <p id="edit_chip_name">—</p>
                         <span id="edit_chip_code">—</span>
                     </div>
                 </div>
+
                 <div class="form-group">
-                    <label class="form-label">Unit Name <span class="req">*</span></label>
-                    <input type="text" name="name" id="edit_name" class="form-control" required>
+                    <label class="form-label" for="edit_name">
+                        Unit name <span class="req">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="edit_name"
+                        name="name"
+                        class="form-control"
+                        required
+                        autocomplete="off"
+                    >
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Status</label>
-                        <select name="status" id="edit_status" class="form-control">
+                        <label class="form-label" for="edit_status">Status</label>
+                        <select id="edit_status" name="status" class="form-control">
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                         </select>
                     </div>
                 </div>
+
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-cancel" data-close="editModal">Cancel</button>
+                <button type="button" class="btn-cancel" data-close="editModal">
+                    <i class="ti ti-x" aria-hidden="true"></i> Cancel
+                </button>
                 <button type="submit" class="btn-submit">
-                    <i class="ti ti-device-floppy" style="font-size:14px"></i> Save changes
+                    <i class="ti ti-device-floppy" aria-hidden="true"></i> Save changes
                 </button>
             </div>
         </form>
     </div>
 </div>
+
 @endsection
 
 @push('scripts')
 <script>
 (function () {
 
-    // message when success or error, auto hide after 3s
-    function showNotification(message, type = 'info') {
+    // ── Toast notification ─────────────────────────────────────────────────
+    function showToast(message, type = 'info') {
         const colors = {
-            success: '#4ade80',
-            warning: '#fbbf24',
-            error: '#f87171',
-            info: '#60a5fa'
+            success : '#059669',
+            error   : '#dc2626',
+            warning : '#d97706',
+            info    : '#2563eb',
         };
 
         const toast = document.createElement('div');
-
         Object.assign(toast.style, {
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            background: colors[type] || '#60a5fa',
-            color: 'white',
-            padding: '12px 16px',
-            borderRadius: '6px',
-            zIndex: 99999,
-            fontSize: '14px',
-            fontWeight: '500',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-            animation: 'slideIn 0.3s ease-out'
+            position     : 'fixed',
+            top          : '20px',
+            right        : '20px',
+            background   : colors[type] ?? colors.info,
+            color        : '#fff',
+            padding      : '11px 18px',
+            borderRadius : '50px',
+            zIndex       : '99999',
+            fontSize     : '13px',
+            fontWeight   : '500',
+            fontFamily   : "'Inter', sans-serif",
+            boxShadow    : '0 4px 16px rgba(0,0,0,0.15)',
+            animation    : 'slideIn 0.3s ease-out',
+            display      : 'flex',
+            alignItems   : 'center',
+            gap          : '8px',
         });
 
-        toast.textContent = message;
+        const iconMap = { success: 'ti-circle-check', error: 'ti-circle-x', warning: 'ti-alert-triangle', info: 'ti-info-circle' };
+        toast.innerHTML = `<i class="ti ${iconMap[type] ?? 'ti-info-circle'}" style="font-size:15px"></i> ${message}`;
         document.body.appendChild(toast);
 
         setTimeout(() => {
-            toast.style.animation = 'slideOut 0.3s ease-out';
+            toast.style.animation = 'slideOut 0.3s ease-out forwards';
             toast.addEventListener('animationend', () => toast.remove());
         }, 3000);
     }
 
-    // slide in/out keyframes
     document.addEventListener('DOMContentLoaded', () => {
         @if(session('success'))
-            showNotification(@json(session('success')), 'success');
+            showToast(@json(session('success')), 'success');
         @endif
-
         @if(session('error'))
-            showNotification(@json(session('error')), 'error');
+            showToast(@json(session('error')), 'error');
         @endif
     });
 
-    /* ── Modal ── */
-    function openModal(id)  {
+    // ── Modal helpers ──────────────────────────────────────────────────────
+    function openModal(id) {
         document.getElementById(id).classList.add('open');
         document.body.style.overflow = 'hidden';
     }
-    // close modal by id
+
     function closeModal(id) {
         document.getElementById(id).classList.remove('open');
         document.body.style.overflow = '';
     }
+
     document.querySelectorAll('[data-close]').forEach(btn =>
         btn.addEventListener('click', () => closeModal(btn.dataset.close))
     );
+
     document.querySelectorAll('.modal-overlay').forEach(overlay =>
-        overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(overlay.id); })
+        overlay.addEventListener('click', e => {
+            if (e.target === overlay) closeModal(overlay.id);
+        })
     );
+
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape')
             document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
     });
 
-    document.getElementById('open-create-modal').addEventListener('click', () => openModal('createModal'));
-    // open edit modal and populate data
+    // ── Open create modal ──────────────────────────────────────────────────
+    document.getElementById('open-create-modal').addEventListener('click', () => {
+        openModal('createModal');
+        document.getElementById('create_code').focus();
+    });
+
+    // ── Open edit modal ────────────────────────────────────────────────────
     document.querySelectorAll('.open-edit-modal').forEach(btn =>
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
             const code = this.dataset.code;
-            document.getElementById('edit_code').value          = code;
-            document.getElementById('edit_name').value          = this.dataset.name;
-            document.getElementById('edit_status').value        = this.dataset.status;
+
+            document.getElementById('edit_code').value           = code;
+            document.getElementById('edit_name').value           = this.dataset.name;
+            document.getElementById('edit_status').value         = this.dataset.status;
             document.getElementById('edit_chip_name').textContent = this.dataset.name;
             document.getElementById('edit_chip_code').textContent = code;
             document.getElementById('editForm').action =
                 '{{ route("admin.unit.update", ":code") }}'.replace(':code', code);
+
             openModal('editModal');
+            document.getElementById('edit_name').focus();
         })
     );
 
-    /* File labels */
-    function bindFile(inputId, spanId) {
-        const el = document.getElementById(inputId);
-        if (el) {
-            el.addEventListener('change', function () {
-                document.getElementById(spanId).textContent =
-                    this.files[0] ? this.files[0].name : 'Click to upload image';
-            });
-        }
-    }
-    bindFile('createFileInput', 'createFileName');
-    bindFile('editFileInput',   'editFileName');
-
-    document.querySelectorAll('.delete-btn').forEach(btn => {
+    // ── Delete ─────────────────────────────────────────────────────────────
+    document.querySelectorAll('.delete-btn').forEach(btn =>
         btn.addEventListener('click', function () {
             const code = this.dataset.code;
             const name = this.dataset.name;
 
-            if (confirm(`Are you sure you want to delete unit "${name}" (${code})?\n\nThis action cannot be undone.`)) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ route("admin.unit.destroy", ":code") }}'.replace(':code', code);
-                form.style.display = 'none';
+            if (!confirm(`Delete unit "${name}" (${code})?\n\nThis action cannot be undone.`)) return;
 
-                const csrf = document.createElement('input');
-                csrf.type = 'hidden';
-                csrf.name = '_token';
-                csrf.value = '{{ csrf_token() }}';
+            const form    = document.createElement('form');
+            form.method   = 'POST';
+            form.action   = '{{ route("admin.unit.destroy", ":code") }}'.replace(':code', code);
+            form.style.display = 'none';
 
-                const method = document.createElement('input');
-                method.type = 'hidden';
-                method.name = '_method';
-                method.value = 'DELETE';
+            form.innerHTML = `
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_method" value="DELETE">
+            `;
 
-                form.appendChild(csrf);
-                form.appendChild(method);
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    });
+            document.body.appendChild(form);
+            form.submit();
+        })
+    );
 
-    /* ── Filter + Sort + Pagination engine ── */
-    // Changed selection targeting from #unitTableBody to #categoryTableBody to match your blade template
-    const allRows  = Array.from(document.querySelectorAll('#categoryTableBody tr[data-name]'));
-    const tbody    = document.getElementById('categoryTableBody');
-    const infoEl   = document.getElementById('tableInfo');
-    const pagEl    = document.getElementById('pagination');
-
-    // state variables
+    // ── Filter + Sort + Pagination engine ──────────────────────────────────
+    const allRows = Array.from(document.querySelectorAll('#categoryTableBody tr[data-name]'));
+    const tbody   = document.getElementById('categoryTableBody');
+    const infoEl  = document.getElementById('tableInfo');
+    const pagEl   = document.getElementById('pagination');
     let currentPage = 1;
 
-    // Get current filter values
     function getFilters() {
         return {
-            search:  document.getElementById('searchInput').value.toLowerCase().trim(),
-            status:  document.getElementById('filterStatus').value,
-            sort:    document.getElementById('filterSort').value,
-            perPage: parseInt(document.getElementById('perPage').value, 10),
+            search  : document.getElementById('searchInput').value.toLowerCase().trim(),
+            status  : document.getElementById('filterStatus').value,
+            sort    : document.getElementById('filterSort').value,
+            perPage : parseInt(document.getElementById('perPage').value, 10),
         };
     }
 
-    // function apply sort data
-    function applSort(rows, sort) {
+    function applySort(rows, sort) {
         return [...rows].sort((a, b) => {
             if (sort === 'newest')    return b.dataset.created - a.dataset.created;
             if (sort === 'oldest')    return a.dataset.created - b.dataset.created;
@@ -380,94 +445,80 @@
     function render() {
         const { search, status, sort, perPage } = getFilters();
 
-        // filter rows based on search and status filters
         let visible = allRows.filter(row => {
-            const matchesSearch = !search ||
+            const matchSearch = !search ||
                 row.dataset.name.includes(search) ||
                 row.dataset.code.includes(search) ||
                 row.dataset.status.includes(search);
             const matchStatus = !status || row.dataset.status === status;
-            return matchesSearch && matchStatus; // Fix variable mismatch here
+            return matchSearch && matchStatus;
         });
 
-        // apply sorting
-        visible = applSort(visible, sort);
-        const total = visible.length;
+        visible = applySort(visible, sort);
+
+        const total      = visible.length;
         const totalPages = Math.max(1, Math.ceil(total / perPage));
+        if (currentPage > totalPages) currentPage = totalPages;
 
-        // adjust current page if it exceeds total pages after filtering
-        if(currentPage > totalPages) currentPage = totalPages;
-
-        // paginate
         const start = (currentPage - 1) * perPage;
-        const end = Math.min(start + perPage, total);
+        const end   = Math.min(start + perPage, total);
         const paged = visible.slice(start, end);
 
-        // render rows
         allRows.forEach(row => { row.style.display = 'none'; });
 
-        // Clear existing pagination or handle empty conditions
-        if(paged.length === 0) {
-            let empty = tbody.querySelector('.js-empty');
-            if(!empty) {
-                empty = document.createElement('tr');
+        const existingEmpty = tbody.querySelector('.js-empty');
+
+        if (paged.length === 0) {
+            if (!existingEmpty) {
+                const empty = document.createElement('tr');
                 empty.className = 'empty-row js-empty';
                 empty.innerHTML = `
                     <td colspan="5">
-                        <i class="ti ti-inbox" style="font-size:24px;display:block;margin:0 auto 8px;color:#d1d5db"></i>
+                        <i class="ti ti-inbox" aria-hidden="true" style="font-size:28px;display:block;margin:0 auto 8px;color:#d1d5db"></i>
                         No units found
-                    </td>
-                `;
+                    </td>`;
                 tbody.appendChild(empty);
+            } else {
+                existingEmpty.style.display = '';
             }
-            empty.style.display = '';
         } else {
-            const empty = tbody.querySelector('.js-empty');
-            if (empty) empty.style.display = 'none';
+            if (existingEmpty) existingEmpty.style.display = 'none';
             paged.forEach(r => {
                 r.style.display = '';
-                tbody.appendChild(r); /* re-order */
+                tbody.appendChild(r);
             });
         }
 
-        // render info - Fixed variable name to infoEl
-        if(total > 0) {
-            infoEl.innerHTML = `Showing <strong>${start + 1}–${end}</strong> of <strong>${total}</strong> units`;
-        } else {
-            infoEl.innerHTML = 'No units to display';
-        }
+        infoEl.innerHTML = total > 0
+            ? `Showing <strong>${start + 1}–${end}</strong> of <strong>${total}</strong> units`
+            : 'No units to display';
 
-        // render pagination
-        renderPagination(currentPage, totalPages); // Correct arguments order: current, total
+        renderPagination(currentPage, totalPages);
 
-        // clear button visibility
         const hasFilter = search || status;
         document.getElementById('btnClear').classList.toggle('visible', !!hasFilter);
         document.getElementById('filterStatus').classList.toggle('has-filter', !!status);
     }
 
-    // function for render pagination
     function renderPagination(current, total) {
         pagEl.innerHTML = '';
         if (total <= 1) return;
 
-        const btn = (label, p, disabled = false, active = false, isIcon = false) => {
+        const btn = (label, page, disabled = false, active = false, isIcon = false) => {
             const b = document.createElement('button');
             b.className = 'pg-btn' + (active ? ' active' : '');
             b.disabled  = disabled;
-            if (isIcon) b.innerHTML = `<i class="${label}"></i>`;
-            else        b.textContent = label;
-            if (!disabled) b.addEventListener('click', () => { currentPage = p; render(); });
+            b.innerHTML = isIcon ? `<i class="${label}" aria-hidden="true"></i>` : label;
+            if (!disabled) b.addEventListener('click', () => { currentPage = page; render(); });
             return b;
         };
 
         pagEl.appendChild(btn('ti ti-chevron-left', current - 1, current === 1, false, true));
 
-        const pages = getPageNumbers(current, total);
-        pages.forEach(p => {
+        getPageNumbers(current, total).forEach(p => {
             if (p === '...') {
                 const span = document.createElement('span');
-                span.className = 'pg-ellipsis';
+                span.className   = 'pg-ellipsis';
                 span.textContent = '…';
                 pagEl.appendChild(span);
             } else {
@@ -478,25 +529,23 @@
         pagEl.appendChild(btn('ti ti-chevron-right', current + 1, current === total, false, true));
     }
 
-    // function for get pagination number
     function getPageNumbers(current, total) {
         if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-        const pages = [];
-        pages.push(1);
-        if (current > 3)         pages.push('...');
+        const pages = [1];
+        if (current > 3) pages.push('...');
         for (let p = Math.max(2, current - 1); p <= Math.min(total - 1, current + 1); p++) pages.push(p);
         if (current < total - 2) pages.push('...');
         pages.push(total);
         return pages;
     }
 
-    /* Event listeners */
+    // ── Event listeners ────────────────────────────────────────────────────
     ['searchInput', 'filterStatus', 'filterSort', 'perPage'].forEach(id => {
-        document.getElementById(id).addEventListener('input', () => { currentPage = 1; render(); });
-        document.getElementById(id).addEventListener('change', () => { currentPage = 1; render(); });
+        const el = document.getElementById(id);
+        el.addEventListener('input',  () => { currentPage = 1; render(); });
+        el.addEventListener('change', () => { currentPage = 1; render(); });
     });
 
-    // button clear
     document.getElementById('btnClear').addEventListener('click', () => {
         document.getElementById('searchInput').value  = '';
         document.getElementById('filterStatus').value = '';
@@ -504,7 +553,7 @@
         render();
     });
 
-    /* Initial render */
+    // ── Init ───────────────────────────────────────────────────────────────
     render();
 
 })();

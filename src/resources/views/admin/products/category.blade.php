@@ -145,7 +145,7 @@
             <button class="modal-close" data-close="createModal" aria-label="Close"><i class="ti ti-x"></i></button>
         </div>
         <form action="{{ route('admin.category.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
+            @csrff
             <div class="modal-body">
                 <div class="form-row">
                     <div class="form-group">
@@ -242,6 +242,7 @@
     </div>
 </div>
 @endsection
+
 
 
 @push('scripts')

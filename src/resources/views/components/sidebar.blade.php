@@ -197,7 +197,7 @@
                     <i class="ti ti-point"></i> All users
                 </a>
                 <a href="{{ route('admin.profile') }}"
-                   class="sub-item {{ request()->routeIs('admin.profile*') ? 'active' : '' }}">
+                    class="sub-item {{ request()->routeIs('admin.profile') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> Profile
                 </a>
                 <a href="{{ route('admin.preview-settings') }}"

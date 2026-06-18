@@ -19,6 +19,7 @@ use App\Http\Controllers\Sale\InventoryController;
 use App\Http\Controllers\Sale\PosController;
 use App\Http\Controllers\Sale\SaleController;
 use App\Http\Controllers\Sale\SaleItemController;
+use App\Http\Controllers\Stock\StockValidateController;
 
 Route::get('/', function () {
     return redirect()->route('auth.login');
@@ -27,14 +28,14 @@ Route::get('/', function () {
 Route::middleware('guest')->group(function () {
     // step 1 login
     Route::get('/login', [LoginController::class, 'index'])
-    ->name('auth.login');
+        ->name('auth.login');
     Route::post('/login', [LoginController::class, 'login'])
         ->name('auth.login.post');
     // step 2 forgot password
     Route::get('/forgot-password', [ForgotPasswordController::class, 'index'])
         ->name('auth.forgot-password');
     Route::post('/forgot-password/send-otp', [ForgotPasswordController::class,'sendOtp'])
-    ->name('auth.forgot-password.send-otp');
+        ->name('auth.forgot-password.send-otp');
     // step 3 OTP verifycation.
     Route::get('/forgot-password/otp', [ForgotPasswordController::class, 'otpForm'])
         ->name('auth.otp.show');
@@ -63,6 +64,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/users/{user}', [RegisterController::class, 'update'])->name('users.update');
         Route::delete('/users/{id}', [RegisterController::class, 'destroy'])->name('users.destroy');
         Route::post('/preview/update', [RegisterController::class, 'updatePreview']);
+        Route::get('/profile', [RegisterController::class, 'userProfile'])->name('profile');
         // category
         Route::get('/category',[CategoryController::class,'index'])->name('category');
         Route::post('/category', [CategoryController::class, 'store'])->name('category.store');
@@ -101,20 +103,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/sales/{id}/edit', [SaleController::class, 'edit'])->name('sales.edit');
         Route::put('/sales/{id}', [SaleController::class, 'update'])->name('sales.update');
         Route::patch('/sales/{id}/cancel', [SaleController::class, 'cancel'])->name('sales.cancel');
-        // sale item
-        Route::get('/profile', function () {
-            return view('admin.users.user-profile');
-        })->name('profile');
 
         Route::get('/preview-settings', function () {
             return view('admin.users.preview-settings');
         })->name('preview-settings');
+
         // inventory
         Route::get('/stock-update', [InventoryController::class, 'index'])->name('stock-update');
-
-        Route::get('/stock-validation',function(){
-            return view('admin.stocks.stock-validation');
-        })->name('stock-validation');
+        Route::get('/stock-validation', [StockValidateController::class, 'index'])->name('stock-validation');
         // report
         Route::get('/reports', [ReportIndexController::class, 'index'])->name('reports.index');
         Route::get('/revenue-tracking', [RevenueTrackingController::class, 'index'])->name('revenue-tracking');

@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Http\Controllers\Stock;
+
+use App\Http\Controllers\Controller;
+use App\Models\BlockedSaleAttempt;
+use Illuminate\Http\Request;
+
+class StockValidateController extends Controller
+{
+    public function index(Request $request)
+    {
+        $attempts = BlockedSaleAttempt::with('productUom.product')
+            ->when($request->search, function ($q) use ($request) {
+                $q->whereHas('productUom.product', function ($q) use ($request) {
+                    $q->where('name', 'LIKE', "%{$request->search}%");
+                });
+            })
+            ->when($request->status, function ($q) use ($request) {
+                if ($request->status === 'allowed') {
+                    $q->where('reason', 'available');
+                }
+
+                if ($request->status === 'blocked') {
+                    $q->whereIn('reason', [
+                        'out_of_stock',
+                        'insufficient_stock'
+                    ]);
+                }
+            })
+            ->orderByDesc('id')
+            ->paginate($request->per_page ?? 15)
+            ->withQueryString();
+
+        return view('admin.stocks.stock-validation', compact('attempts'));
+    }
+}

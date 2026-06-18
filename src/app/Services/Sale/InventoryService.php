@@ -12,17 +12,17 @@ class InventoryService
     /**
      * Validate, check, and deduct stock for one sale item.
      *
-     * NOTE: No DB::transaction() here — SaleService owns the outer transaction,
+     * DB::transaction() here — SaleService owns the outer transaction,
      * so all stock changes roll back automatically if anything else in the sale fails.
      */
     public function deductStockWithCheck(string $productCode, string $uomCode, float $qty): void
     {
-        // Guard: quantity must be positive
+        // quantity must be positive
         if ($qty <= 0) {
             throw new \InvalidArgumentException('Quantity must be greater than zero.');
         }
 
-        // Lock the product row to prevent race conditions
+        // lock the product row to prevent race conditions
         $product = Product::where('code', $productCode)
             ->lockForUpdate()
             ->firstOrFail();
