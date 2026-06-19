@@ -1,22 +1,25 @@
 @extends('layouts.app')
 
 @push('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
-<link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/products.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/products.css') }}">
 @endpush
 
 @section('title', 'Product List')
 
 @section('content')
+
 <x-alert />
+
 <div class="product-section">
-    {{-- HEADER & FILTER BAR --}}
+
+    {{-- ── Header & Filter Bar ── --}}
     <div class="product-section__header">
 
         <form method="GET" action="{{ route('admin.products.index') }}" class="search-wrap" id="filter-form">
 
-            {{-- TEXT SEARCH --}}
+            {{-- Search --}}
             <div class="filter-group">
                 <input
                     type="text"
@@ -29,48 +32,79 @@
                 >
             </div>
 
-            {{-- START DATE --}}
+            {{-- Start date --}}
             <div class="filter-group">
-                <label>Start Date</label>
-                <input type="date" name="start_date" id="start_date"
-                    value="{{ request('start_date') }}" class="filter-input-date">
+                <label for="start_date">Start date</label>
+                <input
+                    type="date"
+                    name="start_date"
+                    id="start_date"
+                    value="{{ request('start_date') }}"
+                    class="filter-input-date"
+                >
             </div>
 
-            {{-- END DATE --}}
+            {{-- End date --}}
             <div class="filter-group">
-                <label>End Date</label>
-                <input type="date" name="end_date" id="end_date"
-                    value="{{ request('end_date') }}" class="filter-input-date">
+                <label for="end_date">End date</label>
+                <input
+                    type="date"
+                    name="end_date"
+                    id="end_date"
+                    value="{{ request('end_date') }}"
+                    class="filter-input-date"
+                >
             </div>
 
-            {{-- CATEGORY --}}
+            {{-- Category --}}
             <div class="filter-group">
                 <select name="category_code" id="category_code" class="filter-select">
-                    <option value="">All Categories</option>
+                    <option value="">All categories</option>
                     @foreach($categories as $category)
-                        <option value="{{ $category->code }}"
-                            {{ request('category_code') == $category->code ? 'selected' : '' }}>
+                        <option
+                            value="{{ $category->code }}"
+                            {{ request('category_code') == $category->code ? 'selected' : '' }}
+                        >
                             {{ $category->name }}
                         </option>
                     @endforeach
                 </select>
             </div>
 
-            {{-- RESET --}}
+            {{-- Reset --}}
             @if(request()->anyFilled(['search', 'start_date', 'end_date', 'category_code']))
-                <a href="{{ route('admin.products.index') }}" class="btn-clear" title="Clear Filters">
-                    ✕ Reset
+                <a href="{{ route('admin.products.index') }}" class="btn-clear" title="Clear filters">
+                    <i class="ti ti-x" aria-hidden="true"></i> Reset
                 </a>
             @endif
-
         </form>
-
+        <form action="#"
+            method="POST"
+            enctype="multipart/form-data">
+            @csrf
+            <input type="file"
+                onclick="alert('Comming soon!.')"
+                name="file"
+                id="excelFile"
+                accept=".xlsx,.xls,.csv"
+                hidden>
+            <button type="button"
+                    class="product-section__btn-add"
+                    style="background-color: rgb(53, 185, 53)"
+                    onclick="document.getElementById('excelFile').click()">
+                <i class="ti ti-upload"></i> Choose File
+            </button>
+            <button type="submit" class="product-section__btn-add">
+                <i class="ti ti-check"></i> Import
+            </button>
+        </form>
+        {{-- Add product --}}
         <a href="{{ route('admin.products.create') }}" class="product-section__btn-add">
-            + Add Product
+            <i class="ti ti-plus" aria-hidden="true"></i> Add product
         </a>
     </div>
 
-    {{-- TABLE --}}
+    {{-- ── Table ── --}}
     <div class="table-card">
         <div class="table-responsive">
             <table class="table-custom">
@@ -83,7 +117,7 @@
                         <th>Cost</th>
                         <th>Price</th>
                         <th>Stock</th>
-                        <th>Min Stock</th>
+                        <th>Min stock</th>
                         <th>Barcode</th>
                         <th>Expiry</th>
                         <th>Status</th>
@@ -96,19 +130,21 @@
                             <td>
                                 <img
                                     loading="lazy"
-                                    src="{{ $product->image ? asset('storage/'.$product->image) : 'https://via.placeholder.com/42' }}"
+                                    src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/40' }}"
                                     alt="{{ $product->name }}"
                                 >
                             </td>
-                            <td><span class="barcode-badge">{{ $product->code }}</span></td>
+                            <td>
+                                <span class="barcode-badge">{{ $product->code }}</span>
+                            </td>
                             <td>{{ $product->name }}</td>
-                            <td>{{ $product->category->name ?? '-' }}</td>
+                            <td>{{ $product->category->name ?? '—' }}</td>
                             <td>${{ number_format($product->cost_price, 2) }}</td>
                             <td>${{ number_format($product->price, 2) }}</td>
-                            <td>{{ $product->stock }}</td>
-                            <td>{{ $product->min_stock }}</td>
-                            <td>{{ $product->barcode ?? '-' }}</td>
-                            <td>{{ $product->expiry_date ?? '-' }}</td>
+                            <td>{{ number_format($product->stock) }}</td>
+                            <td>{{ number_format($product->min_stock) }}</td>
+                            <td>{{ $product->barcode ?? '—' }}</td>
+                            <td>{{ $product->expiry_date ?? '—' }}</td>
                             <td>
                                 <span class="status-badge status-{{ $product->status }}">
                                     {{ ucfirst($product->status) }}
@@ -116,24 +152,26 @@
                             </td>
                             <td>
                                 <div class="action-group">
-                                    <a href="{{ route('admin.products.edit', $product->code) }}" class="btn-edit" title="Edit">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                                        </svg>
+                                    {{-- Edit --}}
+                                    <a
+                                        href="{{ route('admin.products.edit', $product->code) }}"
+                                        class="btn-edit"
+                                        title="Edit product"
+                                    >
+                                        <i class="ti ti-pencil" aria-hidden="true"></i>
                                     </a>
-                                    <form action="{{ route('admin.products.destroy', $product->code) }}" method="POST"
-                                        onsubmit="return confirm('Delete product {{ addslashes($product->name) }}?')"
-                                        style="display:inline;">
+
+                                    {{-- Delete --}}
+                                    <form
+                                        action="{{ route('admin.products.destroy', $product->code) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Delete product \'{{ addslashes($product->name) }}\'?')"
+                                        style="display:inline"
+                                    >
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn-delete" title="Delete">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <polyline points="3 6 5 6 21 6"/>
-                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                                                <line x1="10" y1="11" x2="10" y2="17"/>
-                                                <line x1="14" y1="11" x2="14" y2="17"/>
-                                            </svg>
+                                        <button type="submit" class="btn-delete" title="Delete product">
+                                            <i class="ti ti-trash" aria-hidden="true"></i>
                                         </button>
                                     </form>
                                 </div>
@@ -141,20 +179,25 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="12">No products found</td>
+                            <td colspan="12">
+                                <i class="ti ti-package-off" aria-hidden="true" style="font-size:28px;display:block;margin:0 auto 8px;color:#d1d5db"></i>
+                                No products found.
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-        {{-- PAGINATION --}}
+        {{-- ── Pagination ── --}}
         <div class="pm-pagination">
             {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
         </div>
+
     </div>
 
 </div>
+
 @endsection
 
 @push('scripts')
@@ -181,5 +224,4 @@
     });
 })();
 </script>
-
 @endpush

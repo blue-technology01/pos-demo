@@ -1,44 +1,36 @@
-:root {
-    --primary:       #6366f1;
-    --primary-hover: #4f46e5;
-    --danger:        #ef4444;
-    --danger-hover:  #dc2626;
-    --success:       #22c55e;
-    --warning:       #f59e0b;
-    --bg:            #f9fafb;
-    --card:          #ffffff;
-    --border:        #e5e7eb;
-    --text:          #111827;
-    --text-muted:    #6b7280;
-    --radius:        10px;
-    --shadow:        0 1px 4px rgba(0,0,0,.07);
-}
+/* ============================================================
+   Product List — products.css
+   Primary: #2563eb  |  Border-radius pills: 50px
+   Font: Inter, sans-serif
+   ============================================================ */
 
-/* ── Layout ── */
+/* ---------- Page wrapper ---------- */
 .product-section {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    padding: 1.75rem 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--color-text-primary, #111);
 }
 
-/* ── Header ── */
+/* ---------- Header row ---------- */
 .product-section__header {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     flex-wrap: wrap;
-    gap: 12px;
-    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 1.25rem;
 }
 
-/* ── Filter form ── */
+/* ---------- Filter form ---------- */
 .search-wrap {
     display: flex;
-    flex-wrap: wrap;
     align-items: flex-end;
-    gap: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
     flex: 1;
 }
 
+/* Filter group (label + input stacked) */
 .filter-group {
     display: flex;
     flex-direction: column;
@@ -47,87 +39,115 @@
 
 .filter-group label {
     font-size: 11px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: .5px;
-    line-height: 1;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    color: var(--color-text-secondary, #6b7280);
+    padding-left: 2px;
 }
+
+/* Shared input base */
 .filter-input,
 .filter-input-date,
 .filter-select {
-    height: 38px;
-    padding: 0 12px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--card);
-    color: var(--text);
-    font-size: 13.5px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 7px 14px;
+    border-radius: 50px;
+    border: 0.5px solid var(--color-border-secondary, #d1d5db);
+    background: var(--color-background-primary, #fff);
+    color: var(--color-text-primary, #111);
     outline: none;
-    transition: border-color .2s, box-shadow .2s;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.filter-input        { min-width: 220px; }
-.filter-input-date   { min-width: 145px; }
-.filter-select       { min-width: 155px; }
+.filter-input {
+    min-width: 200px;
+}
+
+.filter-input-date {
+    min-width: 148px;
+}
+
+.filter-select {
+    min-width: 160px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+    cursor: pointer;
+}
+
+.filter-input::placeholder {
+    color: var(--color-text-tertiary, #9ca3af);
+}
 
 .filter-input:focus,
 .filter-input-date:focus,
 .filter-select:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* ── Buttons ── */
+/* Reset / clear button */
 .btn-clear {
-    height: 38px;
-    padding: 0 16px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--card);
-    color: var(--text-muted);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    transition: background .2s, color .2s, border-color .2s;
-    white-space: nowrap;
-}
-.btn-clear:hover {
-    background: #f3f4f6;
-    color: var(--text);
-    border-color: #d1d5db;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 7px 14px;
+    border-radius: 50px;
+    border: 0.5px solid var(--color-border-secondary, #d1d5db);
+    background: transparent;
+    color: var(--color-text-secondary, #6b7280);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    align-self: flex-end;
+    line-height: 1;
 }
 
-.product-section__btn-add {
-    height: 38px;
-    padding: 0 18px;
-    background:#2563eb;
-    color: #fff;
-    border-radius:50px;
-    font-size: 13.5px;
-    font-weight: 600;
+.btn-clear:hover {
+    background: var(--color-background-secondary, #f3f4f6);
+    color: var(--color-text-primary, #111);
     text-decoration: none;
+}
+
+/* Add product button */
+.product-section__btn-add {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: 50px;
+    border: none;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    line-height: 1;
     white-space: nowrap;
-    transition: background .2s, transform .15s;
-}
-.product-section__btn-add:hover {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
+    flex-shrink: 0;
 }
 
-/* ── Table card ── */
+.product-section__btn-add:hover {
+    opacity: 0.88;
+    color: #fff;
+    text-decoration: none;
+}
+
+/* ---------- Table card ---------- */
 .table-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    background: var(--color-background-primary, #fff);
+    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    border-radius: 16px;
     overflow: hidden;
 }
 
@@ -136,34 +156,37 @@
     -webkit-overflow-scrolling: touch;
 }
 
-/* ── Table ── */
+/* ---------- Table ---------- */
 .table-custom {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13.5px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
 }
 
-.table-custom thead tr {
-    background: #f8f9fb;
-    border-bottom: 1px solid var(--border);
+.table-custom thead {
+    background: var(--color-background-secondary, #f9fafb);
 }
 
 .table-custom th {
-    padding: 11px 14px;
     text-align: left;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 600;
-    color: var(--text-muted);
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    letter-spacing: .5px;
+    color: var(--color-text-secondary, #6b7280);
+    padding: 10px 14px;
+    border-bottom: 0.5px solid var(--color-border-tertiary, #e5e7eb);
     white-space: nowrap;
 }
 
 .table-custom td {
-    padding: 12px 14px;
-    color: var(--text);
-    border-bottom: 1px solid #f3f4f6;
+    padding: 11px 14px;
+    border-bottom: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    color: var(--color-text-primary, #111);
+    font-size: 13px;
     vertical-align: middle;
+    line-height: 1.4;
     white-space: nowrap;
 }
 
@@ -171,170 +194,211 @@
     border-bottom: none;
 }
 
-.table-custom tbody tr:hover td {
-    background: #fafbff;
+.table-custom tbody tr {
+    transition: background 0.1s;
 }
 
-/* ── Product image ── */
-.table-custom td img {
-    width: 42px;
-    height: 42px;
+.table-custom tbody tr:hover td {
+    background: #f8faff;
+}
+
+/* Empty row */
+.table-custom td[colspan] {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--color-text-secondary, #6b7280);
+    white-space: normal;
+}
+
+/* ---------- Product image ---------- */
+.table-custom img {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
     object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid var(--border);
+    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
     display: block;
 }
 
-/* ── Barcode badge ── */
+/* ---------- Code badge ---------- */
 .barcode-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    background: #f3f4f6;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    font-size: 12px;
-    font-family: monospace;
-    color: var(--text-muted);
-    letter-spacing: .4px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: var(--color-background-secondary, #f3f4f6);
+    color: var(--color-text-secondary, #374151);
+    letter-spacing: 0.04em;
+    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
 }
 
-/* ── Status badge ── */
+/* ---------- Status badge ---------- */
 .status-badge {
     display: inline-flex;
     align-items: center;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
-    letter-spacing: .2px;
-}
-.status-active {
-    background: #dcfce7;
-    color: #16a34a;
-}
-.status-inactive {
-    background: #fee2e2;
-    color: #dc2626;
+    padding: 3px 10px;
+    border-radius: 50px;
+    white-space: nowrap;
 }
 
-/* ── Action buttons ── */
+.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-draft {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* ---------- Action buttons ---------- */
 .action-group {
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
-.btn-edit {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50px;
-    border: 1px solid var(--border);
-    background: #22c55e;
-    cursor: pointer;
-    transition: background .2s, border-color .2s, color .2s, transform .15s;
-    text-decoration: none;
-    color: white;
-    padding: 0;
-}
-
+.btn-edit,
 .btn-delete {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 50px;
-    border: 1px solid var(--border);
-    background: #dc2626;
+    border: none;
     cursor: pointer;
-    transition: background .2s, border-color .2s, color .2s, transform .15s;
+    transition: background 0.15s;
     text-decoration: none;
-    color: white;
+    flex-shrink: 0;
     padding: 0;
 }
 
-.btn-edit:hover {
+.btn-edit {
     background: #eff6ff;
-    border-color: #bfdbfe;
     color: #2563eb;
-    transform: translateY(-1px);
+}
+
+.btn-edit:hover {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
 }
 
 .btn-delete:hover {
-    background: #fef2f2;
-    border-color: #fecaca;
-    color: var(--danger);
-    transform: translateY(-1px);
+    background: #fecaca;
 }
 
-/* ── Pagination ── */
+.btn-edit svg,
+.btn-delete svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+    flex-shrink: 0;
+}
+
+/* ---------- Pagination ---------- */
 .pm-pagination {
-    padding: 14px 16px;
-    border-top: 1px solid var(--border);
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border-top: 0.5px solid var(--color-border-tertiary, #e5e7eb);
 }
 
+/* Override Laravel Bootstrap 5 pagination */
 .pm-pagination .pagination {
     display: flex;
-    gap: 4px;
     align-items: center;
-    flex-wrap: wrap;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 .pm-pagination .page-item .page-link {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 34px;
-    height: 34px;
-    padding: 0 10px;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    font-size: 13px;
-    color: var(--text);
-    background: var(--card);
+    min-width: 30px;
+    height: 30px;
+    padding: 0 8px;
+    border-radius: 50px;
+    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    background: var(--color-background-primary, #fff);
+    color: var(--color-text-primary, #111);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
     text-decoration: none;
-    transition: background .2s, border-color .2s, color .2s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    line-height: 1;
 }
 
 .pm-pagination .page-item.active .page-link {
-    background: var(--primary);
-    border-color: var(--primary);
+    background: #2563eb;
     color: #fff;
+    border-color: #2563eb;
     font-weight: 600;
 }
 
 .pm-pagination .page-item.disabled .page-link {
-    color: #d1d5db;
+    opacity: 0.35;
+    cursor: default;
     pointer-events: none;
-    background: #f9fafb;
 }
 
-.pm-pagination .page-item .page-link:hover:not(.active) {
-    background: #f3f4f6;
-    border-color: #d1d5db;
+.pm-pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #2563eb;
 }
 
-/* ── Empty row ── */
-.table-custom td[colspan] {
-    padding: 48px 16px;
-    color: var(--text-muted);
+/* Hide "Previous" / "Next" text, keep arrows only */
+.pm-pagination .page-item:first-child .page-link span[aria-hidden],
+.pm-pagination .page-item:last-child .page-link span[aria-hidden] {
     font-size: 14px;
-    text-align: center;
 }
 
-/* ── Responsive ── */
-@media (max-width: 768px) {
-    .product-section { padding: 16px; }
-    .product-section__header { flex-direction: column; align-items: stretch; }
-    .search-wrap { flex-direction: column; }
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .product-section__header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .product-section__btn-add {
+        justify-content: center;
+    }
+
+    .search-wrap {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
     .filter-input,
     .filter-input-date,
-    .filter-select { width: 100%; min-width: unset; }
-    .product-section__btn-add { justify-content: center; }
-    .pm-pagination { justify-content: center; }
+    .filter-select {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .btn-clear {
+        align-self: auto;
+        justify-content: center;
+    }
 }

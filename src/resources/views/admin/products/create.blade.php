@@ -2,6 +2,7 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
 <link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/create.css') }}">
 @endpush
 

@@ -16,7 +16,7 @@ class ProductService
     public function getForAdmin(Request $request)
     {
         $query = Product::query()
-            ->with(['category', 'uoms.uom'])   // Load needed relationships
+            ->with(['category', 'uoms.uom'])  
             ->orderBy('code');
 
         // Text Search

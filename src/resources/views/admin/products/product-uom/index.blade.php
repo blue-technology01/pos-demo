@@ -3,7 +3,8 @@
 @section('title', 'Product UOM Management')
 
 @push('styles')
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/uom-list.css') }}">
 @endpush
 
@@ -11,28 +12,35 @@
 
 <x-alert />
 
+{{-- ── Page Header ── --}}
 <div class="page-header">
     <div>
-        <h2 class="page-title">Product UOM Management</h2>
-        <p class="page-subtitle">
-            Manage product units and conversion ratios
-        </p>
+        <h2 class="page-title">Product UOM management</h2>
+        <p class="page-subtitle">Manage product units and conversion ratios</p>
     </div>
-
     <a href="{{ route('admin.product-uom.create') }}" class="btn-add">
-        + Add Product UOM
+        <i class="ti ti-plus" aria-hidden="true"></i> Add product UOM
     </a>
 </div>
 
-<div class="filter-card" style="background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.04);">
-    <form action="{{ route('admin.product-uom.index') }}" method="GET" style="display: flex; gap: 12px; align-items: flex-end; width: 100%; flex-wrap: wrap;">
+{{-- ── Filters ── --}}
+<div class="filter-card">
+    <form action="{{ route('admin.product-uom.index') }}" method="GET">
 
         <div class="filter-group">
-            <label>Filter by Product</label>
-            <select name="product_code" onchange="this.form.submit()" class="filter-control">
-                <option value="">All Products</option>
+            <label for="product_code">Filter by product</label>
+            <select
+                name="product_code"
+                id="product_code"
+                class="filter-control"
+                onchange="this.form.submit()"
+            >
+                <option value="">All products</option>
                 @foreach($products as $product)
-                    <option value="{{ $product->code }}" {{ request('product_code') == $product->code ? 'selected' : '' }}>
+                    <option
+                        value="{{ $product->code }}"
+                        {{ request('product_code') == $product->code ? 'selected' : '' }}
+                    >
                         {{ $product->name }}
                     </option>
                 @endforeach
@@ -40,11 +48,19 @@
         </div>
 
         <div class="filter-group">
-            <label>Filter by UOM</label>
-            <select name="uom_code" onchange="this.form.submit()" class="filter-control">
+            <label for="uom_code">Filter by UOM</label>
+            <select
+                name="uom_code"
+                id="uom_code"
+                class="filter-control"
+                onchange="this.form.submit()"
+            >
                 <option value="">All UOMs</option>
                 @foreach($uoms as $uom)
-                    <option value="{{ $uom->code }}" {{ request('uom_code') == $uom->code ? 'selected' : '' }}>
+                    <option
+                        value="{{ $uom->code }}"
+                        {{ request('uom_code') == $uom->code ? 'selected' : '' }}
+                    >
                         {{ $uom->name }}
                     </option>
                 @endforeach
@@ -52,70 +68,81 @@
         </div>
 
         <div class="filter-group">
-            <label>Filter by Default Status</label>
-            <select name="is_default" onchange="this.form.submit()" class="filter-control">
-                <option value="">All Status</option>
-                <option value="1" {{ request('is_default') === '1' ? 'selected' : '' }}>Default Only</option>
-                <option value="0" {{ request('is_default') === '0' ? 'selected' : '' }}>Sub-units Only</option>
+            <label for="is_default">Filter by default status</label>
+            <select
+                name="is_default"
+                id="is_default"
+                class="filter-control"
+                onchange="this.form.submit()"
+            >
+                <option value="">All status</option>
+                <option value="1" {{ request('is_default') === '1' ? 'selected' : '' }}>Default only</option>
+                <option value="0" {{ request('is_default') === '0' ? 'selected' : '' }}>Sub-units only</option>
             </select>
         </div>
 
         @if(request('product_code') || request('uom_code') || (request('is_default') !== null && request('is_default') !== ''))
-            <a href="{{ route('admin.product-uom.index') }}" class="btn-clear" style="height: 38px; display: inline-flex; align-items: center; justify-content: center; background: #e5e7eb; color: #1f2937; padding: 0 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500;">
-                Clear Filters
+            <a href="{{ route('admin.product-uom.index') }}" class="btn-clear">
+                <i class="ti ti-x" aria-hidden="true"></i> Clear filters
             </a>
         @endif
     </form>
 </div>
 
+{{-- ── Table ── --}}
 <div class="table-card">
-
     <div class="table-responsive">
-
         <table class="table-custom">
             <thead>
                 <tr>
                     <th>Product</th>
                     <th>UOM</th>
-                    <th>Qty / Unit</th>
-                    <th>Cost Price</th>
-                    <th>Selling Price</th>
+                    <th>Qty / unit</th>
+                    <th>Cost price</th>
+                    <th>Selling price</th>
                     <th>Barcode</th>
                     <th>Default</th>
-                    <th>Action</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
-
             <tbody>
                 @forelse($productUoms as $item)
                     <tr>
-                        <td>{{ $item->product->name ?? '-' }}</td>
-                        <td>{{ $item->uom->name ?? '-' }}</td>
-                        <td>{{ $item->quantity_per_unit }}</td>
+                        <td>{{ $item->product->name ?? '—' }}</td>
+                        <td>{{ $item->uom->name ?? '—' }}</td>
+                        <td>{{ number_format($item->quantity_per_unit) }}</td>
                         <td>${{ number_format($item->cost_price, 2) }}</td>
-
                         <td>${{ number_format($item->selling_price, 2) }}</td>
-
-                        <td>{{ $item->barcode ?? '-' }}</td>
+                        <td>{{ $item->barcode ?? '—' }}</td>
                         <td>
                             @if($item->is_default)
-                                <span class="badge-default">Default</span>
+                                <span class="badge-default">
+                                    <i class="ti ti-circle-check" aria-hidden="true" style="font-size:11px"></i>
+                                    Default
+                                </span>
                             @else
-                                -
+                                <span style="color:var(--color-text-tertiary,#9ca3af);font-size:12px">—</span>
                             @endif
                         </td>
                         <td>
                             <div class="action-group">
-                                <a href="{{ route('admin.product-uom.edit', $item->id) }}" class="btn-edit">
-                                    Edit
+                                <a
+                                    href="{{ route('admin.product-uom.edit', $item->id) }}"
+                                    class="btn-edit"
+                                    title="Edit"
+                                >
+                                    <i class="ti ti-pencil" aria-hidden="true"></i> Edit
                                 </a>
-                                <form action="{{ route('admin.product-uom.destroy', $item->id) }}"
-                                      method="POST"
-                                      onsubmit="return confirm('Delete this Product UOM?')">
+                                <form
+                                    action="{{ route('admin.product-uom.destroy', $item->id) }}"
+                                    method="POST"
+                                    onsubmit="return confirm('Delete this product UOM?')"
+                                    style="display:inline"
+                                >
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn-delete">
-                                        Delete
+                                    <button type="submit" class="btn-delete" title="Delete">
+                                        <i class="ti ti-trash" aria-hidden="true"></i> Delete
                                     </button>
                                 </form>
                             </div>
@@ -123,16 +150,17 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" style="text-align:center; color: #6b7280; padding: 24px;">
-                            No Product UOM found.
+                        <td colspan="8">
+                            <i class="ti ti-package-off" aria-hidden="true" style="font-size:28px;display:block;margin:0 auto 8px;color:#d1d5db"></i>
+                            No product UOM found.
                         </td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
-
     </div>
 
+    {{-- ── Pagination ── --}}
     <div class="pagination-wrapper">
         {{ $productUoms->appends(request()->query())->links() }}
     </div>
@@ -140,9 +168,3 @@
 </div>
 
 @endsection
-
-@push('scripts')
-<script>
-    console.log('Product UOM Page Loaded');
-</script>
-@endpush

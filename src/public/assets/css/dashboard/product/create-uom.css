@@ -1,219 +1,204 @@
 /* ============================================================
    Create Product UOM — create-uom.css
+   Primary: #2563eb  |  Border-radius pills: 50px
+   Font: Inter, sans-serif
    ============================================================ */
 
-/* ---------- Page Header ---------- */
+/* ---------- Page wrapper ---------- */
 .page-header {
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
+    font-family: 'Inter', sans-serif;
 }
 
 .page-header h2 {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 600;
-    color: #111827;
-    margin: 0;
+    letter-spacing: -0.4px;
+    color: var(--color-text-primary, #111);
+    margin: 0 0 4px;
+    line-height: 1.2;
 }
 
 /* ---------- Card ---------- */
 .card {
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    padding: 28px 32px;
-    width: 100%;
+    background: var(--color-background-primary, #fff);
+    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    border-radius: 16px;
+    padding: 1.5rem;
+    font-family: 'Inter', sans-serif;
+    max-width: 780px;
 }
 
-/* ---------- Section Title ---------- */
+/* ---------- Section title ---------- */
 .section-title {
-    font-size: 11px;
-    font-weight: 700;
-    color: #9ca3af;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin: 0 0 16px;
+    color: var(--color-text-secondary, #6b7280);
     padding-bottom: 10px;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    margin-bottom: 1.1rem;
+    margin-top: 1.5rem;
 }
 
-.form-grid + .section-title {
-    margin-top: 32px;
+.section-title:first-of-type {
+    margin-top: 0;
 }
 
-/* ---------- Form Grid ---------- */
+/* ---------- Form grid ---------- */
 .form-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px 24px;
-    margin-bottom: 0;
+    gap: 14px;
+    margin-bottom: 1.25rem;
 }
 
-/* ---------- Form Group ---------- */
+/* ---------- Form group ---------- */
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
 }
 
 .form-group.full {
-    margin-top: 20px;
     grid-column: 1 / -1;
+    margin-bottom: 1.25rem;
 }
 
-/* ---------- Labels ---------- */
 .form-group label {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
-    color: #374151;
+    color: var(--color-text-secondary, #6b7280);
+    letter-spacing: 0.01em;
 }
 
-/* ---------- Inputs & Selects ---------- */
-.form-group input,
-.form-group select {
-    height: 40px;
-    padding: 0 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+/* ---------- Inputs & selects ---------- */
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="email"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
-    color: #111827;
-    background: #fff;
+    font-weight: 400;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 0.5px solid var(--color-border-secondary, #d1d5db);
+    background: var(--color-background-primary, #fff);
+    color: var(--color-text-primary, #111);
     outline: none;
     transition: border-color 0.15s, box-shadow 0.15s;
-    width: 100%;
-    appearance: none;
-    -webkit-appearance: none;
+    box-sizing: border-box;
 }
 
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group input[type="email"]:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--color-text-tertiary, #9ca3af);
+    font-weight: 400;
+}
+
+/* Select chevron */
 .form-group select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 32px;
     cursor: pointer;
 }
 
-.form-group input:focus,
-.form-group select:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+/* Textarea */
+.form-group textarea {
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.5;
 }
 
-.form-group input::placeholder {
-    color: #9ca3af;
-}
-
-.form-group input[type="number"] {
-    font-variant-numeric: tabular-nums;
-}
-
-/* ---------- Row Actions ---------- */
+/* ---------- Row actions ---------- */
 .row-actions {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 10px;
-    margin-top: 28px;
-    padding-top: 20px;
-    border-top: 1px solid #f3f4f6;
+    gap: 8px;
+    padding-top: 1.25rem;
+    margin-top: 0.5rem;
+    border-top: 0.5px solid var(--color-border-tertiary, #e5e7eb);
 }
 
-/* ---------- Cancel Button ---------- */
+/* Cancel */
 .btn-cancel {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    height: 38px;
-    padding: 0 20px;
-    border-radius: 8px;
-    background: #f3f4f6;
-    color: #374151;
+    gap: 5px;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 400;
+    padding: 8px 20px;
+    border-radius: 50px;
+    border: 0.5px solid var(--color-border-secondary, #d1d5db);
+    background: transparent;
+    color: var(--color-text-secondary, #6b7280);
     text-decoration: none;
-    border: 1px solid #e5e7eb;
     cursor: pointer;
-    transition: background 0.15s;
-    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+    line-height: 1;
 }
 
 .btn-cancel:hover {
-    background: #e5e7eb;
-    color: #111827;
+    background: var(--color-background-secondary, #f3f4f6);
+    color: var(--color-text-primary, #111);
+    text-decoration: none;
 }
 
-/* ---------- Submit Button ---------- */
+/* Submit */
 .btn-submit {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    height: 38px;
-    padding: 0 22px;
-    border-radius: 8px;
-    background: #2563eb;
-    color: #fff;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
     font-weight: 500;
+    padding: 8px 22px;
+    border-radius: 50px;
     border: none;
+    background: #2563eb;
+    color: #fff;
     cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
-    white-space: nowrap;
+    transition: opacity 0.15s;
+    line-height: 1;
 }
 
-.btn-submit:hover {
-    background: #1d4ed8;
-}
+.btn-submit:hover { opacity: 0.88; }
 
-.btn-submit:active {
-    transform: scale(0.98);
-}
-
-/* ---------- Alert ---------- */
-.alert {
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    font-size: 13px;
-}
-
-.alert-success {
-    background: #dcfce7;
-    color: #15803d;
-    border: 1px solid #bbf7d0;
-}
-
-.alert-danger,
-.alert-error {
-    background: #fee2e2;
-    color: #b91c1c;
-    border: 1px solid #fecaca;
-}
-
-/* ---------- Validation Error Style ---------- */
+/* ---------- Validation error state ---------- */
 .form-group input.is-invalid,
 .form-group select.is-invalid {
     border-color: #dc2626;
-}
-
-.form-group input.is-invalid:focus,
-.form-group select.is-invalid:focus {
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
-.invalid-feedback {
-    font-size: 12px;
+.form-group .invalid-feedback {
+    font-size: 11px;
     color: #dc2626;
     margin-top: 2px;
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 768px) {
-    .form-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
 @media (max-width: 640px) {
     .card {
-        padding: 20px 16px;
+        padding: 1.1rem;
     }
 
     .form-grid {
