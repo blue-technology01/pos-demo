@@ -18,7 +18,7 @@
     @stack('styles')
 </head>
 <body>
-
+    <x-loading />                         {{-- default: "Loading..." --}}
     <div class="panel-image">
         <div class="panel-logo">
             <img src="{{ asset('assets/images/logo.png') }}" alt="POS Logo" width="120" height="40">

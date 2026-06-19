@@ -98,7 +98,33 @@ class SaleService
 
     public function createSale(array $data): Sale
     {
-        return DB::transaction(function () use ($data) {
+        // Pre-validate stock for every item BEFORE opening the transaction,
+        // so blocked attempts are logged even if the sale itself doesn't proceed.
+        $validatedItems = [];
+
+        foreach ($data['items'] as $item) {
+            $productUom = $this->getProductUom(
+                $item['product_code'],
+                $item['uom_code']
+            );
+
+            if (!$productUom) {
+                throw new \Exception("UOM not found: {$item['uom_code']}");
+            }
+
+            $check = $this->stockGuardService->checkAndBlock($productUom->id, $item['quantity']);
+
+            if (!$check['allowed']) {
+                throw new \Exception("{$check['product_name']} blocked: {$check['reason']}");
+            }
+
+            $validatedItems[] = [
+                'item'        => $item,
+                'productUom'  => $productUom,
+            ];
+        }
+
+        return DB::transaction(function () use ($data, $validatedItems) {
 
             $invoiceNo = 'INV-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
 
@@ -117,8 +143,10 @@ class SaleService
                 'sale_date'       => now(),
                 'status'          => 'completed',
             ]);
-            // Process each sale item
-            foreach ($data['items'] as $item) {
+
+            foreach ($validatedItems as $validated) {
+                $item       = $validated['item'];
+                $productUom = $validated['productUom'];
 
                 $product = Product::where('code', $item['product_code'])
                     ->lockForUpdate()
@@ -128,30 +156,13 @@ class SaleService
                     throw new \Exception("Product not found: {$item['product_code']}");
                 }
 
-                $productUom = $this->getProductUom(
-                    $item['product_code'],
-                    $item['uom_code']
-                );
-
-                if (!$productUom) {
-                    throw new \Exception("UOM not found: {$item['uom_code']}");
-                }
-
-                // Check stock first
-                $check = $this->stockGuardService->checkAndBlock($productUom->id, $item['quantity']);
-
-                if (!$check['allowed']) {
-                    throw new \Exception("{$check['product_name']} blocked: {$check['reason']}");
-                }
-
-                // Deduct stock only after passing validation
+                // Stock was already validated above — deduct directly.
                 $this->inventoryService->deductStockWithCheck(
                     $item['product_code'],
                     $item['uom_code'],
                     $item['quantity']
                 );
 
-                // Create sale item
                 $sale->items()->create([
                     'product_id'   => $product->id,
                     'product_code' => $product->code,
@@ -172,11 +183,13 @@ class SaleService
                     paymentMethod: $data['payment_method'] ?? 'cash'
                 );
             }
+
             Log::info('Sale created', [
                 'invoice_no'   => $sale->invoice_no,
                 'total_amount' => $sale->total_amount,
                 'items_count'  => count($data['items']),
             ]);
+
             return $sale;
         });
     }

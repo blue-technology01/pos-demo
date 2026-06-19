@@ -22,13 +22,17 @@
         #1a4a8a
     );
 }
+.sp-page {
+    padding: 1.75rem 0;
+    font-family: inherit;
+}
 
 /* body layout */
 .dashboard-body {
     margin: 0;
+    font-family: 'Inter', sans-serif;
     height: 100vh;
     overflow: hidden;
-
     display: flex;
     flex-direction: column;
 }

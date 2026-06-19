@@ -8,26 +8,29 @@ use Illuminate\Support\Facades\Auth;
 
 class StockGuardService
 {
-    public function checkAndBlock(int $productUomId, float $qty):  array {
+    public function checkAndBlock(int $productUomId, float $qty): array {
         $productUom = ProductUom::with('product')->findOrFail($productUomId);
-        $stock = $productUom->stock ?? 0;
-        if ($stock <= 0) {
+        // stock lives on the the product, scaled by quality_per_unit for this UOM
+        $baseStock = $productUom->product->stock ?? 0;
+        $stock = $baseStock / ( $productUom->quantity_per_unit ? : 1 );
+        if($stock <= 0) {
             $reason = 'out_of_stock';
             $allowed = false;
-        } elseif ($stock < $qty) {
-            $reason = 'insufficient_stock'; // distinct reason is more useful
+        }elseif ($stock < $qty) {
+            $reason = 'insufficient_stock';
             $allowed = false;
-        } else {
+        }else {
             $reason = 'available';
             $allowed = true;
         }
-        if(!$allowed) {
+
+        if (!$allowed) {
             BlockedSaleAttempt::create([
-                'product_uom_id' => $productUom->id,
-                'requested_qty' => $qty,
+                'product_uom_id'  => $productUom->id,
+                'requested_qty'   => $qty,
                 'available_stock' => $stock,
-                'reason' => $reason,
-                'user_id' => Auth::id(),
+                'reason'          => $reason,
+                'user_id'         => Auth::id(),
             ]);
         }
         return [
@@ -35,7 +38,7 @@ class StockGuardService
             'reason' => $reason,
             'product_name' => $productUom->product->name,
             'current_stock' => $stock,
-            'requested_qty' => $qty,
+            'requested_qty' => $qty
         ];
     }
 }

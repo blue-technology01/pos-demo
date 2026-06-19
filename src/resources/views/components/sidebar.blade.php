@@ -74,9 +74,7 @@
                 <span class="menu-label">Products</span>
                 <i class="ti ti-chevron-right menu-arrow"></i>
             </div>
-
             <div class="sub-menu">
-
                 {{-- Products --}}
                 <a href="{{ route('admin.products.index') }}"
                 class="sub-item {{ request()->routeIs('admin.products.index', 'admin.products.create', 'admin.products.edit') ? 'active' : '' }}">
@@ -104,9 +102,7 @@
                     <i class="ti ti-point"></i>
                     Units
                 </a>
-
             </div>
-
         </div>
 
         {{-- Customers --}}
@@ -128,6 +124,7 @@
                 </a>
             </div>
         </div>
+
         {{-- Inventory --}}
         <div class="menu-group {{ request()->routeIs('admin.stocks*') ? 'open' : '' }}">
             <div class="menu-item has-sub" data-tooltip="Inventory">
@@ -181,7 +178,6 @@
                 </a>
             </div>
         </div>
-
         <div class="menu-group {{ request()->routeIs('admin.users*') ? 'open' : '' }}">
             <div class="menu-item has-sub" data-tooltip="Settings">
                 <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -213,7 +209,6 @@
 @push('scripts')
 <script>
     $(document).ready(function () {
-
         // ── Sidebar Collapse Toggle ──
         $('#sidebarToggle').on('click', function () {
             $('#sidebar').toggleClass('collapsed');

@@ -23,14 +23,16 @@ class RegisterController extends Controller
 
         return view('admin.users.user', compact('users', 'roles'));
     }
-
     // show user profile
     public function userProfile() {
         $users = $this->registerService->getAllUsers();
         $roles = $this->registerService->getRoles();
         return view('admin.users.user-profile',compact('users','roles'));
     }
-
+    // function for preview setting
+    public function previewSetting() {
+        return view('admin.users.preview-settings');
+    }
     public function register(RegisterRequest $request)
     {
         $key = 'register:' . $request->ip();
@@ -65,7 +67,6 @@ class RegisterController extends Controller
         }
 
         $result = $this->registerService->updateUser($user, $data);
-
         return $result['success']
             ? response()->json(['success' => true, 'message' => 'User updated!', 'user' => $this->formatUserResponse($result['user'])])
             : response()->json(['success' => false, 'message' => $result['message']], 422);

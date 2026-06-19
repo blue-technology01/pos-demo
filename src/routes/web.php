@@ -65,6 +65,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/users/{id}', [RegisterController::class, 'destroy'])->name('users.destroy');
         Route::post('/preview/update', [RegisterController::class, 'updatePreview']);
         Route::get('/profile', [RegisterController::class, 'userProfile'])->name('profile');
+        Route::get('/preview-settings', [RegisterController::class, 'previewSetting'])->name('preview-settings');
+
         // category
         Route::get('/category',[CategoryController::class,'index'])->name('category');
         Route::post('/category', [CategoryController::class, 'store'])->name('category.store');
@@ -103,11 +105,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/sales/{id}/edit', [SaleController::class, 'edit'])->name('sales.edit');
         Route::put('/sales/{id}', [SaleController::class, 'update'])->name('sales.update');
         Route::patch('/sales/{id}/cancel', [SaleController::class, 'cancel'])->name('sales.cancel');
-
-        Route::get('/preview-settings', function () {
-            return view('admin.users.preview-settings');
-        })->name('preview-settings');
-
         // inventory
         Route::get('/stock-update', [InventoryController::class, 'index'])->name('stock-update');
         Route::get('/stock-validation', [StockValidateController::class, 'index'])->name('stock-validation');
