@@ -4,8 +4,14 @@
     position: fixed;
     top: 20px;
     right: 20px;
-    width: 20%;
     z-index: 9999;
+
+    width: 320px;
+    max-width: calc(100vw - 40px);
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .alert {

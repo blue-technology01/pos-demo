@@ -9,8 +9,11 @@ use Illuminate\Support\Facades\DB;
 
 class ProductUomService
 {
-   public function getPOSProducts(Request $request): LengthAwarePaginator
+    public function getPOSProducts(Request $request): LengthAwarePaginator
     {
+        $perPage = (int) ($request->per_page ?? 15);
+        $useSimple = (bool) $request->boolean('simple', false); // pass ?simple=1 to skip COUNT()
+
         $query = DB::table('products as p')
             ->select([
                 'p.code',
@@ -22,32 +25,39 @@ class ProductUomService
             ])
             ->where('p.status', 'active');
 
-        if ($request->category_code) {
+        if ($request->filled('category_code')) {
             $query->where('p.category_code', $request->category_code);
         }
 
-        if ($search = $request->search) {
-            $query->where('p.name', 'like', "%{$search}%");
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            // Use prefix search (faster than %term%). If you need full substring search, add FULLTEXT or external search.
+            $query->where('p.name', 'like', "{$search}%");
         }
 
-        $paginator = $query
-            ->orderBy('p.name')
-            ->paginate($request->per_page ?? 20);
+        // Use simplePaginate to avoid expensive COUNT(*) if requested
+        $paginator = $useSimple
+            ? $query->orderBy('p.name')->simplePaginate($perPage)
+            : $query->orderBy('p.name')->paginate($perPage);
 
-        // Pre-load all UOMs for this page's products in one query
-        $codes = $paginator->getCollection()->pluck('code')->toArray();
+        // Pre-load UOMs for all products on this page in one query.
+        $codes = $paginator->getCollection()->pluck('code')->filter()->unique()->values()->all();
 
-        $uomsByProduct = DB::table('product_uoms as pu')
-            ->leftJoin('uoms as u', 'u.code', '=', 'pu.uom_code')
-            ->whereIn('pu.product_code', $codes)
-            ->select([
-                'pu.id', 'pu.product_code', 'pu.uom_code',
-                'pu.quantity_per_unit', 'pu.selling_price',
-                'pu.cost_price', 'pu.barcode', 'pu.uom_role',
-                'pu.is_default', 'u.name as uom_name',
-            ])
-            ->get()
-            ->groupBy('product_code');
+        if (empty($codes)) {
+            $uomsByProduct = collect();
+        } else {
+            $uomsByProduct = DB::table('product_uoms as pu')
+                ->leftJoin('uoms as u', 'u.code', '=', 'pu.uom_code')
+                ->whereIn('pu.product_code', $codes)
+                ->select([
+                    'pu.id', 'pu.product_code', 'pu.uom_code',
+                    'pu.quantity_per_unit', 'pu.selling_price',
+                    'pu.cost_price', 'pu.barcode', 'pu.uom_role',
+                    'pu.is_default', 'u.name as uom_name',
+                ])
+                ->get()
+                ->groupBy('product_code');
+        }
 
         $paginator->getCollection()->transform(function ($item) use ($uomsByProduct) {
             $uoms = ($uomsByProduct[$item->code] ?? collect())->map(fn($u) => [
@@ -92,24 +102,29 @@ class ProductUomService
                 'pu.uom_role',
                 'pu.is_default',
                 'pu.created_at',
+
+                // safe joins
                 'p.name as product_name',
                 'u.name as uom_name',
             ])
-            ->join('products as p', 'p.code', '=', 'pu.product_code')
+            ->leftJoin('products as p', 'p.code', '=', 'pu.product_code')
             ->leftJoin('uoms as u', 'u.code', '=', 'pu.uom_code')
-            ->orderBy('pu.id', 'desc');
+            ->orderByDesc('pu.id');
 
-        if ($request->product_code) {
+        if ($request->filled('product_code')) {
             $query->where('pu.product_code', $request->product_code);
         }
-        if ($request->uom_code) {
+
+        if ($request->filled('uom_code')) {
             $query->where('pu.uom_code', $request->uom_code);
         }
+
         if ($request->filled('is_default')) {
-            $query->where('pu.is_default', $request->boolean('is_default'));
+            $query->where('pu.is_default', filter_var($request->is_default, FILTER_VALIDATE_BOOLEAN));
         }
 
-        return $query->paginate($request->per_page ?? 15);
+        return $query->paginate($request->get('per_page', 15))
+            ->withQueryString();
     }
 
     public function findOrFail(int $id): ProductUom
@@ -165,9 +180,14 @@ class ProductUomService
         });
     }
 
-    public function delete(int $id): bool
+    public function delete(int $id): ProductUom
     {
-        return $this->findOrFail($id)->delete();
+        $uom = $this->findOrFail($id);
+        $uom->update([
+            'is_default' => false,
+            'deleted_at' => now(),
+        ]);
+        return $uom->fresh();
     }
 
     public function setDefault(ProductUom $uom): ProductUom

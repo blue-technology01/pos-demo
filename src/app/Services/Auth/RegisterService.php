@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class RegisterService
 {
@@ -26,44 +28,40 @@ class RegisterService
         return Role::hydrate($data);
     }
 
-    public function getAllUsers(): Collection
+    public function getAllUsers(Request $request): LengthAwarePaginator
     {
-        $data = Cache::remember('users:all', 60, function () {
-            return User::with(['roles:id,name'])
-                ->latest()
-                ->get(['id', 'name', 'email', 'phone', 'avatar', 'created_at'])
-                ->map(fn ($user) => [
-                    'id'         => $user->id,
-                    'name'       => $user->name,
-                    'email'      => $user->email,
-                    'phone'      => $user->phone,
-                    'avatar'     => $user->avatar,
-                    'created_at' => $user->created_at,
-                    'roles'      => $user->roles->toArray(),
-                ])
-                ->values()
-                ->toArray();
-        });
-
-        // Hydrate users from cached arrays and restore the roles relation
-        $users = User::hydrate($data);
-
-        foreach ($users as $idx => $user) {
-            $rolesData = $data[$idx]['roles'] ?? [];
-            $roleModels = Role::hydrate($rolesData ?: []);
-
-            // Ensure there is no raw 'roles' attribute that would shadow the relation
-            $attrs = $user->getAttributes();
-            if (array_key_exists('roles', $attrs)) {
-                unset($attrs['roles']);
-                $user->setRawAttributes($attrs, true);
-            }
-
-            $user->setRelation('roles', $roleModels);
-        }
-
-        return $users;
+        return User::with('roles')
+            ->when($request->search, function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                ->orWhere('email', 'like', "%{$request->search}%");
+            })
+            ->when($request->role, function ($q) use ($request) {
+                $q->whereHas('roles', function ($r) use ($request) {
+                    $r->where('name', $request->role);
+                });
+            })
+            ->latest()
+            ->paginate($request->per_page ?? 25)
+            ->withQueryString();
     }
+
+    // query user
+    public function queryUsers(Request $request) {
+        return User::with('roles')
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $search = $request->search;
+
+                $q->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->filled('role'), function ($q) use ($request) {
+                $q->whereHas('roles', fn($r) => $r->where('name', $request->role));
+            })
+            ->latest();
+    }
+
     // Role helper
     public function getRoleName(User $user): string
     {

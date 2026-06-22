@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class UomController extends Controller
-{   
+{
     // injection of service
     public function __construct(
         private readonly UomService $uomService
@@ -31,7 +31,7 @@ class UomController extends Controller
             ->route('admin.unit')
             ->with('success', 'Unit of Measure created successfully.');
     }
-    
+
     // update existing uom
     public function update(UomRequest $request, string $code)
     {
@@ -39,11 +39,11 @@ class UomController extends Controller
         return redirect()->back()->with('success', 'Updated successfully.');
     }
 
-    // deactivate uom 
+    // deactivate uom
     public function destroy(string $code): RedirectResponse
     {
         $this->uomService->deactivate($code);
-        
+
         return redirect()
             ->route('admin.unit')
             ->with('success', 'Unit of Measure deactivated successfully.');

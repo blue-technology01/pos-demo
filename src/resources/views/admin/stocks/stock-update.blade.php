@@ -31,17 +31,6 @@
         </div>
     </div>
 
-    {{-- Info banner --}}
-    <div class="automation-banner">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        Stock is automatically updated after each sale. No manual entry needed.
-    </div>
-
     {{-- Tabs --}}
     <div class="tab-bar">
         <button class="tab-btn active" data-tab="overview">
@@ -75,22 +64,38 @@
     </div>
 
     {{-- Search & sync bar --}}
-    <div class="search-bar">
+    <form method="GET" action="{{ url()->current() }}" class="search-bar">
         <div class="search-wrap">
-            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="2.5">
+            <svg class="search-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" id="product-search"
-                value="{{ $search ?? '' }}"
-                placeholder="Search product name, code or invoice...">
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Search product name, code or invoice..."
+            >
         </div>
+        {{-- Keep existing filters --}}
+        @foreach(request()->except('search', 'page') as $key => $value)
+            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+        @endforeach
+        <button type="submit" class="btn-filter">
+            Search
+        </button>
         <div class="sync-badge">
             <span class="sync-dot"></span>
             Live sync active
         </div>
-    </div>
+    </form>
 
     {{-- ── TAB 1: Stock overview ── --}}
     <div id="tab-overview" class="tab-content active">
@@ -133,7 +138,10 @@
                                     <div class="product-img-placeholder"></div>
                                 @endif
                             </td>
-                            <td class="code-cell">{{ $product->code }}</td>
+                            <td>
+                                <span class="code-badge">{{ $product->code }}</span>
+                            </td>
+                            {{-- <td class="code-cell">{{ $product->code }}</td> --}}
                             <td class="name-cell">{{ $product->name }}</td>
                             <td>{{ $product->category->name ?? '—' }}</td>
                             <td>
@@ -162,16 +170,34 @@
                 </tbody>
             </table>
         </div>
-
-        @if($products->hasPages())
-            <div class="table-footer">
-                <span>
-                    Showing {{ $products->firstItem() }}–{{ $products->lastItem() }}
-                    of {{ $products->total() }} products
-                </span>
-                {{ $products->links() }}
+        <div class="table-footer">
+            <div class="table-info">
+                Showing
+                {{ $activities->firstItem() ?? 0 }}
+                -
+                {{ $activities->lastItem() ?? 0 }}
+                of
+                {{ $activities->total() }}
+                activities
             </div>
-        @endif
+
+            <div class="pagination">
+                {{ $activities->appends(request()->query())->links() }}
+            </div>
+
+            <form method="GET" action="{{ url()->current() }}">
+                @foreach(request()->except('per_page', 'page') as $key => $value)
+                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                @endforeach
+
+                <select name="per_page" onchange="this.form.submit()">
+                    <option value="15" {{ request('per_page',15) == 15 ? 'selected' : '' }}>15</option>
+                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                </select>
+            </form>
+        </div>
     </div>
 
     {{-- ── TAB 2: Low stock alert ── --}}
@@ -212,7 +238,9 @@
                                     <div class="product-img-placeholder"></div>
                                 @endif
                             </td>
-                            <td class="code-cell">{{ $product->code }}</td>
+                            <td>
+                                <span class="code-badge">{{ $product->code }}</span>
+                            </td>
                             <td class="name-cell">{{ $product->name }}</td>
                             <td>{{ $product->category->name ?? '—' }}</td>
                             <td>
@@ -243,6 +271,34 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+        <div class="table-footer">
+            <div class="table-info">
+                Showing
+                {{ $activities->firstItem() ?? 0 }}
+                -
+                {{ $activities->lastItem() ?? 0 }}
+                of
+                {{ $activities->total() }}
+                activities
+            </div>
+
+            <div class="pagination">
+                {{ $activities->appends(request()->query())->links() }}
+            </div>
+
+            <form method="GET" action="{{ url()->current() }}">
+                @foreach(request()->except('per_page', 'page') as $key => $value)
+                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                @endforeach
+
+                <select name="per_page" onchange="this.form.submit()">
+                    <option value="15" {{ request('per_page',15) == 15 ? 'selected' : '' }}>15</option>
+                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                </select>
+            </form>
         </div>
     </div>
 
@@ -318,18 +374,35 @@
                 </tbody>
             </table>
         </div>
+       <div class="table-footer">
+        <div class="table-info">
+            Showing
+            {{ $activities->firstItem() ?? 0 }}
+            -
+            {{ $activities->lastItem() ?? 0 }}
+            of
+            {{ $activities->total() }}
+            activities
+        </div>
 
-        @if($activities->hasPages())
-            <div class="table-footer">
-                <span>
-                    Showing {{ $activities->firstItem() }}–{{ $activities->lastItem() }}
-                    of {{ $activities->total() }} activities today
-                </span>
-                {{ $activities->links() }}
-            </div>
-        @endif
+        <div class="pagination">
+            {{ $activities->appends(request()->query())->links() }}
+        </div>
+
+        <form method="GET" action="{{ url()->current() }}">
+            @foreach(request()->except('per_page', 'page') as $key => $value)
+                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+            @endforeach
+
+            <select name="per_page" onchange="this.form.submit()">
+                <option value="15" {{ request('per_page',15) == 15 ? 'selected' : '' }}>15</option>
+                <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+            </select>
+        </form>
     </div>
-
+    </div>
 </div>
 @endsection
 

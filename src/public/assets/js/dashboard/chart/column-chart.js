@@ -5,40 +5,38 @@ const CHART_COLORS = {
 };
 
 let columnChart = null;
+let currentChartData = {};
+let currentChartMetric = 'revenue';
+
+const CHART_LABELS = {
+    revenue: 'Revenue',
+    profit:  'Profit',
+    cost:    'Cost',
+};
 
 function buildChartOptions() {
 
     return {
 
         series: [
-            { name: 'Net Profit', data: [] },
-            { name: 'Revenue',    data: [] },
-            { name: 'Cost',       data: [] },
+            { name: CHART_LABELS[currentChartMetric], data: [] },
         ],
 
         chart: {
-            type:       'bar',
+            type:       'area',
             height:     320,
             toolbar:    { show: false },
-            animations: { enabled: true, speed: 400 },
+            zoom:       { enabled: false },
+            animations: { enabled: true, speed: 350 },
             fontFamily: 'inherit',
-        },
-
-        plotOptions: {
-            bar: {
-                horizontal:              false,
-                columnWidth:             '55%',
-                borderRadius:            5,
-                borderRadiusApplication: 'end',
-            },
         },
 
         dataLabels: { enabled: false },
 
         stroke: {
-            show:   true,
-            width:  2,
-            colors: ['transparent'],
+            curve:   'smooth',
+            width:   3,
+            lineCap: 'round',
         },
 
         xaxis: {
@@ -55,30 +53,39 @@ function buildChartOptions() {
             },
         },
 
+        markers: {
+            size: 0,
+            strokeWidth: 0,
+            hover: { size: 5 },
+        },
+
         tooltip: {
             shared:    true,
             intersect: false,
             y:         { formatter: formatUSD },
         },
 
-        fill: { opacity: 1 },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.24,
+                opacityTo: 0.02,
+                stops: [0, 95, 100],
+            },
+        },
 
         grid: {
             borderColor:     '#f1f5f9',
             strokeDashArray: 4,
-            padding:         { left: 0, right: 0 },
+            padding:         { left: 4, right: 12, top: 0, bottom: 0 },
         },
 
         legend: {
-            position:        'top',
-            horizontalAlign: 'right',
+            show: false,
         },
 
-        colors: [
-            CHART_COLORS.profit,
-            CHART_COLORS.revenue,
-            CHART_COLORS.cost,
-        ],
+        colors: [CHART_COLORS[currentChartMetric]],
 
         noData: {
             text:  'No data for this period',
@@ -101,24 +108,49 @@ function initChart() {
     columnChart = new ApexCharts(el, buildChartOptions());
     columnChart.render();
 
+    document.querySelectorAll('.chart-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            setAreaChartMetric(tab.dataset.chart || 'revenue');
+        });
+    });
+
 }
 
 function updateColumnChart(data) {
 
     if (!columnChart) return;
 
+    currentChartData = data || {};
+
     columnChart.updateOptions(
         {
-            xaxis:  { categories: data.categories || [] },
+            colors: [CHART_COLORS[currentChartMetric]],
+            stroke: { curve: 'smooth', width: 3, lineCap: 'round' },
+            xaxis:  { categories: currentChartData.categories || [] },
 
             series: [
-                { name: 'Net Profit', data: data.profit  || [] },
-                { name: 'Revenue',    data: data.revenue || [] },
-                { name: 'Cost',       data: data.cost    || [] },
+                {
+                    name: CHART_LABELS[currentChartMetric],
+                    data: currentChartData[currentChartMetric] || [],
+                },
             ],
         },
         false,
         true
     );
+
+}
+
+function setAreaChartMetric(metric) {
+
+    if (!CHART_LABELS[metric]) return;
+
+    currentChartMetric = metric;
+
+    document.querySelectorAll('.chart-tab').forEach(function (tab) {
+        tab.classList.toggle('active', tab.dataset.chart === metric);
+    });
+
+    updateColumnChart(currentChartData);
 
 }

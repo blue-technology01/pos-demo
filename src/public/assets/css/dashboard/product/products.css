@@ -312,25 +312,35 @@
 }
 
 /* ---------- Pagination ---------- */
-.pm-pagination {
+.table-footer {
     display: flex;
     align-items: center;
-    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
     padding: 12px 16px;
     border-top: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    background: var(--color-background-secondary, #f9fafb);
 }
 
-/* Override Laravel Bootstrap 5 pagination */
-.pm-pagination .pagination {
+.table-info {
+    font-size: 12px;
+    color: var(--color-text-secondary, #6b7280);
+}
+
+/* Pagination wrapper */
+.pagination {
+    display: flex;
+    align-items: center;
+}
+
+.pagination nav {
     display: flex;
     align-items: center;
     gap: 4px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
 }
 
-.pm-pagination .page-item .page-link {
+.pagination span,
+.pagination a {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -341,39 +351,55 @@
     border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
     background: var(--color-background-primary, #fff);
     color: var(--color-text-primary, #111);
-    font-family: 'Inter', sans-serif;
     font-size: 12px;
     font-weight: 500;
     text-decoration: none;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
-    line-height: 1;
 }
 
-.pm-pagination .page-item.active .page-link {
+.pagination [aria-current="page"] > span,
+.pagination .active > span {
     background: #2563eb;
     color: #fff;
     border-color: #2563eb;
     font-weight: 600;
 }
 
-.pm-pagination .page-item.disabled .page-link {
-    opacity: 0.35;
-    cursor: default;
-    pointer-events: none;
-}
-
-.pm-pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+.pagination a:hover {
     background: #eff6ff;
     border-color: #bfdbfe;
     color: #2563eb;
 }
 
-/* Hide "Previous" / "Next" text, keep arrows only */
-.pm-pagination .page-item:first-child .page-link span[aria-hidden],
-.pm-pagination .page-item:last-child .page-link span[aria-hidden] {
-    font-size: 14px;
+.pagination [disabled] span {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
 }
 
+/* Per-page select */
+.table-footer > form select {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    padding: 5px 28px 5px 12px;
+    border-radius: 50px;
+    border: 0.5px solid var(--color-border-secondary, #d1d5db);
+    background: var(--color-background-primary, #fff);
+    color: var(--color-text-secondary, #6b7280);
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.table-footer > form select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
     .product-section__header {

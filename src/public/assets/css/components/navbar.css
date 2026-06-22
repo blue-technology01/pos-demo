@@ -1,383 +1,476 @@
-
 .navbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    height: 64px;
-    padding: 0 24px;
+    justify-content: space-between;
+    height: 60px;
+    padding: 0 20px;
     background-color: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    box-sizing: border-box;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    border-bottom: 1px solid #e9ecef;
     position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 1000;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-/* --- Left Section (Toggle & Logo) --- */
 .navbar-left {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
 }
 
-/* Sidebar Hamburger Toggle Button */
-.navbar-toggle {
-    background: transparent;
-    border: none;
-    color: #4b5563;
-    font-size: 1.25rem;
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 6px;
+.panel-logo {
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.15s ease;
 }
 
-.navbar-toggle:hover {
-    background-color: #f3f4f6;
-    color: #111827;
-}
-
-/* Panel Logo Space */
 .panel-logo img {
     height: 32px;
     width: auto;
     object-fit: contain;
 }
 
-.navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* Wrap containers managing absolute positioning dropdowns */
-.nav-pill-wrap {
-    position: relative;
-}
-
-/* Base Pill Button Template */
-.nav-pill-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    height: 38px;
-    padding: 0 12px;
-    background-color:#e5e7eb ;
-    border: 1px solid #e5e7eb;
-    border-radius: 50px;
-    color: grey;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.nav-pill-btn:hover {
-    background-color: #f9fafb;
-    border-color: #d1d5db;
-    color: black;
-}
-
-.nav-pill-btn i {
-    font-size: 1.1rem;
-    color: #4b5563;
-}
-.ti:hover{
-    color: white;
-}
-
-/* Modification for single-icon elements (Fullscreen, Notifications) */
-.nav-pill-btn.icon-only {
-    width: 38px;
-    padding: 0;
-    justify-content: center;
-    position: relative;
-}
-
-/* Notification Alert Red Counter Dot */
-.notif-badge {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 8px;
-    height: 8px;
-    background-color: #ef4444;
-    border-radius: 50%;
-    border: 1px solid #ffffff;
-}
-
-.nav-pill-dropdown {
-    display: none;
-    position: absolute;
-    top: calc(100% + 6px);
-    right: 0;
-    min-width: 160px;
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 4px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); /* Soft structure depth */
-}
-
-/* Toggle drop behavior when container parent receives active state */
-.nav-pill-wrap.open .nav-pill-dropdown {
-    display: block;
-}
-
-/* Language Dropdown Core Rows */
-.pill-dropdown-item {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: transparent;
-    border: none;
-    font-size: 0.875rem;
-    color: #374151;
-    text-align: left;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.15s ease;
-}
-
-.pill-dropdown-item:hover {
-    background-color: #f3f4f6;
-    color: #111827;
-}
-
-.pill-dropdown-item.active {
-    background-color: #f3f4f6;
-    color: #111827;
-    font-weight: 600;
-}
-
-/* Notifications Card Custom Adjustments */
-.nav-pill-dropdown.notif-dropdown {
-    width: 280px;
-    padding: 0;
-    overflow: hidden;
-}
-
-.pill-dropdown-header {
-    padding: 12px 16px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #111827;
-    border-bottom: 1px solid #e5e7eb;
-    background-color: #f9fafb;
-}
-
-.notif-item {
-    padding: 12px 16px;
-    border-bottom: 1px solid #f3f4f6;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.notif-item:hover {
-    background-color: #f9fafb;
-}
-
-.notif-title {
-    font-size: 0.8125rem;
-    color: #374151;
-    margin-bottom: 2px;
-    line-height: 1.4;
-}
-
-.notif-time {
-    font-size: 0.75rem;
-    color: #9ca3af;
-}
-
-/* --- User Profile Dropdown Setup --- */
-.navbar-user {
+.navbar-right,
+.header-actions {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 4px 8px;
-    border-radius: 6px;
-    cursor: pointer;
+}
+
+.navbar-toggle,
+.nav-pill-btn,
+.action-btn {
     position: relative;
-    user-select: none;
-    transition: background-color 0.15s ease;
-}
-
-.navbar-user:hover {
-    background-color: #f9fafb;
-}
-
-/* Tiny Navigation Avatar Framework */
-.avatar-img-sm {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid #e5e7eb;
-}
-
-.user-info {
     display: flex;
-    flex-direction: column;
-    text-align: left;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    background-color: #f1f3f5;
+    border: none;
+    border-radius: 50%;
+    color: #495057;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    text-decoration: none;
+    flex-shrink: 0;
 }
 
-.user-name {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #111827;
-    line-height: 1.2;
+.navbar-toggle:hover,
+.nav-pill-btn:hover,
+.action-btn:hover {
+    background-color: #e2e8f0;
+    color: #2563a8;
 }
 
-.user-position {
-    font-size: 0.75rem;
-    color: #6b7280;
+.navbar-toggle:focus-visible,
+.nav-pill-btn:focus-visible,
+.action-btn:focus-visible {
+    outline: 2px solid #2563a8;
+    outline-offset: 2px;
 }
 
-/* Sub-chevron alignment indicator */
-.navbar-user > i {
-    font-size: 0.85rem;
-    color: #9ca3af;
-    transition: transform 0.15s ease;
+/* Material Symbols icon size inside all icon buttons */
+.navbar-toggle .material-symbols-outlined,
+.nav-pill-btn .material-symbols-outlined,
+.action-btn .material-symbols-outlined {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 1;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Rotate Chevron Indicator when active opens layout block */
-.navbar-user.open > i {
-    transform: rotate(180deg);
-}
-
-/* Main User Floating Block Container */
-.navbar-dropdown {
-    display: none;
-    position: absolute;
-    top: calc(100% + 6px);
-    right: 0;
-    width: 240px;
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-}
-
-.navbar-user.open .navbar-dropdown {
+/* Flag icon inside language button */
+.nav-pill-btn .flag-icon {
+    width: 22px;
+    height: auto;
+    border-radius: 2px;
     display: block;
 }
 
-/* Header context blocks interior to profile dropdown toggles */
+.nav-pill-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Remove decoration from anchor wrapping POS button */
+.nav-pill-wrap a {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+
+.notif-badge,
+.action-btn.has-badge .badge {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    width: 8px;
+    height: 8px;
+    background-color: #fa5252;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    pointer-events: none;
+}
+
+
+.navbar-user,
+.user-profile-toggle {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 5px 12px 5px 6px;
+    background-color: #f1f3f5;
+    border-radius: 30px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+    position: relative;
+}
+
+.navbar-user:hover,
+.user-profile-toggle:hover {
+    background-color: #e2e8f0;
+}
+
+.navbar-user:focus-visible,
+.user-profile-toggle:focus-visible {
+    outline: 2px solid #2563a8;
+    outline-offset: 2px;
+    border-radius: 30px;
+}
+
+/* Avatar image inside user pill */
+.avatar-img-sm,
+.profile-avatar {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    min-height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+/* User name + role text stack */
+.user-info,
+.user-meta {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.3;
+}
+
+.user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #212529;
+    white-space: nowrap;
+}
+
+.user-position,
+.user-role {
+    font-size: 10px;
+    color: #868e96;
+    white-space: nowrap;
+}
+
+/* Chevron icon inside user pill */
+.navbar-user .material-symbols-outlined {
+    font-size: 20px;
+    color: #868e96;
+    flex-shrink: 0;
+}
+
+
+.navbar-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 220px;
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+    z-index: 1100;
+    overflow: hidden;
+}
+
+.navbar-dropdown.is-open,
+#userDropdown.is-open {
+    display: block;
+    animation: dropdownFadeIn 0.15s ease;
+}
+
+/* Dropdown user header section */
 .dropdown-user-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px 8px 12px 8px;
-    text-align: left;
+    padding: 14px 16px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
 }
 
 .avatar-img-lg {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
     border-radius: 50%;
     object-fit: cover;
 }
 
 .dropdown-user-name {
-    font-size: 0.875rem;
+    font-size: 14px;
     font-weight: 600;
-    color: #111827;
+    color: #212529;
+    white-space: nowrap;
 }
 
 .dropdown-user-role {
-    font-size: 0.75rem;
-    color: #6b7280;
+    font-size: 11px;
+    color: #868e96;
+    margin-top: 2px;
 }
 
-/* Standard structural line breaks */
+/* Divider inside dropdown */
 .navbar-dropdown hr {
-    border: 0;
-    border-top: 1px solid #e5e7eb;
-    margin: 6px 0;
+    margin: 4px 0;
+    border: none;
+    border-top: 1px solid #f1f3f5;
 }
 
-/* Action Hyperlinks Row Styles inside Dropdown */
+/* Dropdown menu items */
 .dropdown-item {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 12px;
-    color: #374151;
-    font-size: 0.875rem;
-    font-weight: 500;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: #495057;
     text-decoration: none;
-    border-radius: 6px;
-    width: 100%;
-    box-sizing: border-box;
     background: transparent;
     border: none;
+    width: 100%;
     text-align: left;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
-
-
-.pos-nav__customer {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 9999px;
-    padding: 6px 12px;
-}
-
-.pos-nav__customer-select {
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 14px;
-    cursor: pointer;
-    min-width: 160px;
-}
-
-.pos-nav__add-customer-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #3b82f6;
-    color: white;
-    border: none;
-    font-size: 18px;
-}
-
-
-
 
 .dropdown-item:hover {
-    background-color: #f3f4f6;
-    color: #111827;
+    background-color: #f8f9fa;
+    color: #2563a8;
 }
 
-.dropdown-item i {
-    font-size: 1.1rem;
-    color: #4b5563;
+.dropdown-item .material-symbols-outlined {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #868e96;
+    flex-shrink: 0;
+    vertical-align: middle;
+    transition: color 0.15s ease;
 }
 
+.dropdown-item:hover .material-symbols-outlined {
+    color: #2563a8;
+}
+
+/* Danger/logout item */
 .dropdown-item.text-danger {
-    color: #dc2626;
+    color: #e03131;
+}
+
+.dropdown-item.text-danger .material-symbols-outlined {
+    color: #e03131;
 }
 
 .dropdown-item.text-danger:hover {
-    background-color: #fef2f2;
-    color: #b91c1c;
+    background-color: #fff5f5;
+    color: #c92a2a;
 }
 
-.dropdown-item.text-danger i {
-    color: inherit;
+/* Remove default form styling around logout button */
+.navbar-dropdown form {
+    margin: 0;
+    padding: 0;
+}
+
+
+.nav-pill-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+    z-index: 1100;
+    overflow: hidden;
+    min-width: 180px;
+}
+
+.nav-pill-dropdown.is-open {
+    display: block;
+    animation: dropdownFadeIn 0.15s ease;
+}
+
+/* Dropdown header label (Notifications) */
+.pill-dropdown-header {
+    padding: 11px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #212529;
+    border-bottom: 1px solid #e9ecef;
+    background-color: #f8f9fa;
+}
+
+.lang-dropdown-flags {
+    min-width: 150px;
+}
+
+.pill-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    font-size: 13px;
+    color: #495057;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.pill-dropdown-item:hover {
+    background-color: #f1f3f5;
+    color: #2563a8;
+}
+
+.pill-dropdown-item.active {
+    color: #2563a8;
+    font-weight: 600;
+    background-color: #e8f0fb;
+}
+
+.pill-dropdown-item img {
+    width: 22px;
+    height: auto;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.notif-dropdown {
+    min-width: 290px;
+    max-height: 340px;
+    overflow-y: auto;
+}
+
+.notif-item {
+    padding: 11px 16px;
+    border-bottom: 1px solid #f1f3f5;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.notif-item:last-child {
+    border-bottom: none;
+}
+
+.notif-item:hover {
+    background-color: #f8f9fa;
+}
+
+.notif-title {
+    font-size: 13px;
+    color: #212529;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.notif-time {
+    font-size: 11px;
+    color: #adb5bd;
+    margin-top: 3px;
+}
+
+/* Scrollbar style for notification list */
+.notif-dropdown::-webkit-scrollbar {
+    width: 4px;
+}
+
+.notif-dropdown::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.notif-dropdown::-webkit-scrollbar-thumb {
+    background-color: #dee2e6;
+    border-radius: 4px;
+}
+
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0 12px;
+        height: 54px;
+    }
+
+    .user-info,
+    .user-meta {
+        display: none;
+    }
+
+    .navbar-user,
+    .user-profile-toggle {
+        padding: 4px;
+        border-radius: 50%;
+        gap: 0;
+    }
+
+    .navbar-user .material-symbols-outlined {
+        display: none;
+    }
+
+    .panel-logo img {
+        height: 26px;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-right,
+    .header-actions {
+        gap: 6px;
+    }
+
+    .navbar-toggle,
+    .nav-pill-btn,
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+    }
 }

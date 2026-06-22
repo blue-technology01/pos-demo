@@ -4,6 +4,7 @@
 
 @push('styles')
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard/dashboard.css') }}">
 @endpush
@@ -13,7 +14,6 @@
 @php $stats = $dashboardData['stats'] ?? []; @endphp
 
 <div class="dash-wrapper">
-
     {{-- ── Header ── --}}
     <div class="dash-header">
         <div>
@@ -75,17 +75,17 @@
     {{-- ── Charts Row ── --}}
     <div class="dash-row-2">
 
-        {{-- Sales analytics (column chart) --}}
+        {{-- Sales analytics (area chart) --}}
         <div class="dash-card chart-card">
             <div class="dash-card-header">
                 <div>
                     <div class="dash-card-title">Sales analytics</div>
-                    <div class="dash-card-sub">Revenue, orders and customer trends</div>
+                    <div class="dash-card-sub">Revenue, profit and cost trends</div>
                 </div>
                 <div class="chart-tabs">
                     <button class="chart-tab active" data-chart="revenue">Revenue</button>
-                    <button class="chart-tab"        data-chart="orders">Orders</button>
-                    <button class="chart-tab"        data-chart="customers">Customers</button>
+                    <button class="chart-tab"        data-chart="profit">Profit</button>
+                    <button class="chart-tab"        data-chart="cost">Cost</button>
                 </div>
             </div>
             <div id="chart"></div>

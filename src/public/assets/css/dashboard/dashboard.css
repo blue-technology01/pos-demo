@@ -192,6 +192,20 @@
     overflow: hidden;
 }
 
+.chart-card {
+    border-color: #edf2f7;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+#chart {
+    min-height: 320px;
+    margin: 0 -8px -10px;
+}
+
+#donutChart {
+    min-height: 248px;
+}
+
 /* ---------- Card header ---------- */
 .dash-card-header {
     display: flex;
@@ -221,37 +235,38 @@
 .chart-tabs {
     display: flex;
     align-items: center;
-    border: 0.5px solid var(--color-border-secondary, #d1d5db);
-    border-radius: 50px;
-    overflow: hidden;
-    background: var(--color-background-primary, #fff);
+    gap: 4px;
+    border: 0;
+    border-radius: 10px;
+    background: #f8fafc;
+    padding: 4px;
     flex-shrink: 0;
 }
 
 .chart-tab {
     font-family: 'Inter', sans-serif;
     font-size: 12px;
-    font-weight: 400;
-    padding: 6px 14px;
+    font-weight: 500;
+    padding: 7px 12px;
     border: none;
     background: transparent;
     color: var(--color-text-secondary, #6b7280);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    border-radius: 8px;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
     white-space: nowrap;
     line-height: 1;
 }
 
 .chart-tab:hover {
-    background: var(--color-background-secondary, #f3f4f6);
+    background: #fff;
     color: var(--color-text-primary, #111);
 }
 
 .chart-tab.active {
-    background: #2563eb;
-    color: #fff;
-    font-weight: 500;
-    border-radius: 50px;
+    background: #fff;
+    color: #2563eb;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.10);
 }
 
 /* ============================================================

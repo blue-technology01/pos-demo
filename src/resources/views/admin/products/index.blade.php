@@ -134,9 +134,11 @@
                                     alt="{{ $product->name }}"
                                 >
                             </td>
+
                             <td>
                                 <span class="barcode-badge">{{ $product->code }}</span>
                             </td>
+
                             <td>{{ $product->name }}</td>
                             <td>{{ $product->category->name ?? '—' }}</td>
                             <td>${{ number_format($product->cost_price, 2) }}</td>
@@ -150,6 +152,7 @@
                                     {{ ucfirst($product->status) }}
                                 </span>
                             </td>
+
                             <td>
                                 <div class="action-group">
                                     {{-- Edit --}}
@@ -160,7 +163,6 @@
                                     >
                                         <i class="ti ti-pencil" aria-hidden="true"></i>
                                     </a>
-
                                     {{-- Delete --}}
                                     <form
                                         action="{{ route('admin.products.destroy', $product->code) }}"
@@ -190,12 +192,35 @@
         </div>
 
         {{-- ── Pagination ── --}}
-        <div class="pm-pagination">
-            {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
+        <div class="table-footer" id="tableFooter">
+            <div class="table-info">
+                Showing
+                {{ $products->firstItem() ?? 0 }}
+                -
+                {{ $products->lastItem() ?? 0 }}
+                of
+                {{ $products->total() }}
+                units
+            </div>
+
+            <div class="pagination">
+                {{ $products->links() }}
+            </div>
+
+            {{-- per page --}}
+            <form method="GET" action="{{ url()->current() }}">
+                @foreach(request()->except('per_page', 'page') as $key => $value)
+                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                @endforeach
+
+                <select name="per_page" onchange="this.form.submit()">
+                    <option value="15" {{ request('per_page') == 15 ? 'selected' : '' }}>15</option>
+                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                </select>
+            </form>
         </div>
-
     </div>
-
 </div>
 
 @endsection

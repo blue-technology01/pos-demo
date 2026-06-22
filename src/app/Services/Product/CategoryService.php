@@ -15,9 +15,57 @@ class CategoryService
      */
     public function getAll(Request $request): LengthAwarePaginator
     {
-        return Category::select('code', 'name', 'description', 'image', 'status', 'created_at')
-            ->where('status', 'active')
-            ->paginate($request->query('per_page', 15));
+        $query = Category::select(
+            'code',
+            'name',
+            'description',
+            'image',
+            'status',
+            'created_at'
+        )
+        ->where('status', 'active');
+        // Search
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            $query->where(function ($q) use ($search) {
+                $q->where('code', 'like', "%{$search}%")
+                ->orWhere('name', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Sort
+        switch ($request->get('sort')) {
+            case 'oldest':
+                $query->oldest();
+                break;
+
+            case 'name_asc':
+                $query->orderBy('name');
+                break;
+
+            case 'name_desc':
+                $query->orderByDesc('name');
+                break;
+
+            case 'code_asc':
+                $query->orderBy('code');
+                break;
+
+            default:
+                $query->latest();
+                break;
+        }
+
+        return $query
+            ->paginate($request->get('per_page', 15))
+            ->withQueryString();
     }
 
     /**
@@ -78,7 +126,10 @@ class CategoryService
     public function deactivate(string $code): Category
     {
         $category = Category::findOrFail($code);
-        $category->update(['status' => 'inactive']);
+
+        $category->update([
+            'status' => 'inactive'
+        ]);
 
         return $category->fresh();
     }

@@ -11,56 +11,38 @@
 @section('content')
 
 <div class="page">
-
+    <x-alert/>
     {{-- ── Toolbar ── --}}
     <div class="toolbar">
-        <div class="toolbar-left">
-
-            {{-- Search --}}
-            <div class="search-box">
-                <i class="ti ti-search" aria-hidden="true"></i>
-                <input type="text" id="searchInput" placeholder="Search units..." autocomplete="off">
-            </div>
-
-            {{-- Status filter --}}
-            <select id="filterStatus" class="filter-select">
-                <option value="">All status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-            </select>
-
-            {{-- Sort filter --}}
-            <select id="filterSort" class="filter-select">
-                <option value="newest">Newest first</option>
-                <option value="oldest">Oldest first</option>
-                <option value="name_asc">Name A–Z</option>
-                <option value="name_desc">Name Z–A</option>
-                <option value="code_asc">Code A–Z</option>
-            </select>
-
-            {{-- Clear filters --}}
-            <button id="btnClear" class="btn-clear" type="button">
-                <i class="ti ti-x" aria-hidden="true"></i> Clear filters
-            </button>
-
+        <div class="toolbar-left" >
+            <form method="GET" action="{{ url()->current() }}" style="display:flex; gap:10px;">
+                {{-- search --}}
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Search categories..."
+                >
+                {{-- status --}}
+                <select name="status" class="border rounded px-3 py-2">
+                    <option value="">All Status</option>
+                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                </select>
+                <select name="sort">
+                    <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest first</option>
+                    <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest first</option>
+                    <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name A-Z</option>
+                    <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name Z-A</option>
+                    <option value="code_asc" {{ request('sort') == 'code_asc' ? 'selected' : '' }}>Code A-Z</option>
+                </select>
+                <button type="submit" class="btn-filter">Filter</button>
+            </form>
         </div>
         <div class="toolbar-right">
-
-            {{-- Per page --}}
-            <div class="per-page-wrap">
-                <label for="perPage">Show</label>
-                <select id="perPage" class="filter-select" style="width:72px">
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                </select>
-            </div>
-
-            {{-- Add unit --}}
             <button type="button" id="open-create-modal" class="btn-add">
-                <i class="ti ti-plus" aria-hidden="true"></i> Add unit
+                <i class="ti ti-plus"></i> Add unit
             </button>
-
         </div>
     </div>
 
@@ -151,14 +133,36 @@
                 </tbody>
             </table>
         </div>
-
-        {{-- Table footer --}}
+        {{-- table footer --}}
         <div class="table-footer" id="tableFooter">
-            <div class="table-info" id="tableInfo"></div>
-            <div class="pagination" id="pagination"></div>
+            <div class="table-info">
+                Showing
+                {{ $uoms->firstItem() ?? 0 }}
+                -
+                {{ $uoms->lastItem() ?? 0 }}
+                of
+                {{ $uoms->total() }}
+                units
+            </div>
+
+            <div class="pagination">
+                {{ $uoms->links() }}
+            </div>
+
+            {{-- per page --}}
+            <form method="GET" action="{{ url()->current() }}">
+                @foreach(request()->except('per_page', 'page') as $key => $value)
+                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                @endforeach
+
+                <select name="per_page" onchange="this.form.submit()">
+                    <option value="15" {{ request('per_page') == 15 ? 'selected' : '' }}>15</option>
+                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                </select>
+            </form>
         </div>
     </div>
-
 </div>
 
 {{-- ══ Create Modal ══ --}}
@@ -287,7 +291,6 @@
         </form>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')

@@ -21,7 +21,6 @@ class CategoryController extends Controller
     public function index(Request $request): View
     {
         $categories = $this->categoryService->getAll($request);
-
         return view('admin.products.category', compact('categories'));
     }
 
@@ -55,7 +54,7 @@ class CategoryController extends Controller
     public function destroy(string $code): RedirectResponse
     {
         $this->categoryService->deactivate($code);
-        
+
         return redirect()
             ->route('admin.category')
             ->with('success', 'Category deactivated successfully.');

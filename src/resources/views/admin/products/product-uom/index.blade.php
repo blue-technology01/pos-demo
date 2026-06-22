@@ -18,8 +18,9 @@
         <h2 class="page-title">Product UOM management</h2>
         <p class="page-subtitle">Manage product units and conversion ratios</p>
     </div>
+
     <a href="{{ route('admin.product-uom.create') }}" class="btn-add">
-        <i class="ti ti-plus" aria-hidden="true"></i> Add product UOM
+        <i class="ti ti-plus"></i> Add product UOM
     </a>
 </div>
 
@@ -28,19 +29,12 @@
     <form action="{{ route('admin.product-uom.index') }}" method="GET">
 
         <div class="filter-group">
-            <label for="product_code">Filter by product</label>
-            <select
-                name="product_code"
-                id="product_code"
-                class="filter-control"
-                onchange="this.form.submit()"
-            >
+            <label>Filter by product</label>
+            <select name="product_code" class="filter-control" onchange="this.form.submit()">
                 <option value="">All products</option>
                 @foreach($products as $product)
-                    <option
-                        value="{{ $product->code }}"
-                        {{ request('product_code') == $product->code ? 'selected' : '' }}
-                    >
+                    <option value="{{ $product->code }}"
+                        {{ request('product_code') == $product->code ? 'selected' : '' }}>
                         {{ $product->name }}
                     </option>
                 @endforeach
@@ -48,19 +42,12 @@
         </div>
 
         <div class="filter-group">
-            <label for="uom_code">Filter by UOM</label>
-            <select
-                name="uom_code"
-                id="uom_code"
-                class="filter-control"
-                onchange="this.form.submit()"
-            >
+            <label>Filter by UOM</label>
+            <select name="uom_code" class="filter-control" onchange="this.form.submit()">
                 <option value="">All UOMs</option>
                 @foreach($uoms as $uom)
-                    <option
-                        value="{{ $uom->code }}"
-                        {{ request('uom_code') == $uom->code ? 'selected' : '' }}
-                    >
+                    <option value="{{ $uom->code }}"
+                        {{ request('uom_code') == $uom->code ? 'selected' : '' }}>
                         {{ $uom->name }}
                     </option>
                 @endforeach
@@ -68,24 +55,20 @@
         </div>
 
         <div class="filter-group">
-            <label for="is_default">Filter by default status</label>
-            <select
-                name="is_default"
-                id="is_default"
-                class="filter-control"
-                onchange="this.form.submit()"
-            >
-                <option value="">All status</option>
-                <option value="1" {{ request('is_default') === '1' ? 'selected' : '' }}>Default only</option>
-                <option value="0" {{ request('is_default') === '0' ? 'selected' : '' }}>Sub-units only</option>
+            <label>Default status</label>
+            <select name="is_default" class="filter-control" onchange="this.form.submit()">
+                <option value="">All</option>
+                <option value="1" {{ request('is_default') == '1' ? 'selected' : '' }}>Default only</option>
+                <option value="0" {{ request('is_default') == '0' ? 'selected' : '' }}>Sub units only</option>
             </select>
         </div>
 
-        @if(request('product_code') || request('uom_code') || (request('is_default') !== null && request('is_default') !== ''))
+        @if(request()->filled('product_code') || request()->filled('uom_code') || request()->filled('is_default'))
             <a href="{{ route('admin.product-uom.index') }}" class="btn-clear">
-                <i class="ti ti-x" aria-hidden="true"></i> Clear filters
+                <i class="ti ti-x"></i> Clear filters
             </a>
         @endif
+
     </form>
 </div>
 
@@ -101,48 +84,67 @@
                     <th>Cost price</th>
                     <th>Selling price</th>
                     <th>Barcode</th>
+                    <th>Role</th>
                     <th>Default</th>
                     <th>Actions</th>
                 </tr>
             </thead>
+
             <tbody>
                 @forelse($productUoms as $item)
                     <tr>
-                        <td>{{ $item->product->name ?? '—' }}</td>
-                        <td>{{ $item->uom->name ?? '—' }}</td>
-                        <td>{{ number_format($item->quantity_per_unit) }}</td>
-                        <td>${{ number_format($item->cost_price, 2) }}</td>
-                        <td>${{ number_format($item->selling_price, 2) }}</td>
-                        <td>{{ $item->barcode ?? '—' }}</td>
+                        {{-- PRODUCT --}}
+                        <td>{{ $item->product_name ?? '—' }}</td>
+
+                        {{-- UOM --}}
+                        <td>{{ $item->uom_name ?? '—' }}</td>
+
+                        {{-- QTY --}}
+                        <td>{{ number_format($item->quantity_per_unit ?? 0, 2) }}</td>
+
+                        {{-- COST --}}
+                        <td>${{ number_format($item->cost_price ?? 0, 2) }}</td>
+
+                        {{-- SELLING --}}
+                        <td>${{ number_format($item->selling_price ?? 0, 2) }}</td>
+
+                        {{-- BARCODE --}}
+                        <td>{{ $item->barcode ?: '—' }}</td>
+
+                        {{-- ROLE --}}
                         <td>
-                            @if($item->is_default)
+                            <span class="badge">
+                                {{ ucfirst($item->uom_role ?? 'retail') }}
+                            </span>
+                        </td>
+
+                        {{-- DEFAULT --}}
+                        <td>
+                            @if(!empty($item->is_default))
                                 <span class="badge-default">
-                                    <i class="ti ti-circle-check" aria-hidden="true" style="font-size:11px"></i>
-                                    Default
+                                    <i class="ti ti-circle-check"></i> Default
                                 </span>
                             @else
-                                <span style="color:var(--color-text-tertiary,#9ca3af);font-size:12px">—</span>
+                                <span style="color:#9ca3af;font-size:12px">—</span>
                             @endif
                         </td>
+
+                        {{-- ACTIONS --}}
                         <td>
                             <div class="action-group">
-                                <a
-                                    href="{{ route('admin.product-uom.edit', $item->id) }}"
-                                    class="btn-edit"
-                                    title="Edit"
-                                >
-                                    <i class="ti ti-pencil" aria-hidden="true"></i> Edit
+                                <a href="{{ route('admin.product-uom.edit', $item->id) }}"
+                                   class="btn-edit">
+                                    <i class="ti ti-pencil"></i> Edit
                                 </a>
-                                <form
-                                    action="{{ route('admin.product-uom.destroy', $item->id) }}"
-                                    method="POST"
-                                    onsubmit="return confirm('Delete this product UOM?')"
-                                    style="display:inline"
-                                >
+
+                                <form action="{{ route('admin.product-uom.destroy', $item->id) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('Are you sure you want to delete this item?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn-delete" title="Delete">
-                                        <i class="ti ti-trash" aria-hidden="true"></i> Delete
+
+                                    <button type="submit" class="btn-delete">
+                                        <i class="ti ti-trash"></i> Delete
                                     </button>
                                 </form>
                             </div>
@@ -150,9 +152,10 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8">
-                            <i class="ti ti-package-off" aria-hidden="true" style="font-size:28px;display:block;margin:0 auto 8px;color:#d1d5db"></i>
-                            No product UOM found.
+                        <td colspan="9" style="text-align:center;padding:40px;">
+                            <i class="ti ti-package-off" style="font-size:30px;color:#d1d5db;"></i>
+                            <div>No product UOM found</div>
+                            <small>Try changing filters or add new data</small>
                         </td>
                     </tr>
                 @endforelse
@@ -161,10 +164,32 @@
     </div>
 
     {{-- ── Pagination ── --}}
-    <div class="pagination-wrapper">
-        {{ $productUoms->appends(request()->query())->links() }}
-    </div>
+    <div class="table-footer" id="tableFooter">
 
+        <div class="table-info">
+            Showing
+            {{ $productUoms->firstItem() ?? 0 }}
+            -
+            {{ $productUoms->lastItem() ?? 0 }}
+            of
+            {{ $productUoms->total() }}
+        </div>
+        <div class="pagination">
+            {{ $productUoms->appends(request()->query())->links() }}
+        </div>
+        {{-- per page selector --}}
+        <form method="GET" action="{{ url()->current() }}">
+            {{-- keep filters --}}
+            @foreach(request()->except('per_page', 'page') as $key => $value)
+                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+            @endforeach
+            <select name="per_page" onchange="this.form.submit()">
+                <option value="15" {{ request('per_page') == 15 ? 'selected' : '' }}>15</option>
+                <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+            </select>
+        </form>
+    </div>
 </div>
 
 @endsection

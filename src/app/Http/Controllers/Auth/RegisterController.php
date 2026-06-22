@@ -16,13 +16,14 @@ class RegisterController extends Controller
         protected RegisterService $registerService
     ) {}
 
-    public function showFormRegister()
+    public function showFormRegister(Request $request)
     {
-        $users = $this->registerService->getAllUsers();
+        $users = $this->registerService->getAllUsers($request);
         $roles = $this->registerService->getRoles();
 
         return view('admin.users.user', compact('users', 'roles'));
     }
+
     // show user profile
     public function userProfile() {
         $users = $this->registerService->getAllUsers();
