@@ -64,7 +64,7 @@
             >
 
             {{-- Filter --}}
-            <button type="submit" class="btn-filter">
+            <button type="submit" class="btn-filter" >
                 <i class="ti ti-filter" aria-hidden="true"></i> Filter
             </button>
 
@@ -218,11 +218,34 @@
         </div>
 
         {{-- Pagination --}}
-        <div class="pm-pagination">
-            <div class="pm-pagination__meta">
-                <span class="pm-pagination__text">
-                    Showing {{ $products->count() }} of {{ $summary['total_products'] }} products
-                </span>
+        <div class="table-footer" style="width: 100%; display: flex;  justify-content: space-between" id="tableFooter">
+            <span class="table-footer-left">
+                <div class="table-info">
+                    showing
+                    {{ $products->firstItem() ?? 0 }}
+                    -
+                    {{ $products->lastItem() ?? 0 }}
+                    of
+                    {{ $products->total() }}
+                    sales
+                </div>
+
+                {{-- per page --}}
+                <form method="GET" action="{{ request()->url() }}">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+
+                    <select name="per_page" onchange="showLoader(); this.form.submit()">
+                        <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+            </span>
+
+            <div class="pagination">
+                {{ $products->links('vendor.pagination.numbers-only') }}
             </div>
         </div>
     </div>
@@ -234,7 +257,6 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-{{-- Pass PHP data to JS --}}
 <script>
     window.topProductsData = @json($chartData);
 </script>
@@ -247,7 +269,7 @@
     let chartInitialized = false;
     let chartInstance    = null;
 
-    // ── Init ApexCharts ────────────────────────────────────────────────────
+    // Init ApexCharts
     function initChart() {
         const data = window.topProductsData || [];
         if (!data.length) return;
@@ -326,8 +348,6 @@
         chartInstance.render();
         chartInitialized = true;
     }
-
-    // ── View switcher ──────────────────────────────────────────────────────
     function switchView(view) {
         const chartView = document.getElementById('chart-view');
         const listView  = document.getElementById('list-view');
@@ -348,7 +368,6 @@
         }
     }
 
-    // ── Events ─────────────────────────────────────────────────────────────
     document.getElementById('btn-chart').addEventListener('click', function () {
         switchView('chart');
     });
@@ -364,8 +383,6 @@
             chartInitialized = false;
         });
     }
-
-    // ── Boot ───────────────────────────────────────────────────────────────
     function boot() {
         switchView('chart');
     }

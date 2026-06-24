@@ -11,9 +11,8 @@
 @section('content')
 
 <x-alert />
-
+<x-spinner />
 <div class="product-section">
-
     {{-- ── Header & Filter Bar ── --}}
     <div class="product-section__header">
 
@@ -70,10 +69,10 @@
                     @endforeach
                 </select>
             </div>
-
+            <button type="submit" class="product-section__btn-add" onclick="showLoader()">Filter</button>
             {{-- Reset --}}
             @if(request()->anyFilled(['search', 'start_date', 'end_date', 'category_code']))
-                <a href="{{ route('admin.products.index') }}" class="btn-clear" title="Clear filters">
+                <a href="{{ route('admin.products.index') }}" onclick="showLoader()" class="btn-clear" title="Clear filters">
                     <i class="ti ti-x" aria-hidden="true"></i> Reset
                 </a>
             @endif
@@ -191,62 +190,45 @@
             </table>
         </div>
 
-        {{-- ── Pagination ── --}}
-        <div class="table-footer" id="tableFooter">
-            <div class="table-info">
-                Showing
-                {{ $products->firstItem() ?? 0 }}
-                -
-                {{ $products->lastItem() ?? 0 }}
-                of
-                {{ $products->total() }}
-                units
-            </div>
+        {{-- pagination --}}
+        <div class="table-footer" style="width: 100%; display: flex; justify-content: space-between" id="tableFooter">
+            <span class="table-footer-left">
+                <div class="table-info">
+                    showing
+                    {{ $products->firstItem() ?? 0 }}
+                    -
+                    {{ $products->lastItem() ?? 0 }}
+                    of
+                    {{ $products->total() }}
+                    sales
+                </div>
+
+                {{-- per page --}}
+                <form method="GET" action="{{ request()->url() }}">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+
+                    <select name="per_page" onchange="showLoader(); this.form.submit()">
+                        <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+            </span>
 
             <div class="pagination">
-                {{ $products->links() }}
+                {{ $products->links('vendor.pagination.numbers-only') }}
             </div>
-
-            {{-- per page --}}
-            <form method="GET" action="{{ url()->current() }}">
-                @foreach(request()->except('per_page', 'page') as $key => $value)
-                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                @endforeach
-
-                <select name="per_page" onchange="this.form.submit()">
-                    <option value="15" {{ request('per_page') == 15 ? 'selected' : '' }}>15</option>
-                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
-                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-                </select>
-            </form>
         </div>
     </div>
 </div>
 
 @endsection
-
 @push('scripts')
-<script>
-(function () {
-    const form = document.getElementById('filter-form');
-    if (!form) return;
-
-    let debounceTimer;
-
-    // Text search — submit 500ms after user stops typing
-    const searchInput = document.getElementById('search');
-    if (searchInput) {
-        searchInput.addEventListener('input', function () {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => form.submit(), 500);
+    <script>
+        document.getElementById('filter-form').addEventListener('submit', function () {
+            showLoader();
         });
-    }
-
-    // Date & category — submit instantly on change
-    ['start_date', 'end_date', 'category_code'].forEach(function (id) {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('change', () => form.submit());
-    });
-})();
-</script>
+    </script>
 @endpush

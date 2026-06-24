@@ -1,16 +1,20 @@
 /* ============================================================
    Top Products Report — top-product.css
    Primary: #2563eb  |  Border-radius pills: 50px
-   Consistent with sale-person.css conventions
+   Font: -apple-system, Inter fallback
    ============================================================ */
 
-/* ---------- Page shell ---------- */
+/* ---------- Base ---------- */
 .tp-page {
     padding: 1.75rem 0;
-    font-family: 'Inter', inherit;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    color: var(--color-text-primary, #111);
 }
 
-/* ---------- Page header ---------- */
+/* ============================================================
+   Page Header
+   ============================================================ */
 .tp-page__header {
     display: flex;
     align-items: flex-start;
@@ -20,18 +24,13 @@
     margin-bottom: 1.25rem;
 }
 
-.tp-page__title-group {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
 .tp-page__title {
-    font-size: 20px;
-    font-weight: 500;
-    letter-spacing: -0.3px;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
     color: var(--color-text-primary, #111);
-    margin: 0;
+    margin: 0 0 4px;
+    line-height: 1.2;
 }
 
 .tp-page__subtitle {
@@ -40,7 +39,9 @@
     margin: 0;
 }
 
-/* ---------- Filter bar ---------- */
+/* ============================================================
+   Filter Bar
+   ============================================================ */
 .tp-filter-bar {
     display: flex;
     align-items: center;
@@ -49,24 +50,22 @@
     margin-bottom: 1.25rem;
 }
 
+/* Shared input / select base */
 .tp-filter-bar input[type="text"],
 .tp-filter-bar input[type="date"],
 .tp-filter-bar .filter-category {
+    font-family: inherit;
     font-size: 13px;
-    padding: 7px 16px;
+    padding: 7px 14px;
     border-radius: 50px;
     border: 0.5px solid var(--color-border-secondary, #d1d5db);
     background: var(--color-background-primary, #fff);
     color: var(--color-text-primary, #111);
     outline: none;
-    transition: border-color 0.15s;
-    appearance: none;
-    -webkit-appearance: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.tp-filter-bar input[type="text"] {
-    min-width: 190px;
-}
+.tp-filter-bar input[type="text"] { min-width: 190px; }
 
 .tp-filter-bar input[type="text"]:focus,
 .tp-filter-bar input[type="date"]:focus,
@@ -75,93 +74,73 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* Search input wrapper with icon */
+/* Select arrow */
+.tp-filter-bar .filter-category {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+    cursor: pointer;
+}
+
+/* Search wrap — icon inside input */
 .tp-search-wrap {
     position: relative;
     display: flex;
     align-items: center;
 }
 
-.tp-search-wrap .tp-search-icon {
+.tp-search-icon {
     position: absolute;
-    left: 12px;
+    left: 13px;
     font-size: 15px;
     color: var(--color-text-tertiary, #9ca3af);
     pointer-events: none;
 }
 
 .tp-search-wrap input[type="text"] {
-    padding-left: 34px;
+    padding-left: 36px;
 }
 
-/* Filter / Reset / Excel buttons */
-.btn-filter {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    padding: 7px 18px;
-    border-radius: 50px;
-    border: none;
-    background: #2563eb;
-    color: #fff;
-    cursor: pointer;
-    text-decoration: none;
-    transition: opacity 0.15s;
-    line-height: 1;
-}
-
-.btn-filter:hover {
-    opacity: 0.88;
-    color: #fff;
-    text-decoration: none;
-}
-
-.btn-excel {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    padding: 7px 18px;
-    border-radius: 50px;
-    border: none;
-    background: #059669;
-    color: #fff;
-    cursor: pointer;
-    text-decoration: none;
-    transition: opacity 0.15s;
-    line-height: 1;
-}
-
-.btn-excel:hover {
-    opacity: 0.88;
-    color: #fff;
-    text-decoration: none;
-}
-
+/* Buttons */
+.btn-filter,
+.btn-excel,
 .btn-reset {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
     padding: 7px 18px;
     border-radius: 50px;
-    border: 0.5px solid var(--color-border-secondary, #d1d5db);
-    background: transparent;
-    color: var(--color-text-secondary, #6b7280);
     cursor: pointer;
     text-decoration: none;
-    transition: background 0.15s;
+    transition: opacity 0.15s, background 0.15s;
     line-height: 1;
+    white-space: nowrap;
+    border: none;
 }
 
-.btn-reset:hover {
-    background: var(--color-background-secondary, #f9fafb);
+.btn-filter { background: #2563eb; color: #fff; }
+.btn-filter:hover { opacity: 0.88; color: #fff; }
+
+.btn-excel  { background: #059669; color: #fff; }
+.btn-excel:hover  { opacity: 0.88; color: #fff; }
+
+.btn-reset {
+    background: transparent;
     color: var(--color-text-secondary, #6b7280);
-    text-decoration: none;
+    border: 0.5px solid var(--color-border-secondary, #d1d5db);
+}
+.btn-reset:hover {
+    background: var(--color-background-secondary, #f3f4f6);
+    color: var(--color-text-primary, #111);
 }
 
-/* ---------- View toggle ---------- */
+/* View toggle */
 .tp-view-toggle {
     display: flex;
     border: 0.5px solid #2563eb;
@@ -174,7 +153,9 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 400;
     padding: 7px 16px;
     border: none;
     background: transparent;
@@ -184,16 +165,12 @@
     line-height: 1;
 }
 
-.tp-view-btn.active {
-    background: #2563eb;
-    color: #fff;
-}
+.tp-view-btn.active          { background: #2563eb; color: #fff; }
+.tp-view-btn:not(.active):hover { background: #eff6ff; }
 
-.tp-view-btn:not(.active):hover {
-    background: #eff6ff;
-}
-
-/* ---------- KPI summary cards ---------- */
+/* ============================================================
+   KPI Cards
+   ============================================================ */
 .tp-kpi-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -202,25 +179,34 @@
 }
 
 .tp-kpi-card {
-    background: var(--color-background-secondary, #f9fafb);
-    border-radius: var(--border-radius-md, 8px);
-    padding: 1rem;
+    background: var(--color-background-primary, #fff);
+    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
     text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.tp-kpi-card:hover {
+    border-color: rgba(37, 99, 235, 0.25);
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.05);
 }
 
 .tp-kpi-card__label {
     font-size: 11px;
     font-weight: 500;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--color-text-secondary, #6b7280);
-    margin: 0 0 5px;
+    margin: 0 0 6px;
 }
 
 .tp-kpi-card__value {
-    font-size: 22px;
-    font-weight: 500;
+    font-size: 24px;
+    font-weight: 600;
     letter-spacing: -0.5px;
     margin: 0;
+    line-height: 1;
 }
 
 .tp-kpi-card__value--blue   { color: #2563eb; }
@@ -228,13 +214,15 @@
 .tp-kpi-card__value--purple { color: #7c3aed; }
 .tp-kpi-card__value--red    { color: #dc2626; }
 
-/* ---------- Panel (shared card shell) ---------- */
+/* ============================================================
+   Panel (chart & list wrapper)
+   ============================================================ */
 .tp-panel {
     background: var(--color-background-primary, #fff);
     border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
     border-radius: 16px;
-    padding: 1.1rem 1.25rem;
-    margin-bottom: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 12px;
 }
 
 .tp-panel__header {
@@ -243,11 +231,14 @@
     justify-content: space-between;
     gap: 8px;
     margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 0.5px solid var(--color-border-tertiary, #e5e7eb);
 }
 
 .tp-panel__title {
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: -0.1px;
     color: var(--color-text-primary, #111);
     margin: 0;
 }
@@ -255,7 +246,7 @@
 .tp-panel__sub {
     font-size: 12px;
     color: var(--color-text-secondary, #6b7280);
-    margin: 2px 0 0;
+    margin: 3px 0 0;
 }
 
 .tp-panel__meta {
@@ -263,14 +254,12 @@
     color: var(--color-text-secondary, #6b7280);
     white-space: nowrap;
     flex-shrink: 0;
+    align-self: flex-end;
 }
 
-/* ---------- Chart container ---------- */
-.tp-chart-container {
-    width: 100%;
-}
-
-/* ---------- Table ---------- */
+/* ============================================================
+   Table
+   ============================================================ */
 .table-responsive {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -279,36 +268,45 @@
 .table-custom {
     width: 100%;
     border-collapse: collapse;
-    font-size: 12px;
+    font-size: 13px;
+}
+
+.table-custom thead {
+    background: var(--color-background-secondary, #f9fafb);
 }
 
 .table-custom th {
     text-align: left;
-    font-weight: 500;
     font-size: 11px;
-    letter-spacing: 0.04em;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--color-text-secondary, #6b7280);
-    padding: 7px 10px;
+    padding: 10px 12px;
     border-bottom: 0.5px solid var(--color-border-tertiary, #e5e7eb);
     white-space: nowrap;
 }
 
 .table-custom td {
-    padding: 9px 10px;
+    padding: 11px 12px;
     border-bottom: 0.5px solid var(--color-border-tertiary, #e5e7eb);
     color: var(--color-text-primary, #111);
+    font-size: 13px;
     vertical-align: middle;
+    line-height: 1.4;
 }
 
-.table-custom tbody tr:last-child td {
-    border-bottom: none;
+.table-custom tbody tr:last-child td { border-bottom: none; }
+
+.table-custom tbody tr {
+    transition: background 0.1s;
 }
 
-.table-custom tbody tr:hover td {
-    background: var(--color-background-secondary, #f9fafb);
-}
+.table-custom tbody tr:hover td { background: #f8faff; }
 
-/* ---------- Rank badge ---------- */
+/* ============================================================
+   Rank badge
+   ============================================================ */
 .rank-badge {
     display: inline-flex;
     align-items: center;
@@ -316,29 +314,28 @@
     width: 26px;
     height: 26px;
     border-radius: 50%;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 12px;
     flex-shrink: 0;
 }
 
-.rank-1 { background: #fbbf24; color: #78350f; }
-.rank-2 { background: #9ca3af; color: #1f2937; }
-.rank-3 { background: #b45309; color: #fff;    }
-.rank-other {
-    background: var(--color-background-secondary, #f1f5f9);
-    color: var(--color-text-secondary, #374151);
-}
+.rank-1     { background: #fbbf24; color: #78350f; }
+.rank-2     { background: #9ca3af; color: #1f2937; }
+.rank-3     { background: #b45309; color: #fff; }
+.rank-other { background: var(--color-background-secondary, #f1f5f9); color: var(--color-text-secondary, #374151); }
 
-/* ---------- Product cell ---------- */
+/* ============================================================
+   Product cell
+   ============================================================ */
 .tp-product-cell {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 9px;
 }
 
 .tp-product-icon {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     border-radius: 8px;
     background: #eff6ff;
     display: flex;
@@ -350,11 +347,14 @@
 }
 
 .tp-product-name {
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--color-text-primary, #111);
 }
 
-/* ---------- Performance bar ---------- */
+/* ============================================================
+   Performance bar
+   ============================================================ */
 .tp-bar-wrap {
     display: flex;
     align-items: center;
@@ -381,11 +381,13 @@
     font-size: 11px;
     color: var(--color-text-secondary, #6b7280);
     white-space: nowrap;
-    min-width: 32px;
+    min-width: 34px;
     text-align: right;
 }
 
-/* ---------- Stock status badges ---------- */
+/* ============================================================
+   Stock badges
+   ============================================================ */
 .stock-badge {
     display: inline-flex;
     align-items: center;
@@ -400,102 +402,145 @@
 .stock-low { background: #fef3c7; color: #92400e; }
 .stock-out { background: #fee2e2; color: #991b1b; }
 
-/* ---------- Pagination ---------- */
-.pm-pagination {
+/* ============================================================
+   Table footer — info + per-page + pagination
+   ============================================================ */
+.table-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 1rem;
+    gap: 10px;
+    padding: 12px 0 0;
+    border-top: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    margin-top: 0.75rem;
 }
 
-.pm-pagination__meta {
+.table-footer-left {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
-.pm-pagination__text {
-    font-size: 11px;
+.table-info {
+    font-size: 12px;
     color: var(--color-text-secondary, #6b7280);
 }
 
-.pm-pagination__per-page {
-    display: flex;
+/* Per-page select form */
+.table-footer form {
+    display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 11px;
-    color: var(--color-text-secondary, #6b7280);
 }
 
-.pm-pagination__select {
+.table-footer form select {
+    font-family: inherit;
     font-size: 12px;
-    padding: 4px 10px;
+    padding: 4px 28px 4px 10px;
     border-radius: 50px;
     border: 0.5px solid var(--color-border-secondary, #d1d5db);
     background: var(--color-background-primary, #fff);
     color: var(--color-text-primary, #111);
-    cursor: pointer;
     outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.pm-pagination__links {
+.table-footer form select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* Pagination (numbers-only partial) */
+.table-footer .pagination,
+.table-footer nav .pagination {
     display: flex;
     align-items: center;
     gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
-.pm-pagination__btn {
-    width: 28px;
-    height: 28px;
+.table-footer .page-item .page-link,
+.table-footer nav .page-item .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 8px;
     border-radius: 50px;
     border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
     background: var(--color-background-primary, #fff);
     color: var(--color-text-primary, #111);
-    font-size: 11px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-.pm-pagination__btn:disabled {
-    opacity: 0.35;
-    cursor: default;
-}
-
-.pm-pagination__btn.active {
+.table-footer .page-item.active .page-link,
+.table-footer nav .page-item.active .page-link {
     background: #2563eb;
     color: #fff;
     border-color: #2563eb;
+    font-weight: 600;
 }
 
-.pm-pagination__btn:not(.active):not(:disabled):hover {
-    background: var(--color-background-secondary, #f9fafb);
+.table-footer .page-item.disabled .page-link,
+.table-footer nav .page-item.disabled .page-link {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
 }
 
-/* ---------- Hidden utility ---------- */
-.hidden {
-    display: none !important;
+.table-footer .page-item:not(.active):not(.disabled) .page-link:hover,
+.table-footer nav .page-item:not(.active):not(.disabled) .page-link:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #2563eb;
 }
 
-/* ---------- Responsive ---------- */
+/* ============================================================
+   Utility
+   ============================================================ */
+.hidden { display: none !important; }
+
+/* ============================================================
+   Responsive
+   ============================================================ */
 @media (max-width: 900px) {
-    .tp-kpi-row {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    .tp-kpi-row { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 640px) {
-    .tp-page__header {
+    .tp-page__header  { flex-direction: column; }
+
+    .tp-kpi-row { grid-template-columns: 1fr 1fr; }
+
+    .tp-filter-bar {
         flex-direction: column;
+        align-items: stretch;
     }
 
-    .tp-kpi-row {
-        grid-template-columns: 1fr 1fr;
-    }
+    .tp-filter-bar input[type="text"],
+    .tp-filter-bar input[type="date"],
+    .tp-filter-bar .filter-category,
+    .btn-filter,
+    .btn-reset,
+    .btn-excel { width: 100%; }
+
+    .btn-filter,
+    .btn-reset,
+    .btn-excel { justify-content: center; }
 
     .tp-view-toggle {
         margin-left: 0;
@@ -507,21 +552,8 @@
         justify-content: center;
     }
 
-    .tp-filter-bar {
+    .table-footer {
         flex-direction: column;
-        align-items: stretch;
-    }
-
-    .tp-filter-bar input[type="text"],
-    .tp-filter-bar input[type="date"],
-    .tp-filter-bar .filter-category {
-        width: 100%;
-    }
-
-    .btn-filter,    
-    .btn-reset,
-    .btn-excel {
-        width: 100%;
-        justify-content: center;
+        align-items: flex-start;
     }
 }

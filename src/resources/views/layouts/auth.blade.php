@@ -18,14 +18,14 @@
     @stack('styles')
 </head>
 <body>
-    <x-loading />                         {{-- default: "Loading..." --}}
+    <x-loading />
     <div class="panel-image">
         <div class="panel-logo">
             <img src="{{ asset('assets/images/logo.png') }}" alt="POS Logo" width="120" height="40">
         </div>
         <div class="slides">
             <div class="slide active" style="background-image: url('{{ asset('assets/images/slider1.png') }}')"></div>
-            <div class="slide" style="background-image: url('{{ asset('assets/images/slider2.jpg') }}')"></div>
+            <div class="slide" style="background-image: url('{{ asset('assets/images/slider3.jpg') }}')"></div>
             <div class="slide" style="background-image: url('{{ asset('assets/images/slider3.webp') }}')"></div>
         </div>
         <div class="panel-copy">

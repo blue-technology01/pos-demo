@@ -2,18 +2,53 @@
 
 namespace App\Services\Report;
 
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 
 class TopProductService
 {
     /**
-     * Get top products report data
-     *
-     * @param array $filters
-     * @return Collection
+     * Get paginated products for the list table.
      */
-    public function getTopProducts(array $filters = []): Collection
+    public function getPaginatedProducts(Request $request): LengthAwarePaginator
+    {
+        $paginator = $this->buildQuery($request)
+            ->paginate($request->per_page ?? 15)
+            ->withQueryString();
+
+        $offset = ($paginator->currentPage() - 1) * $paginator->perPage();
+
+        $paginator->getCollection()->transform(function ($item, $index) use ($offset) {
+            $item->rank         = $offset + $index + 1;
+            $item->qty_sold     = (int) $item->qty_sold;
+            $item->stock_status = $this->getStockStatus((float) $item->stock_left);
+            return $item;
+        });
+
+        return $paginator;
+    }
+
+    /**
+     * Get full collection for summary cards and chart.
+     */
+    public function getTopProducts(Request $request): Collection
+    {
+        return $this->buildQuery($request)
+            ->get()
+            ->map(function ($item, $index) {
+                $item->rank         = $index + 1;
+                $item->qty_sold     = (int) $item->qty_sold;
+                $item->stock_status = $this->getStockStatus((float) $item->stock_left);
+                return $item;
+            });
+    }
+
+    /**
+     * Shared base query used by both methods above.
+     */
+    private function buildQuery(Request $request)
     {
         $query = DB::table('sale_items as si')
             ->join('sales as s', 's.id', '=', 'si.sale_id')
@@ -37,63 +72,35 @@ class TopProductService
             ])
             ->orderByDesc('qty_sold');
 
-        // Filter by category
-        if (!empty($filters['category_code'])) {
-            $query->where('p.category_code', $filters['category_code']);
+        if ($search = $request->search) {
+            $query->where('si.product_name', 'like', "%{$search}%");
         }
 
-        // Filter by product name
-        if (!empty($filters['search'])) {
-            $query->where('si.product_name', 'like', '%' . $filters['search'] . '%');
+        if ($categoryCode = $request->category_code) {
+            $query->where('p.category_code', $categoryCode);
         }
 
-        // Filter by date range
-        if (!empty($filters['date_from'])) {
-            $query->whereDate('s.sale_date', '>=', $filters['date_from']);
+        if ($request->date_from && $request->date_to) {
+            $query->whereBetween('s.sale_date', [
+                $request->date_from . ' 00:00:00',
+                $request->date_to   . ' 23:59:59',
+            ]);
+        } elseif ($request->date_from) {
+            $query->where('s.sale_date', '>=', $request->date_from . ' 00:00:00');
+        } elseif ($request->date_to) {
+            $query->where('s.sale_date', '<=', $request->date_to . ' 23:59:59');
         }
 
-        if (!empty($filters['date_to'])) {
-            $query->whereDate('s.sale_date', '<=', $filters['date_to']);
-        }
-
-        // Filter by limit
-        if (!empty($filters['limit'])) {
-            $query->limit($filters['limit']);
-        }
-
-        return $query->get()->map(function ($item, $index) {
-            $item->rank         = $index + 1;
-            $item->qty_sold     = (int) $item->qty_sold;
-            $item->stock_status = $this->getStockStatus($item->stock_left);
-            return $item;
-        });
+        return $query;
     }
 
-    /**
-     * Get stock status label based on stock quantity
-     *
-     * @param float $stock
-     * @return string
-     */
     public function getStockStatus(float $stock): string
     {
-        if ($stock <= 0) {
-            return 'Out of Stock';
-        }
-
-        if ($stock <= 10) {
-            return 'Low Stock';
-        }
-
+        if ($stock <= 0)  return 'Out of Stock';
+        if ($stock <= 10) return 'Low Stock';
         return 'In Stock';
     }
 
-    /**
-     * Get summary totals for the report
-     *
-     * @param Collection $products
-     * @return array
-     */
     public function getSummary(Collection $products): array
     {
         return [

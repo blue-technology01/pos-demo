@@ -6,17 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard')</title>
 
-    <!-- Critical CSS only -->
     <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}" data-turbo-track="reload">
     <link rel="stylesheet" href="{{ asset('assets/css/components/navbar.css') }}" data-turbo-track="reload">
     <link rel="stylesheet" href="{{ asset('assets/css/components/sidebar.css') }}" data-turbo-track="reload">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 
-    <!-- Page-specific styles -->
     @stack('styles')
 </head>
 <body class="dashboard-body">
+
+    <x-spinner />
+    <x-alert/>
 
     @include('components.navbar')
 
@@ -32,11 +33,38 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="{{ asset('assets/js/app.js') }}"></script>
 
+    {{-- Global loader helpers — defined before page scripts --}}
+    <script>
+        function showLoader() {
+            const el = document.getElementById('loader');
+            if (el) el.style.display = 'flex';
+        }
+
+        function hideLoader() {
+            const el = document.getElementById('loader');
+            if (el) el.style.display = 'none';
+        }
+
+        function submitWithLoader(form) {
+            showLoader();
+            setTimeout(() => form.submit(), 50);
+        }
+
+        // Turbo-aware: show loader on every navigation & form submit
+        document.addEventListener('turbo:click',        showLoader);
+        document.addEventListener('turbo:submit-start', showLoader);
+
+        // Hide loader when Turbo finishes loading
+        document.addEventListener('turbo:load',   hideLoader);
+        document.addEventListener('turbo:render', hideLoader);
+    </script>
+
     @stack('scripts')
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
+            /* ── Dropdown system ── */
             const dropdowns = [];
 
             function registerDropdown(toggleEl, panelEl) {
@@ -48,11 +76,8 @@
                     e.stopPropagation();
 
                     const isOpen = panelEl.classList.contains('is-open');
-
-                    // Close all other dropdowns first
                     closeAllDropdowns();
 
-                    // Toggle this one
                     if (!isOpen) {
                         panelEl.classList.add('is-open');
                         toggleEl.setAttribute('aria-expanded', 'true');
@@ -67,86 +92,52 @@
                 });
             }
 
-            // Close all dropdowns when clicking outside
-            document.addEventListener('click', function () {
-                closeAllDropdowns();
-            });
+            document.addEventListener('click', closeAllDropdowns);
 
-            // Prevent clicks inside a dropdown panel from closing it
             document.querySelectorAll('.navbar-dropdown, .nav-pill-dropdown').forEach(function (panel) {
-                panel.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                });
+                panel.addEventListener('click', e => e.stopPropagation());
             });
 
-            // Close all dropdowns on Escape key
             document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') {
-                    closeAllDropdowns();
-                }
+                if (e.key === 'Escape') closeAllDropdowns();
             });
 
+            registerDropdown(
+                document.getElementById('userDropdownToggle'),
+                document.getElementById('userDropdown')
+            );
+            registerDropdown(
+                document.getElementById('notifBtn'),
+                document.getElementById('notifDropdown')
+            );
+            registerDropdown(
+                document.getElementById('langBtn'),
+                document.getElementById('langDropdown')
+            );
 
-            /* ============================================================
-            PROFILE DROPDOWN
-            ============================================================ */
-
-            const userToggle = document.getElementById('userDropdownToggle');
-            const userDropdown = document.getElementById('userDropdown');
-
-            registerDropdown(userToggle, userDropdown);
-
-
-            /* ============================================================
-            NOTIFICATION DROPDOWN
-            ============================================================ */
-
-            const notifBtn = document.getElementById('notifBtn');
-            const notifDropdown = document.getElementById('notifDropdown');
-
-            registerDropdown(notifBtn, notifDropdown);
-
-
-            /* ============================================================
-            LANGUAGE DROPDOWN
-            ============================================================ */
-
+            /* ── Language switcher ── */
             const langBtn = document.getElementById('langBtn');
-            const langDropdown = document.getElementById('langDropdown');
 
-            registerDropdown(langBtn, langDropdown);
-
-            // Language selection
             document.querySelectorAll('.pill-dropdown-item[data-lang]').forEach(function (btn) {
                 btn.addEventListener('click', function () {
                     const lang = this.getAttribute('data-lang');
 
-                    // Update active state
-                    document.querySelectorAll('.pill-dropdown-item[data-lang]').forEach(function (b) {
-                        b.classList.remove('active');
-                    });
+                    document.querySelectorAll('.pill-dropdown-item[data-lang]').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
 
-                    // Swap flag icon in the button
                     const selectedImg = this.querySelector('img');
-                    const btnImg = langBtn.querySelector('img');
+                    const btnImg      = langBtn?.querySelector('img');
                     if (selectedImg && btnImg) {
                         btnImg.src = selectedImg.src;
                         btnImg.alt = selectedImg.alt;
                     }
 
                     closeAllDropdowns();
-
-                    // Submit language change — adjust URL to your route
                     window.location.href = '/language/' + lang;
                 });
             });
 
-
-            /* ============================================================
-            FULLSCREEN TOGGLE
-            ============================================================ */
-
+            /* ── Fullscreen toggle ── */
             const fsBtn = document.getElementById('fsBtn');
 
             if (fsBtn) {
@@ -154,45 +145,34 @@
                     const icon = this.querySelector('.material-symbols-outlined');
 
                     if (!document.fullscreenElement) {
-                        document.documentElement.requestFullscreen().then(function () {
-                            if (icon) icon.textContent = 'fullscreen_exit';
-                        }).catch(function (err) {
-                            console.warn('Fullscreen request failed:', err);
-                        });
+                        document.documentElement.requestFullscreen()
+                            .then(() => { if (icon) icon.textContent = 'fullscreen_exit'; })
+                            .catch(err  => console.warn('Fullscreen error:', err));
                     } else {
-                        document.exitFullscreen().then(function () {
-                            if (icon) icon.textContent = 'fullscreen';
-                        });
+                        document.exitFullscreen()
+                            .then(() => { if (icon) icon.textContent = 'fullscreen'; });
                     }
                 });
 
-                // Sync icon if user presses Escape to exit fullscreen
                 document.addEventListener('fullscreenchange', function () {
                     const icon = fsBtn.querySelector('.material-symbols-outlined');
-                    if (icon) {
-                        icon.textContent = document.fullscreenElement ? 'fullscreen_exit' : 'fullscreen';
-                    }
+                    if (icon) icon.textContent = document.fullscreenElement ? 'fullscreen_exit' : 'fullscreen';
                 });
             }
 
-
-            /* ============================================================
-            SIDEBAR TOGGLE
-            ============================================================ */
-
+            /* ── Sidebar toggle ── */
             const sidebarToggle = document.getElementById('sidebarToggle');
-
             if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', function () {
-                    document.body.classList.toggle('sidebar-collapsed');
-                });
+                sidebarToggle.addEventListener('click', () => document.body.classList.toggle('sidebar-collapsed'));
             }
 
         });
+
+        /* ── Lucide icons on Turbo navigation ── */
         document.addEventListener('turbo:load', function () {
-            // Reinitialize Lucide on every Turbo navigation
             if (window.lucide) lucide.createIcons();
         });
     </script>
+
 </body>
 </html>

@@ -12,7 +12,9 @@
         products: [],
         activeCategory: 'all',
         searchQuery: '',
-        productStock: {}  // Separate stock tracking
+        productStock: {},  // Separate stock tracking
+        productPagination: null,
+        productRequestId: 0
     };
 
     const utils = {
@@ -25,6 +27,24 @@
 
         parseCurrency(str) {
             return parseFloat(str.replace(/[^0-9.-]+/g, '')) || 0;
+        },
+
+        escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[char]));
+        },
+
+        productImageUrl(path) {
+            if (!path) return window.POS_ASSETS?.placeholder || '/assets/images/not-product.png';
+            if (/^https?:\/\//i.test(path)) return path;
+
+            const storageBase = (window.POS_ASSETS?.storageBase || '/storage').replace(/\/$/, '');
+            return `${storageBase}/${String(path).replace(/^\/+/, '')}`;
         },
 
         debounce(func, wait = CONFIG.DEBOUNCE_DELAY) {
@@ -75,39 +95,97 @@
 
     const productManager = {
         init() {
-            this.loadProducts();
             this.bindEvents();
+            this.loadProducts();
         },
 
-        loadProducts() {
-            state.products = [
-                { id: 1, name: 'Coca Cola', price: 1.50, category: 'drink', stock: 90, image: 'https://i5.walmartimages.com/seo/Coca-Cola-Soda-Pop-20-fl-oz-Bottle_011c7f32-c0b9-44a2-9c78-7e02019279c8.be7a0cbc7c42ceb7fdb7b70fb8e5832f.jpeg' },
-                { id: 2, name: 'Pepsi', price: 1.40, category: 'drink', stock: 75, image: 'https://www.qibahstore.com/cdn/shop/files/332818_main.webp?v=1721580460' },
-                { id: 3, name: 'Red Bull', price: 2.50, category: 'drink', stock: 65, image: 'https://www.mystore.in/s/62ea2c599d1398fa16dbae0a/67189b9d44ff040024d311af/red-bull-image.jpg' },
-                { id: 4, name: 'Potato Chips', price: 1.20, category: 'snack', stock: 0, image: 'https://jgsj.jayagrocer.com/cdn/shop/files/096693-1-1_39cd9f35-360c-413b-953f-f55cbe0e4e53.jpg?v=1750072333' },
-                { id: 5, name: 'Doritos Nacho Cheese', price: 1.80, category: 'snack', stock: 45, image: 'https://m.media-amazon.com/images/I/81vX1z7X9QL.jpg' },
-                { id: 6, name: 'Sprite', price: 1.45, category: 'drink', stock: 55, image: 'https://i5.walmartimages.com/asr/0e8e8e8e-0b0e-4b0e-9b0e-0e8e8e8e0b0e_1.0.jpg' },
-                { id: 7, name: 'Mountain Dew', price: 1.60, category: 'drink', stock: 40, image: 'https://i5.walmartimages.com/seo/Mountain-Dew-Soda-20-fl-oz-Bottle_0f0f0f0f-0f0f-0f0f-0f0f-0f0f0f0f0f0f_1.jpg' },
-                { id: 8, name: "Lay's Classic Chips", price: 1.30, category: 'snack', stock: 80, image: 'https://m.media-amazon.com/images/I/51Xk2chvfuL._AC_SL1500_.jpg' },
-                { id: 9, name: 'Pringles Original', price: 2.20, category: 'snack', stock: 30, image: 'https://m.media-amazon.com/images/I/71f7Q5z5ZQL._AC_SL1500_.jpg' },
-                { id: 10, name: 'Snickers Bar', price: 1.10, category: 'snack', stock: 120, image: 'https://m.media-amazon.com/images/I/61f2z2z2z2z.jpg' }
-            ];
+        async loadProducts(page = 1) {
+            const requestId = ++state.productRequestId;
+            const $grid = $('#product-grid');
 
-            // Initialize stock tracking
-            state.products.forEach(product => {
-                state.productStock[product.id] = product.stock;
-            });
+            this.renderSkeleton();
 
-            this.render();
+            try {
+                const url = new URL(window.ROUTES.posProducts, window.location.origin);
+                url.searchParams.set('page', page);
+                url.searchParams.set('per_page', 30);
+                url.searchParams.set('simple', 1);
+
+                if (state.activeCategory !== 'all') {
+                    url.searchParams.set('category_code', state.activeCategory);
+                }
+
+                if (state.searchQuery.trim()) {
+                    url.searchParams.set('search', state.searchQuery.trim());
+                }
+
+                const response = await fetch(url.toString(), {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Product request failed: ${response.status}`);
+                }
+
+                const payload = await response.json();
+                const paginator = payload.data || {};
+
+                if (requestId !== state.productRequestId) return;
+
+                state.products = (paginator.data || []).map(item => this.normalizeProduct(item));
+                state.productPagination = paginator;
+
+                state.products.forEach(product => {
+                    if (state.productStock[product.id] === undefined) {
+                        state.productStock[product.id] = product.stock;
+                    }
+                });
+
+                this.render();
+                this.renderPagination();
+            } catch (error) {
+                console.error(error);
+                $grid.html(`
+                    <div style="grid-column:1/-1;padding:24px;text-align:center;color:#991b1b;">
+                        Unable to load products. Please refresh and try again.
+                    </div>
+                `);
+                $('#product-pagination').empty();
+            }
+        },
+
+        normalizeProduct(item) {
+            const uoms = Array.isArray(item.uoms) ? item.uoms : [];
+            const defaultUom = uoms.find(uom => uom.is_default) || uoms[0] || {};
+
+            return {
+                id: item.product_code,
+                code: item.product_code,
+                name: item.product_name,
+                category: item.category_code,
+                stock: Number(item.stock) || 0,
+                minStock: Number(item.min_stock) || 0,
+                lowStock: Boolean(item.low_stock),
+                image: utils.productImageUrl(item.product_image),
+                uoms,
+                selectedUomId: defaultUom.id ?? '',
+                price: Number(defaultUom.selling_price) || 0,
+                costPrice: Number(defaultUom.cost_price) || 0,
+                uomCode: defaultUom.uom_code || null,
+                uomName: defaultUom.uom_name || defaultUom.uom_code || ''
+            };
+        },
+
+        renderSkeleton() {
+            $('#product-grid').html(Array.from({ length: 12 }, () => '<div class="skeleton"></div>').join(''));
+            $('#product-pagination').empty();
         },
 
         filterProducts() {
-            const query = state.searchQuery.toLowerCase().trim();
-            return state.products.filter(product => {
-                const categoryMatch = state.activeCategory === 'all' || product.category === state.activeCategory;
-                const searchMatch = !query || product.name.toLowerCase().includes(query);
-                return categoryMatch && searchMatch;
-            });
+            return state.products;
         },
 
         getProductById(id) {
@@ -118,32 +196,78 @@
             return state.productStock[id] || 0;
         },
 
+        getSelectedUom(product) {
+            return product.uoms.find(uom => String(uom.id) === String(product.selectedUomId)) || product.uoms[0] || null;
+        },
+
         render() {
             const $grid = $('#product-grid');
             const filtered = this.filterProducts();
+
+            if (!filtered.length) {
+                $grid.html(`
+                    <div style="grid-column:1/-1;padding:24px;text-align:center;color:#64748b;">
+                        No products found.
+                    </div>
+                `);
+                return;
+            }
 
             const html = filtered.map(product => {
                 const availableStock = this.getAvailableStock(product.id);
                 const isOutOfStock = availableStock === 0;
                 const isLowStock = availableStock > 0 && availableStock <= CONFIG.LOW_STOCK_THRESHOLD;
+                const selectedUom = this.getSelectedUom(product);
+                const price = selectedUom ? Number(selectedUom.selling_price) || 0 : product.price;
 
                 const stockClass = isOutOfStock ? 'stock-out' : isLowStock ? 'stock-low' : 'stock-good';
                 const stockText = isOutOfStock ? 'Out of stock' : `${availableStock} available`;
+                const uomOptions = product.uoms.map(uom => `
+                    <option value="${utils.escapeHtml(uom.id)}" ${String(uom.id) === String(product.selectedUomId) ? 'selected' : ''}>
+                        ${utils.escapeHtml(uom.uom_name || uom.uom_code)}
+                    </option>
+                `).join('');
 
                 return `
                     <div class="product-card ${isOutOfStock ? 'product-card--disabled' : ''}" data-product-id="${product.id}">
+                        ${isLowStock ? '<span class="low-stock-badge">LOW</span>' : ''}
                         <div class="product-card__image">
-                            <img src="${product.image}" alt="${product.name}" loading="lazy">
+                            <img src="${product.image}" alt="${utils.escapeHtml(product.name)}" loading="lazy" onerror="this.src='${window.POS_ASSETS?.placeholder || '/assets/images/not-product.png'}'">
                         </div>
-                        <div class="product-card__info">
-                            <span class="product-card__name">${product.name}</span>
-                            <span class="product-card__price">${utils.formatCurrency(product.price)}</span>
+                        <div class="product-card__body">
+                            <span class="product-card__name">${utils.escapeHtml(product.name)}</span>
+                            <span class="product-card__price">${utils.formatCurrency(price)}</span>
                             <div class="product-card__stock ${stockClass}">${stockText}</div>
+                            <div class="product-card__uom-row">
+                                <select class="product-card__uom-select" data-product-id="${product.id}" ${product.uoms.length <= 1 ? 'disabled' : ''}>
+                                    ${uomOptions}
+                                </select>
+                                <button type="button" class="product-card__add-btn" ${isOutOfStock ? 'disabled' : ''}>
+                                    <span class="material-symbols-outlined">add</span>
+                                </button>
+                            </div>
                         </div>
                     </div>`;
             }).join('');
 
             $grid.html(html);
+        },
+
+        renderPagination() {
+            const paginator = state.productPagination;
+            if (!paginator) return;
+
+            const currentPage = paginator.current_page || 1;
+            const hasPrev = Boolean(paginator.prev_page_url);
+            const hasNext = Boolean(paginator.next_page_url);
+
+            $('#product-pagination').html(`
+                <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+                    <button class="pg-btn" data-page="${currentPage - 1}" ${hasPrev ? '' : 'disabled'}>Prev</button>
+                    <span style="font-size:13px;color:#64748b;">Page ${currentPage}</span>
+                    <button class="pg-btn" data-page="${currentPage + 1}" ${hasNext ? '' : 'disabled'}>Next</button>
+                </div>
+            `);
         },
 
         bindEvents() {
@@ -160,19 +284,53 @@
                 }
             });
 
+            $('#product-grid').on('click', '.product-card__uom-select, .product-card__add-btn', (e) => {
+                e.stopPropagation();
+            });
+
+            $('#product-grid').on('change', '.product-card__uom-select', (e) => {
+                const id = $(e.currentTarget).data('product-id');
+                const product = this.getProductById(id);
+                if (!product) return;
+
+                product.selectedUomId = $(e.currentTarget).val();
+                const selectedUom = this.getSelectedUom(product);
+                product.price = Number(selectedUom?.selling_price) || product.price;
+                product.costPrice = Number(selectedUom?.cost_price) || product.costPrice;
+                product.uomCode = selectedUom?.uom_code || product.uomCode;
+                product.uomName = selectedUom?.uom_name || selectedUom?.uom_code || product.uomName;
+                this.render();
+            });
+
+            $('#product-grid').on('click', '.product-card__add-btn', (e) => {
+                const id = $(e.currentTarget).closest('.product-card').data('product-id');
+                const product = this.getProductById(id);
+                const available = this.getAvailableStock(id);
+
+                if (product && available > 0) {
+                    cartManager.addItem(product);
+                    state.productStock[id]--;
+                    this.render();
+                }
+            });
+
             // Category filter
             $('#product-grid').closest('.pos-catalog').find('.pos-catalog__filter-pill').on('click', (e) => {
                 $('#product-grid').closest('.pos-catalog').find('.pos-catalog__filter-pill').removeClass('pos-catalog__filter-pill--active');
                 $(e.currentTarget).addClass('pos-catalog__filter-pill--active');
                 state.activeCategory = $(e.currentTarget).data('category');
-                this.render();
+                this.loadProducts(1);
             });
 
             // Search
             $('#product-search').on('input', utils.debounce((e) => {
                 state.searchQuery = e.target.value;
-                this.render();
+                this.loadProducts(1);
             }));
+
+            $('#product-pagination').on('click', '.pg-btn:not(:disabled)', (e) => {
+                this.loadProducts(Number($(e.currentTarget).data('page')) || 1);
+            });
         }
     };
 
@@ -190,8 +348,12 @@
                     id: product.id,
                     name: product.name,
                     price: product.price,
+                    costPrice: product.costPrice,
                     category: product.category,
                     image: product.image,
+                    productCode: product.code,
+                    uomCode: product.uomCode,
+                    uomName: product.uomName,
                     quantity: 1
                 };
             }

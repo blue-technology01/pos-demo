@@ -171,6 +171,10 @@
 .sp-kpi-card {
     background: var(--color-background-primary, #fff);
     border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    border: none;
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 4px 16px rgba(15, 23, 42, 0.06);
     border-radius: 16px;
     padding: 1.1rem 1.25rem;
 }
@@ -300,6 +304,10 @@
 .sp-panel {
     background: var(--color-background-primary, #fff);
     border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    border: none;
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 4px 16px rgba(15, 23, 42, 0.06);
     border-radius: 16px;
     padding: 1.1rem 1.25rem;
 }
@@ -408,79 +416,130 @@
 .sp-trend--down { color: #dc2626; }
 
 /* ---------- Pagination ---------- */
-.pm-pagination {
+
+/* ===== TABLE FOOTER WRAPPER ===== */
+.table-footer {
+    width: 100%;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 1rem;
+    align-items: center;
+    padding: 1rem;
 }
 
-.pm-pagination__meta {
+/* LEFT SIDE (info + select) */
+.table-footer-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
-.pm-pagination__text {
-    font-size: 11px;
-    color: var(--color-text-secondary, #6b7280);
+/* INFO TEXT */
+.table-info {
+    font-size: 13px;
+    color: #374151;
 }
 
-.pm-pagination__per-page {
+/* ===== PAGINATION WRAPPER ===== */
+.pagination {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: var(--color-text-secondary, #6b7280);
 }
 
-.pm-pagination__select {
-    font-size: 12px;
-    padding: 4px 10px;
-    border-radius: 50px;
-    border: 0.5px solid var(--color-border-secondary, #d1d5db);
-    background: var(--color-background-primary, #fff);
-    color: var(--color-text-primary, #111);
-    cursor: pointer;
-    outline: none;
-}
-
-.pm-pagination__links {
+.pagination nav ul {
     display: flex;
     align-items: center;
     gap: 4px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.pm-pagination__btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 50px;
-    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
-    background: var(--color-background-primary, #fff);
-    color: var(--color-text-primary, #111);
-    font-size: 11px;
+.pagination nav li {
+    display: flex;
+}
+
+.pagination span,
+.pagination a {
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 8px;
+    border-radius: 50px;
+    border: 0.5px solid #e5e7eb;
+    background: #fff;
+    color: #111;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.15s ease;
 }
 
-.pm-pagination__btn:disabled {
-    opacity: 0.35;
-    cursor: default;
-}
-
-.pm-pagination__btn.active {
+/* ACTIVE PAGE */
+.pagination .active span {
     background: #2563eb;
     color: #fff;
     border-color: #2563eb;
+    font-weight: 600;
 }
 
-.pm-pagination__btn:not(.active):not(:disabled):hover {
-    background: var(--color-background-secondary, #f9fafb);
+/* HOVER */
+.pagination a:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #2563eb;
+}
+
+/* DISABLED */
+.pagination .disabled span,
+.pagination [aria-disabled="true"] span {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+/* ===== PER PAGE SELECT ===== */
+.table-footer select {
+    font-family: Inter, sans-serif;
+    font-size: 12px;
+    padding: 5px 28px 5px 12px;
+    border-radius: 50px;
+    border: 0.5px solid #d1d5db;
+    background: #fff;
+    color: #6b7280;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+.pagination-numbers{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    align-items:center;
+}
+
+.pagination-numbers a,
+.pagination-numbers span{
+    width:36px;
+    height:36px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #ddd;
+    border-radius:8px;
+    text-decoration:none;
+}
+
+.pagination-numbers .active{
+    background:#111827;
+    color:#fff;
+}
+
+.pagination-numbers .dots{
+    border:none;
 }
 
 /* ---------- Donut chart ---------- */

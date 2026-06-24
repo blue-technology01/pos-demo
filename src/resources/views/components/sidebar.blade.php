@@ -209,7 +209,7 @@
 @push('scripts')
 <script>
     $(document).ready(function () {
-        // ── Sidebar Collapse Toggle ──
+        // ── Sidebar Collapse Toggle
         $('#sidebarToggle').on('click', function () {
             $('#sidebar').toggleClass('collapsed');
             localStorage.setItem('sidebar_collapsed', $('#sidebar').hasClass('collapsed'));

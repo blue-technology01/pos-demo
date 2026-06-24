@@ -1,9 +1,3 @@
-/* ============================================================
-   Admin Dashboard — dashboard.css
-   Primary: #2563eb  |  Font: Inter, sans-serif
-   ============================================================ */
-
-/* ---------- Page wrapper ---------- */
 .dash-wrapper {
     padding: 1.75rem 0;
     font-family: 'Inter', sans-serif;
@@ -38,17 +32,21 @@
 .dash-period {
     display: flex;
     align-items: center;
-    border: 0.5px solid var(--color-border-secondary, #d1d5db);
     border-radius: 50px;
     overflow: hidden;
     background: var(--color-background-primary, #fff);
+    border: none;
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 4px 16px rgba(15, 23, 42, 0.06);
+    /* border: 0.5px solid var(--color-border-tertiary, #e5e7eb); */
 }
 
 .period-btn {
     font-family: 'Inter', sans-serif;
     font-size: 12px;
     font-weight: 400;
-    padding: 7px 16px;
+    padding: 10px 16px;
     border: none;
     background: transparent;
     color: var(--color-text-secondary, #6b7280);
@@ -62,7 +60,7 @@
     background: var(--color-background-secondary, #f3f4f6);
     color: var(--color-text-primary, #111);
 }
-
+/* active button tab */
 .period-btn.active {
     background: #2563eb;
     color: #fff;
@@ -70,9 +68,6 @@
     border-radius: 50px;
 }
 
-/* ============================================================
-   Stat Cards Grid
-   ============================================================ */
 .dash-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -80,29 +75,14 @@
     margin-bottom: 1.25rem;
 }
 
-/* ---------- Stat card ---------- */
 .stat-card {
     background: var(--color-background-primary, #fff);
-    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    border: 0.5px solid #edf2f7;
     border-radius: 16px;
     padding: 1.25rem 1.4rem;
     position: relative;
     overflow: hidden;
-}
-
-
-/* Subtle left accent bar */
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 20%;
-    left: 0;
-    width: 3px;
-    height: 60%;
-    background: #2563eb;
-    border-radius: 0 3px 3px 0;
-    opacity: 0;
-    transition: opacity 0.2s;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
 }
 
 .stat-card:hover::before {
@@ -174,22 +154,21 @@
     color: var(--color-text-secondary, #6b7280);
 }
 
-/* ============================================================
-   Charts Row
-   ============================================================ */
 .dash-row-2 {
     display: grid;
     grid-template-columns: 1fr 360px;
     gap: 12px;
 }
 
-/* ---------- Dash card (shared) ---------- */
 .dash-card {
-    background: var(--color-background-primary, #fff);
-    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    background: #ffffff;
+    border: none;
     border-radius: 16px;
     padding: 1.25rem 1.5rem;
     overflow: hidden;
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 4px 16px rgba(15, 23, 42, 0.06);
 }
 
 .chart-card {
@@ -229,9 +208,6 @@
     color: var(--color-text-secondary, #6b7280);
 }
 
-/* ============================================================
-   Chart tabs (Revenue / Orders / Customers)
-   ============================================================ */
 .chart-tabs {
     display: flex;
     align-items: center;
@@ -263,15 +239,6 @@
     color: var(--color-text-primary, #111);
 }
 
-.chart-tab.active {
-    background: #fff;
-    color: #2563eb;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.10);
-}
-
-/* ============================================================
-   Product stat list (donut legend)
-   ============================================================ */
 .product-stat-list {
     list-style: none;
     margin: 1rem 0 0;
@@ -340,9 +307,6 @@
     color: var(--color-text-secondary, #6b7280);
 }
 
-/* ============================================================
-   Loading / skeleton shimmer
-   ============================================================ */
 @keyframes shimmer {
     0%   { background-position: -400px 0; }
     100% { background-position: 400px 0; }

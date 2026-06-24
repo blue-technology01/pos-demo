@@ -1,9 +1,4 @@
-{{-- resources/views/components/loading.blade.php
-     Usage: <x-loading />
-            <x-loading message="Please wait" />
---}}
 
-{{-- Styles INLINE — not @push — so they always render regardless of layout --}}
 <style>
 #page-loader {
     position: fixed;

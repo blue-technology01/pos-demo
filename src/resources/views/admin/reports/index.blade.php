@@ -41,7 +41,8 @@
         </div>
 
         {{-- Date Filter --}}
-        <div class="report-date">
+        <form method="GET" action="{{ route('admin.reports.index') }}" class="report-date" id="filter-form">
+
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                 <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -49,12 +50,16 @@
                 <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
 
-            <input type="date" id="start_date" value="{{ $startDate }}" max="{{ $endDate }}">
+            <input type="date" name="start_date" id="start_date"
+                value="{{ $startDate }}"
+                max="{{ now()->format('Y-m-d') }}">
             <span>-</span>
-            <input type="date" id="end_date" value="{{ $endDate }}" min="{{ $startDate }}" max="{{ now()->format('Y-m-d') }}">
+            <input type="date" name="end_date" id="end_date"
+                value="{{ $endDate }}"
+                max="{{ now()->format('Y-m-d') }}">
+            <button id="filter-btn" type="submit" onclick="showLoader()">Filter</button>
 
-            <button id="filter-btn" type="button">Filter</button>
-        </div>
+        </form>
     </div>
 
     {{-- Revenue Overview Chart --}}
@@ -148,49 +153,6 @@
             document.addEventListener('turbo:load', initPage);
             if (document.readyState === 'complete') initPage();
             else document.addEventListener('DOMContentLoaded', initPage);
-
-            const filterBtn  = document.getElementById('filter-btn');
-            const startInput = document.getElementById('start_date');
-            const endInput   = document.getElementById('end_date');
-            const summaryEl  = document.getElementById('report-summary');
-
-            if (!filterBtn) return;
-
-            async function applyFilter() {
-                const startDate = startInput.value;
-                const endDate   = endInput.value;
-                if (!startDate || !endDate) return;
-
-                filterBtn.disabled    = true;
-                filterBtn.textContent = 'Loading...';
-
-                try {
-                    const url = `{{ route('admin.reports.index') }}?start_date=${startDate}&end_date=${endDate}`;
-                    const response = await fetch(url, {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                        }
-                    });
-
-                    const data = await response.json();
-
-                    initializeReportChart(data.chartData);
-
-                    summaryEl.textContent = `Revenue: ${Number(data.summary.total_revenue).toFixed(2)} - Orders: ${data.summary.total_orders} - Avg Sale: ${Number(data.summary.average_sale).toFixed(2)}`;
-
-                    window.history.pushState({}, '', url);
-
-                } catch (error) {
-                    console.error('Filter error:', error);
-                } finally {
-                    filterBtn.disabled    = false;
-                    filterBtn.textContent = 'Filter';
-                }
-            }
-
-            filterBtn.addEventListener('click', applyFilter);
-            endInput.addEventListener('change', applyFilter);
         })();
     </script>
 @endpush

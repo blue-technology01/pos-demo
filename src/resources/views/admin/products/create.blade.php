@@ -20,18 +20,6 @@
         </a>
     </div>
 
-    {{-- ── Validation errors ── --}}
-    @if($errors->any())
-        <div class="alert-error">
-            <strong>Please fix the errors below:</strong>
-            <ul>
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
     <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
@@ -233,10 +221,10 @@
 
         {{-- ── Actions ── --}}
         <div class="form-actions">
-            <a href="{{ route('admin.products.index') }}" class="btn-cancel">
+            <a href="{{ route('admin.products.index') }}" onclick="showLoader()" class="btn-cancel">
                 <i class="ti ti-x" aria-hidden="true"></i> Cancel
             </a>
-            <button type="submit" class="btn-submit">
+            <button type="submit" class="btn-submit" onclick="showLoader()">
                 <i class="ti ti-device-floppy" aria-hidden="true"></i> Save product
             </button>
         </div>
@@ -249,8 +237,6 @@
 @push('scripts')
 <script>
 (function () {
-
-    // ── Image preview ──────────────────────────────────────────────
     const imageInput   = document.getElementById('imageInput');
     const imagePreview = document.getElementById('imagePreview');
     const previewImg   = document.getElementById('previewImg');
@@ -270,33 +256,6 @@
             reader.readAsDataURL(file);
         });
     }
-
-    // ── Toast notification ─────────────────────────────────────────
-    function showToast(message, type = 'success') {
-        const iconMap = { success: 'ti-circle-check', error: 'ti-circle-x' };
-        const toast   = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `
-            <i class="ti ${iconMap[type] ?? 'ti-circle-check'} toast-icon" aria-hidden="true"></i>
-            <span>${message}</span>
-            <button class="toast-close" onclick="this.parentElement.remove()" aria-label="Close">
-                <i class="ti ti-x" aria-hidden="true"></i>
-            </button>
-        `;
-        document.body.appendChild(toast);
-        setTimeout(() => {
-            toast.style.animation = 'slideOut .3s ease-out forwards';
-            toast.addEventListener('animationend', () => toast.remove());
-        }, 4000);
-    }
-
-    @if(session('success'))
-        showToast(@json(session('success')), 'success');
-    @endif
-    @if(session('error'))
-        showToast(@json(session('error')), 'error');
-    @endif
-
 })();
 </script>
 @endpush

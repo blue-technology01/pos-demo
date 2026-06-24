@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Cash\CashController;
 use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\Dashboard\DashboardController;
+// use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Product\CategoryController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Product\ProductUomController;
@@ -48,10 +49,13 @@ Route::middleware('guest')->group(function () {
         ->name('auth.reset-password.show');
     Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])
         ->name('auth.reset-password.post');
+
 });
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('auth.logout');
+    // notification
+    // Route::get('/notifications/low-stock', [NotificationController::class, 'lowStock'])->name('notifications.low-stock');
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/customers/search', [CustomerController::class, 'searchAjax'])->name('customers.search.ajax');
         // Route::get('/admin/sales/{id}/pdf', [InvoiceController::class, 'exportSingleInvoicePdf'])->name('admin.sales.single-pdf');

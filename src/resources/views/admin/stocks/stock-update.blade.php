@@ -88,7 +88,7 @@
         @foreach(request()->except('search', 'page') as $key => $value)
             <input type="hidden" name="{{ $key }}" value="{{ $value }}">
         @endforeach
-        <button type="submit" class="btn-filter">
+        <button type="submit" class="btn-filter" onclick="showLoader()" >
             Search
         </button>
         <div class="sync-badge">
@@ -169,34 +169,37 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
-        <div class="table-footer">
-            <div class="table-info">
-                Showing
-                {{ $activities->firstItem() ?? 0 }}
-                -
-                {{ $activities->lastItem() ?? 0 }}
-                of
-                {{ $activities->total() }}
-                activities
+            {{-- pagination --}}
+            <div class="table-footer" style="width: 100%; display: flex; justify-content: space-between" id="tableFooter">
+                <span class="table-footer-left">
+                    <div class="table-info">
+                        showing
+                        {{ $products->firstItem() ?? 0 }}
+                        -
+                        {{ $products->lastItem() ?? 0 }}
+                        of
+                        {{ $products->total() }}
+                        Product
+                    </div>
+
+                    {{-- per page --}}
+                    <form method="GET" action="{{ request()->url() }}">
+                        @foreach(request()->except('per_page', 'page') as $key => $value)
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @endforeach
+
+                        <select name="per_page" onchange="showLoader(); this.form.submit()">
+                            <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                        </select>
+                    </form>
+                </span>
+
+                <div class="pagination">
+                    {{ $products->links('vendor.pagination.numbers-only') }}
+                </div>
             </div>
-
-            <div class="pagination">
-                {{ $activities->appends(request()->query())->links() }}
-            </div>
-
-            <form method="GET" action="{{ url()->current() }}">
-                @foreach(request()->except('per_page', 'page') as $key => $value)
-                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                @endforeach
-
-                <select name="per_page" onchange="this.form.submit()">
-                    <option value="15" {{ request('per_page',15) == 15 ? 'selected' : '' }}>15</option>
-                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
-                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
-                </select>
-            </form>
         </div>
     </div>
 
@@ -271,34 +274,37 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
-        <div class="table-footer">
-            <div class="table-info">
-                Showing
-                {{ $activities->firstItem() ?? 0 }}
-                -
-                {{ $activities->lastItem() ?? 0 }}
-                of
-                {{ $activities->total() }}
-                activities
+            {{-- pagination --}}
+            <div class="table-footer" style="width: 100%; display: flex; justify-content: space-between" id="tableFooter">
+                <span class="table-footer-left">
+                    <div class="table-info">
+                        showing
+                        {{ $lowStockProducts->firstItem() ?? 0 }}
+                        -
+                        {{ $lowStockProducts->lastItem() ?? 0 }}
+                        of
+                        {{ $lowStockProducts->total() }}
+                        Low stock
+                    </div>
+
+                    {{-- per page --}}
+                    <form method="GET" action="{{ request()->url() }}">
+                        @foreach(request()->except('per_page', 'page') as $key => $value)
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @endforeach
+
+                        <select name="per_page" onchange="showLoader(); this.form.submit()">
+                            <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                        </select>
+                    </form>
+                </span>
+
+                <div class="pagination">
+                    {{ $lowStockProducts->links('vendor.pagination.numbers-only') }}
+                </div>
             </div>
-
-            <div class="pagination">
-                {{ $activities->appends(request()->query())->links() }}
-            </div>
-
-            <form method="GET" action="{{ url()->current() }}">
-                @foreach(request()->except('per_page', 'page') as $key => $value)
-                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                @endforeach
-
-                <select name="per_page" onchange="this.form.submit()">
-                    <option value="15" {{ request('per_page',15) == 15 ? 'selected' : '' }}>15</option>
-                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
-                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
-                </select>
-            </form>
         </div>
     </div>
 
@@ -373,35 +379,38 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
-       <div class="table-footer">
-        <div class="table-info">
-            Showing
-            {{ $activities->firstItem() ?? 0 }}
-            -
-            {{ $activities->lastItem() ?? 0 }}
-            of
-            {{ $activities->total() }}
-            activities
-        </div>
+            {{-- pagination --}}
+            <div class="table-footer" style="width: 100%; display: flex; justify-content: space-between" id="tableFooter">
+                <span class="table-footer-left">
+                    <div class="table-info">
+                        showing
+                        {{ $activities->firstItem() ?? 0 }}
+                        -
+                        {{ $activities->lastItem() ?? 0 }}
+                        of
+                        {{ $activities->total() }}
+                        Activities
+                    </div>
 
-        <div class="pagination">
-            {{ $activities->appends(request()->query())->links() }}
+                    {{-- per page --}}
+                    <form method="GET" action="{{ request()->url() }}">
+                        @foreach(request()->except('per_page', 'page') as $key => $value)
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @endforeach
+
+                        <select name="per_page" onchange="showLoader(); this.form.submit()">
+                            <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                        </select>
+                    </form>
+                </span>
+
+                <div class="pagination">
+                    {{ $activities->links('vendor.pagination.numbers-only') }}
+                </div>
+            </div>
         </div>
-
-        <form method="GET" action="{{ url()->current() }}">
-            @foreach(request()->except('per_page', 'page') as $key => $value)
-                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-            @endforeach
-
-            <select name="per_page" onchange="this.form.submit()">
-                <option value="15" {{ request('per_page',15) == 15 ? 'selected' : '' }}>15</option>
-                <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
-                <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-                <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
-            </select>
-        </form>
-    </div>
     </div>
 </div>
 @endsection

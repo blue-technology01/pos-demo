@@ -4,12 +4,12 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(15, 23, 42, 0.6); /* ពណ៌ខ្មៅស្រអាប់បាំងផ្ទៃក្រោយ */
-    backdrop-filter: blur(4px);              /* ធ្វើឱ្យផ្ទៃក្រោយរាងព្រិលៗ */
+    background-color: rgba(15, 23, 42, 0.6); 
+    backdrop-filter: blur(4px);              
     display: none;
     justify-content: center;
     align-items: center;
-    z-index: 99999;                          /* ឱ្យអណ្តែតលើគេបង្អស់ */
+    z-index: 99999;                        
     animation: posFadeIn 0.2s ease-out;
 }
 
@@ -45,7 +45,7 @@
 }
 
 .pos-modal__title .material-symbols-outlined {
-    color: #0284c7; /* ពណ៌ Icon ខៀវ */
+    color: #0284c7; 
 }
 
 .pos-modal__close-btn {
@@ -125,7 +125,7 @@
 }
 
 .pos-customer-item:hover {
-    background-color: #f0fdf4; /* លោតពណ៌បៃតងខ្ចីពេលដេញ Mouse ទៅចំ */
+    background-color: #f0fdf4;
 }
 
 .pos-customer-name {
@@ -144,10 +144,9 @@
 .pos-customer-select-text {
     font-size: 13px;
     font-weight: 600;
-    color: #008000; /* ពណ៌បៃតងចំ */
+    color: #008000; 
 }
 
-/* ករណីរកមិនឃើញ៖ ប្រអប់ប៊ូតុង Add Customer ធំពេញប្រអប់ */
 .pos-no-data {
     padding: 30px 20px;
     text-align: center;
@@ -187,7 +186,7 @@
 }
 
 .pos-btn--success {
-    background-color: #008000; /* ពណ៌បៃតងចំ */
+    background-color: #008000; 
     color: #ffffff;
     width: 100%;
     display: flex;

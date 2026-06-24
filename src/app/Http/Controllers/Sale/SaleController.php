@@ -61,7 +61,7 @@ class SaleController extends Controller
             $sale = $this->saleService->createSale($request->validated());
             return response()->json([
                 'success'    => true,
-                'message'    => "sale is #{$sale->invoice_no} successfully!",
+                'message'    => "Sale #{$sale->invoice_no} created successfully!",
                 'invoice_no' => $sale->invoice_no,
                 'sale_id'    => $sale->id
             ], 201);
@@ -83,7 +83,7 @@ class SaleController extends Controller
             $sale = $this->saleService->updateSale($id, $request->validated());
 
             return redirect()->route('admin.sales.index')
-                ->with('success', "Reciept  #{$sale->invoice_no} edit successfullly.!");
+                ->with('success', "Receipt #{$sale->invoice_no} updated successfully!");
 
         } catch (\Exception $e) {
             return redirect()->back()
@@ -101,7 +101,7 @@ class SaleController extends Controller
             $sale = $this->saleService->cancelSale($id);
 
             return redirect()->back()
-                ->with('success', "Reciept #{$sale->invoice_no} is cancel and restore to stock ready!");
+                ->with('success', "Receipt #{$sale->invoice_no} has been voided and stock restored!");
 
         } catch (\Exception $e) {
             return redirect()->back()

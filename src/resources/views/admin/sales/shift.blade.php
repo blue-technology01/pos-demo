@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @push('styles')
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard/sale/shift.css') }}">
 @endpush
@@ -9,14 +9,11 @@
 @section('title', 'Cash Register')
 
 @section('content')
+<x-spinner />
 <div class="unit-section">
-
-    {{-- ========================================================= --}}
-    {{-- Search & Filter --}}
-    {{-- ========================================================= --}}
+    {{-- search and filter data --}}
     <div class="header-actions">
-        <form action="{{ route('admin.shift') }}" method="GET" class="search-wrap">
-
+        <form action="{{ route('admin.shift') }}"  method="GET" class="search-wrap">
             <div class="search-box">
                 <span class="material-symbols-outlined">search</span>
                 <input type="text" name="search" id="searchInput"
@@ -24,21 +21,18 @@
                     placeholder="Search by cashier or invoice...">
             </div>
 
-            <input type="date" name="start_date" value="{{ request('start_date') }}"
-                class="filter-date" id="startDate">
+            <input type="date" name="start_date"
+                value="{{ request('start_date') }}"
+                class="filter-date">
 
             <input type="date" name="end_date" value="{{ request('end_date') }}"
                 class="filter-date" id="endDate">
 
-            <button type="submit" class="btn-filter">Filter</button>
-            <a href="{{ route('admin.shift') }}" class="btn-reset">Reset</a>
-
+            <button type="submit" class="btn-filter" onclick="showLoader()">Filter</button>
+            <a href="{{ route('admin.shift') }}" class="btn-reset" onclick="showLoader()">Reset</a>
         </form>
     </div>
-
-    {{-- ========================================================= --}}
-    {{-- summary start cards    --}}
-    {{-- ========================================================= --}}
+    {{-- summary cart --}}
     <div class="stat-grid">
         {{-- shift start --}}
         <div class="stat-card">
@@ -90,10 +84,7 @@
             </div>
         </div>
     </div>
-
-    {{-- ========================================================= --}}
-    {{-- Shift History Table --}}
-    {{-- ========================================================= --}}
+    {{-- shitf detail history --}}
     <div class="unit-card">
         <div class="table-responsive">
             <table class="table-custom shift-table" id="shiftTable">
@@ -168,32 +159,47 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" style="text-align: center; padding: 24px; color: #161e30;">មិនមានទិន្នន័យវេនលក់ស្របតាមលក្ខខណ្ឌស្វែងរកឡើយ។</td>
+                            <td colspan="11" style="text-align: center; padding: 24px; color: #161e30;">Not found data!</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
-        </div
+        </div>
 
-        {{-- ========================================================= --}}
-        {{--  dynamic Pagination  --}}
-        {{-- ========================================================= --}}
-        <div class="pm-pagination">
-            <div class="pm-pagination__meta">
-                <span class="pm-pagination__text">
-                    Showing {{ $history->firstItem() ?? 0 }} to {{ $history->lastItem() ?? 0 }} of {{ $history->total() }} records
-                </span>
-            </div>
-            <div class="pm-pagination__links" id="paginationLinks">
-                {{ $history->appends(request()->query())->links() }}
+        {{-- pagination --}}
+        <div class="table-footer" style="width: 100%; display: flex;  justify-content: space-between" id="tableFooter">
+            <span class="table-footer-left">
+                <div class="table-info">
+                    showing
+                    {{ $history->firstItem() ?? 0 }}
+                    -
+                    {{ $history->lastItem() ?? 0 }}
+                    of
+                    {{ $history->total() }}
+                    sales
+                </div>
+
+                {{-- per page --}}
+                <form method="GET" action="{{ request()->url() }}">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+
+                    <select name="per_page" onchange="showLoader(); this.form.submit()">
+                        <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+            </span>
+
+            <div class="pagination">
+                {{ $history->links('vendor.pagination.numbers-only') }}
             </div>
         </div>
     </div>
 </div>
-
-{{-- ========================================================= --}}
-{{-- Modal View Detail --}}
-{{-- ========================================================= --}}
+{{-- modal view detail --}}
 <div id="detail-modal" class="modal-overlay" style="display: none;">
     <div class="modal-box">
         <div class="modal-header">
@@ -296,18 +302,15 @@
             document.getElementById('detail-closing').textContent  = d.closing;
             document.getElementById('detail-txn').textContent      = d.txn;
 
-            // កំណត់ពណ៌ទៅតាម Difference Type (ខ្វះពណ៌ក្រហម, លើសពណ៌បៃតង)
             const diffEl = document.getElementById('detail-diff');
             diffEl.textContent = d.diff;
             diffEl.className = 'detail-stat-value ' +
                 (d.diffType === 'negative' ? 'danger' : d.diffType === 'positive' ? 'success' : '');
 
-            // ស្ថានភាព Badge (Open/Closed)
             const statusBadge = document.getElementById('detail-status-badge');
             statusBadge.textContent = d.status;
             statusBadge.className = 'status-badge ' + (d.status === 'Open' ? 'open' : 'closed');
 
-            // បង្ហាញកំណត់សម្គាល់បើមាន
             const noteWrap = document.getElementById('detail-note-wrap');
             if (d.note && d.note.trim() !== '') {
                 document.getElementById('detail-note').textContent = d.note;

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Report\RevenueReportService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -84,5 +85,11 @@ class Sale extends Model
     public function getIsPaidAttribute()
     {
         return $this->paid_amount >= $this->total_amount;
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(fn ()   => RevenueReportService::flushCache());
+        static::deleted(fn () => RevenueReportService::flushCache());
     }
 }

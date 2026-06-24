@@ -1,10 +1,3 @@
-/* ============================================================
-   Edit Product UOM — edit-uom.css
-   Primary: #2563eb  |  Border-radius pills: 50px
-   Font: Inter, sans-serif
-   ============================================================ */
-
-/* ---------- Page header ---------- */
 .page-header {
     margin-bottom: 1.5rem;
     font-family: 'Inter', sans-serif;
@@ -19,17 +12,17 @@
     line-height: 1.2;
 }
 
-/* ---------- Card ---------- */
 .card {
     background: var(--color-background-primary, #fff);
-    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    border: none;
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 4px 16px rgba(15, 23, 42, 0.06);
     border-radius: 16px;
     padding: 1.5rem;
     font-family: 'Inter', sans-serif;
-    max-width: 780px;
 }
 
-/* ---------- Form group ---------- */
 .form-group {
     display: flex;
     flex-direction: column;

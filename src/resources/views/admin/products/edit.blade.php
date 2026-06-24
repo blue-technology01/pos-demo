@@ -6,7 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/create.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/edit.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('assets/css/dashboard/product/edit.css') }}"> --}}
 @endpush
 
 @section('content')
@@ -23,19 +23,6 @@
             <i class="ti ti-arrow-left" aria-hidden="true"></i> Back to products
         </a>
     </div>
-
-    {{-- ── Validation errors ── --}}
-    @if($errors->any())
-        <div class="alert-error">
-            <strong>Please fix the errors below:</strong>
-            <ul>
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
     <form action="{{ route('admin.products.update', $product->code) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
@@ -248,10 +235,10 @@
 
         {{-- ── Actions ── --}}
         <div class="form-actions">
-            <a href="{{ route('admin.products.index') }}" class="btn-cancel">
+            <a href="{{ route('admin.products.index') }}" onclick="showLoader()" class="btn-cancel">
                 <i class="ti ti-x" aria-hidden="true"></i> Cancel
             </a>
-            <button type="submit" class="btn-submit">
+            <button type="submit" class="btn-submit" onclick="showLoader()" >
                 <i class="ti ti-device-floppy" aria-hidden="true"></i> Update product
             </button>
         </div>
@@ -265,7 +252,6 @@
 <script>
 (function () {
 
-    // ── Image preview ──────────────────────────────────────────────
     const imageInput    = document.getElementById('imageInput');
     const uploadTrigger = document.getElementById('uploadTrigger');
     const imagePreview  = document.getElementById('imagePreview');
@@ -297,33 +283,6 @@
             uploadTrigger.style.display = 'flex';
         });
     }
-
-    // ── Toast ──────────────────────────────────────────────────────
-    function showToast(message, type = 'success') {
-        const iconMap = { success: 'ti-circle-check', error: 'ti-circle-x' };
-        const toast   = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `
-            <i class="ti ${iconMap[type] ?? 'ti-circle-check'} toast-icon" aria-hidden="true"></i>
-            <span>${message}</span>
-            <button class="toast-close" onclick="this.parentElement.remove()" aria-label="Close">
-                <i class="ti ti-x" aria-hidden="true"></i>
-            </button>
-        `;
-        document.body.appendChild(toast);
-        setTimeout(() => {
-            toast.style.animation = 'slideOut .3s ease-out forwards';
-            toast.addEventListener('animationend', () => toast.remove());
-        }, 4000);
-    }
-
-    @if(session('success'))
-        showToast(@json(session('success')), 'success');
-    @endif
-    @if(session('error'))
-        showToast(@json(session('error')), 'error');
-    @endif
-
 })();
 </script>
 @endpush

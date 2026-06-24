@@ -169,10 +169,10 @@
 
         {{-- ── Actions ── --}}
         <div class="row-actions">
-            <a href="{{ route('admin.product-uom.index') }}" class="btn-cancel">
+            <a href="{{ route('admin.product-uom.index') }}" onclick="showLoader()" class="btn-cancel">
                 <i class="ti ti-x" aria-hidden="true"></i> Cancel
             </a>
-            <button type="submit" class="btn-submit">
+            <button type="submit" class="btn-submit" onclick="showLoader()" >
                 <i class="ti ti-device-floppy" aria-hidden="true"></i> Save product UOM
             </button>
         </div>

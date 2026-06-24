@@ -15,15 +15,10 @@ class PosController extends Controller
 
     public function index(Request $request)
     {
-        $products = $this->productUomService->getPOSProducts($request);
-
         $categories = Category::where('status', 'active')
             ->orderBy('name')
             ->get(['code', 'name']);
 
-        return view('cashier.pos.index', compact(
-            'products',
-            'categories'
-        ));
+        return view('cashier.pos.index', compact('categories'));
     }
 }

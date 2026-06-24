@@ -61,11 +61,8 @@
         </div>
 
         <div class="btn-group">
-            <button type="submit" class="btn-save">Update</button>
-
-            <a href="{{ route('admin.product-uom.index') }}" class="btn-cancel">
-                Cancel
-            </a>
+            <button type="submit" class="btn-save" onclick="showLoader()">Update</button>
+            <a href="{{ route('admin.product-uom.index') }}" class="btn-cancel" onclick="showLoader()">Cancel</a>
         </div>
     </form>
 </div>

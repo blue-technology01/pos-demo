@@ -16,32 +16,53 @@ class ProductService
     public function getForAdmin(Request $request)
     {
         $query = Product::query()
-            ->with(['category', 'uoms.uom'])  
+            ->select([
+                'code',
+                'name',
+                'category_code',
+                'price',
+                'cost_price',
+                'stock',
+                'min_stock',
+                'barcode',
+                'image',
+                'status',
+                'created_at'
+            ])
+            // load only category
+            ->with(['category:code,name'])
             ->orderBy('code');
 
-        // Text Search
-        if ($search = $request->get('search')) {
+        // search
+        if ($search = $request->search) {
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%")
-                  ->orWhere('barcode', 'like', "%{$search}%");
+                $q->where('code', $search)
+                ->orWhere('barcode', $search)
+                ->orWhere('name', 'like', "%{$search}%");
             });
         }
 
-        // Date Range
-        if ($start = $request->get('start_date')) {
-            $query->whereDate('created_at', '>=', $start);
-        }
-        if ($end = $request->get('end_date')) {
-            $query->whereDate('created_at', '<=', $end);
+        // date range
+        if ($request->start_date && $request->end_date) {
+            $query->whereBetween('created_at', [
+                $request->start_date . ' 00:00:00',
+                $request->end_date . ' 23:59:59'
+            ]);
+        } elseif ($request->start_date) {
+            $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+        } elseif ($request->end_date) {
+            $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
         }
 
-        // Category Filter
-        if ($categoryCode = $request->get('category_code')) {
+
+        // category
+        if ($categoryCode = $request->category_code) {
             $query->where('category_code', $categoryCode);
         }
 
-        return $query->paginate($request->query('per_page', 15));
+        return $query
+            ->paginate($request->per_page ?? 15)
+            ->withQueryString();
     }
 
     /**

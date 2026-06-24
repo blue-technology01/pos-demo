@@ -553,6 +553,10 @@
         clearCart:   "{!! route('cashier.sale-items.clear') !!}",
         confirmSale: "{!! route('cashier.sale-items.confirm') !!}",
     };
+    window.POS_ASSETS = {
+        storageBase: "{{ asset('storage') }}",
+        placeholder: "{{ asset('assets/images/not-product.png') }}",
+    };
     window.CSRF_TOKEN = "{{ csrf_token() }}";
 
     window.currentRegisterId = {{

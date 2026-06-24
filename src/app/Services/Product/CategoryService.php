@@ -10,61 +10,31 @@ use Illuminate\Support\Facades\Storage;
 
 class CategoryService
 {
+    private const MAX_PER_PAGE    = 100;
+    private const DEFAULT_PER_PAGE = 15;
+    private const IMAGE_DISK      = 'public';
+    private const IMAGE_DIR       = 'categories';
+
     /**
-     * Get all active categories with pagination.
+     * Get paginated categories with optional search, filter, and sort.
      */
     public function getAll(Request $request): LengthAwarePaginator
     {
-        $query = Category::select(
+        $query = Category::query()->select([
             'code',
             'name',
             'description',
             'image',
             'status',
-            'created_at'
-        )
-        ->where('status', 'active');
-        // Search
-        if ($request->filled('search')) {
-            $search = trim($request->search);
+            'created_at',
+        ]);
 
-            $query->where(function ($q) use ($search) {
-                $q->where('code', 'like', "%{$search}%")
-                ->orWhere('name', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        // Status filter
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // Sort
-        switch ($request->get('sort')) {
-            case 'oldest':
-                $query->oldest();
-                break;
-
-            case 'name_asc':
-                $query->orderBy('name');
-                break;
-
-            case 'name_desc':
-                $query->orderByDesc('name');
-                break;
-
-            case 'code_asc':
-                $query->orderBy('code');
-                break;
-
-            default:
-                $query->latest();
-                break;
-        }
+        $this->applySearch($query, $request->input('search'));
+        $this->applyStatus($query, $request->input('status'));
+        $this->applySort($query, $request->input('sort'));
 
         return $query
-            ->paginate($request->get('per_page', 15))
+            ->paginate($this->resolvePerPage($request))
             ->withQueryString();
     }
 
@@ -81,56 +51,120 @@ class CategoryService
      */
     public function create(array $data): Category
     {
-        if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
-            $data['image'] = $data['image']->store('categories', 'public');
-        }
-
         return Category::create([
             'code'        => $data['code'],
             'name'        => $data['name'],
             'description' => $data['description'] ?? null,
-            'image'       => $data['image'] ?? null,
+            'image'       => $this->uploadImage($data['image'] ?? null),
             'status'      => $data['status'] ?? 'active',
         ]);
     }
 
     /**
-     * Update an existing category by code.
+     * Update an existing category.
      */
     public function update(string $code, array $data): Category
     {
         $category = Category::findOrFail($code);
 
-        if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
-            // Delete old image if exists
-            if ($category->image && Storage::disk('public')->exists($category->image)) {
-                Storage::disk('public')->delete($category->image);
-            }
-
-            $data['image'] = $data['image']->store('categories', 'public');
-        }
+        $image = isset($data['image']) && $data['image'] instanceof UploadedFile
+            ? $this->replaceImage($category->image, $data['image'])
+            : $category->image;
 
         $category->update([
-            'name'        => $data['name'] ?? $category->name,
+            'name'        => $data['name']        ?? $category->name,
             'description' => $data['description'] ?? $category->description,
-            'image'       => $data['image'] ?? $category->image,
-            'status'      => $data['status'] ?? $category->status,
+            'image'       => $image,
+            'status'      => $data['status']       ?? $category->status,
         ]);
 
         return $category->fresh();
     }
 
     /**
-     * Deactivate a category (soft delete via status).
+     * Delete a category and its associated image.
+     */
+    public function delete(string $code): void
+    {
+        $category = Category::findOrFail($code);
+
+        $this->deleteImage($category->image);
+
+        $category->delete();
+    }
+
+    /**
+     * Deactivate a category (soft status change).
      */
     public function deactivate(string $code): Category
     {
         $category = Category::findOrFail($code);
-
-        $category->update([
-            'status' => 'inactive'
-        ]);
+        $category->update(['status' => 'inactive']);
 
         return $category->fresh();
+    }
+
+    /* ─────────────────────────────────────────
+    |  Private helpers
+    ───────────────────────────────────────── */
+
+    private function applySearch($query, ?string $search): void
+    {
+        if (blank($search)) return;
+
+        $term = trim($search);
+
+        $query->where(function ($q) use ($term) {
+            $q->where('code', 'like', $term . '%')
+              ->orWhere('name', 'like', '%' . $term . '%')
+              ->orWhere('description', 'like', '%' . $term . '%');
+        });
+    }
+
+    private function applyStatus($query, ?string $status): void
+    {
+        if (blank($status)) return;
+
+        $query->where('status', $status);
+    }
+
+    private function applySort($query, ?string $sort): void
+    {
+        match ($sort) {
+            'oldest'    => $query->oldest(),
+            'name_asc'  => $query->orderBy('name'),
+            'name_desc' => $query->orderByDesc('name'),
+            'code_asc'  => $query->orderBy('code'),
+            default     => $query->latest(),
+        };
+    }
+
+    private function resolvePerPage(Request $request): int
+    {
+        return min(
+            (int) $request->input('per_page', self::DEFAULT_PER_PAGE),
+            self::MAX_PER_PAGE
+        );
+    }
+
+    private function uploadImage(mixed $file): ?string
+    {
+        if (!$file instanceof UploadedFile) return null;
+
+        return $file->store(self::IMAGE_DIR, self::IMAGE_DISK);
+    }
+
+    private function replaceImage(?string $old, UploadedFile $new): string
+    {
+        $this->deleteImage($old);
+
+        return $new->store(self::IMAGE_DIR, self::IMAGE_DISK);
+    }
+
+    private function deleteImage(?string $path): void
+    {
+        if ($path && Storage::disk(self::IMAGE_DISK)->exists($path)) {
+            Storage::disk(self::IMAGE_DISK)->delete($path);
+        }
     }
 }

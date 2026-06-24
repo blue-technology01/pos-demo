@@ -76,20 +76,34 @@ class SaleService
     public function getAllSales(Request $request): LengthAwarePaginator
     {
         return Sale::query()
-            ->with(['items'])
-            ->when($request->invoice_no, fn($q) => $q->where('invoice_no', 'LIKE', "%{$request->invoice_no}%"))
-            ->when($request->status,     fn($q) => $q->where('status', $request->status))
+            ->with(['items', 'user'])
+            ->when($request->search, fn($q) =>
+                $q->where(function ($q) use ($request) {
+                    $q->where('invoice_no', 'LIKE', "%{$request->search}%")
+                    ->orWhereHas('user', fn($u) => $u->where('name', 'LIKE', "%{$request->search}%"));
+                })
+            )
+            ->when($request->status, fn($q) => $q->where('status', $request->status))
             ->when(
-                $request->date && !$request->date_from && !$request->date_to,
-                fn($q) => $q->whereDate('sale_date', $request->date)
+                $request->start_date && $request->end_date,
+                fn($q) => $q->whereBetween('sale_date', [
+                    $request->start_date,  // e.g. 2026-06-01T08:00
+                    $request->end_date,    // e.g. 2026-06-24T18:00
+                ])
             )
             ->when(
-                $request->date_from && $request->date_to,
-                fn($q) => $q->whereBetween('sale_date', [$request->date_from, $request->date_to])
+                $request->start_date && !$request->end_date,
+                fn($q) => $q->where('sale_date', '>=', $request->start_date)
+            )
+            ->when(
+                !$request->start_date && $request->end_date,
+                fn($q) => $q->where('sale_date', '<=', $request->end_date)
             )
             ->orderByDesc('id')
-            ->paginate($request->per_page ?? 15);
+            ->paginate($request->per_page ?? 15)
+            ->withQueryString();
     }
+
     // create / confirm
     public function confirmSale(array $data): Sale
     {

@@ -11,7 +11,7 @@
 @section('content')
 
 <div class="page">
-    <x-alert/>
+    {{-- <x-alert/> --}}
     {{-- ── Toolbar ── --}}
     <div class="toolbar">
         <div class="toolbar-left" >
@@ -36,7 +36,7 @@
                     <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name Z-A</option>
                     <option value="code_asc" {{ request('sort') == 'code_asc' ? 'selected' : '' }}>Code A-Z</option>
                 </select>
-                <button type="submit" class="btn-filter">Filter</button>
+                <button type="submit" class="btn-filter" onclick="showLoader()">Filter</button>
             </form>
         </div>
         <div class="toolbar-right">
@@ -133,34 +133,36 @@
                 </tbody>
             </table>
         </div>
-        {{-- table footer --}}
-        <div class="table-footer" id="tableFooter">
-            <div class="table-info">
-                Showing
-                {{ $uoms->firstItem() ?? 0 }}
-                -
-                {{ $uoms->lastItem() ?? 0 }}
-                of
-                {{ $uoms->total() }}
-                units
-            </div>
+        {{-- pagination --}}
+        <div class="table-footer" style="width: 100%; display: flex; justify-content: space-between" id="tableFooter">
+            <span class="table-footer-left">
+                <div class="table-info">
+                    showing
+                    {{ $uoms->firstItem() ?? 0 }}
+                    -
+                    {{ $uoms->lastItem() ?? 0 }}
+                    of
+                    {{ $uoms->total() }}
+                    sales
+                </div>
+
+                {{-- per page --}}
+                <form method="GET" action="{{ request()->url() }}">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+
+                    <select name="per_page" onchange="showLoader(); this.form.submit()">
+                        <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+            </span>
 
             <div class="pagination">
-                {{ $uoms->links() }}
+                {{ $uoms->links('vendor.pagination.numbers-only') }}
             </div>
-
-            {{-- per page --}}
-            <form method="GET" action="{{ url()->current() }}">
-                @foreach(request()->except('per_page', 'page') as $key => $value)
-                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                @endforeach
-
-                <select name="per_page" onchange="this.form.submit()">
-                    <option value="15" {{ request('per_page') == 15 ? 'selected' : '' }}>15</option>
-                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
-                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-                </select>
-            </form>
         </div>
     </div>
 </div>
@@ -221,7 +223,7 @@
                 <button type="button" class="btn-cancel" data-close="createModal">
                     <i class="ti ti-x" aria-hidden="true"></i> Cancel
                 </button>
-                <button type="submit" class="btn-submit">
+                <button type="submit" class="btn-submit" onclick="showLoader()" >
                     <i class="ti ti-device-floppy" aria-hidden="true"></i> Save unit
                 </button>
             </div>
@@ -284,7 +286,7 @@
                 <button type="button" class="btn-cancel" data-close="editModal">
                     <i class="ti ti-x" aria-hidden="true"></i> Cancel
                 </button>
-                <button type="submit" class="btn-submit">
+                <button type="submit" class="btn-submit" onclick="showLoader()" >
                     <i class="ti ti-device-floppy" aria-hidden="true"></i> Save changes
                 </button>
             </div>
@@ -297,55 +299,6 @@
 <script>
 (function () {
 
-    // ── Toast notification ─────────────────────────────────────────────────
-    function showToast(message, type = 'info') {
-        const colors = {
-            success : '#059669',
-            error   : '#dc2626',
-            warning : '#d97706',
-            info    : '#2563eb',
-        };
-
-        const toast = document.createElement('div');
-        Object.assign(toast.style, {
-            position     : 'fixed',
-            top          : '20px',
-            right        : '20px',
-            background   : colors[type] ?? colors.info,
-            color        : '#fff',
-            padding      : '11px 18px',
-            borderRadius : '50px',
-            zIndex       : '99999',
-            fontSize     : '13px',
-            fontWeight   : '500',
-            fontFamily   : "'Inter', sans-serif",
-            boxShadow    : '0 4px 16px rgba(0,0,0,0.15)',
-            animation    : 'slideIn 0.3s ease-out',
-            display      : 'flex',
-            alignItems   : 'center',
-            gap          : '8px',
-        });
-
-        const iconMap = { success: 'ti-circle-check', error: 'ti-circle-x', warning: 'ti-alert-triangle', info: 'ti-info-circle' };
-        toast.innerHTML = `<i class="ti ${iconMap[type] ?? 'ti-info-circle'}" style="font-size:15px"></i> ${message}`;
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            toast.style.animation = 'slideOut 0.3s ease-out forwards';
-            toast.addEventListener('animationend', () => toast.remove());
-        }, 3000);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        @if(session('success'))
-            showToast(@json(session('success')), 'success');
-        @endif
-        @if(session('error'))
-            showToast(@json(session('error')), 'error');
-        @endif
-    });
-
-    // ── Modal helpers ──────────────────────────────────────────────────────
     function openModal(id) {
         document.getElementById(id).classList.add('open');
         document.body.style.overflow = 'hidden';
@@ -371,13 +324,13 @@
             document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
     });
 
-    // ── Open create modal ──────────────────────────────────────────────────
+    // open create modal
     document.getElementById('open-create-modal').addEventListener('click', () => {
         openModal('createModal');
         document.getElementById('create_code').focus();
     });
 
-    // ── Open edit modal ────────────────────────────────────────────────────
+    // open edit modal
     document.querySelectorAll('.open-edit-modal').forEach(btn =>
         btn.addEventListener('click', function () {
             const code = this.dataset.code;
@@ -394,8 +347,7 @@
             document.getElementById('edit_name').focus();
         })
     );
-
-    // ── Delete ─────────────────────────────────────────────────────────────
+    // remove
     document.querySelectorAll('.delete-btn').forEach(btn =>
         btn.addEventListener('click', function () {
             const code = this.dataset.code;
@@ -417,146 +369,12 @@
             form.submit();
         })
     );
-
-    // ── Filter + Sort + Pagination engine ──────────────────────────────────
-    const allRows = Array.from(document.querySelectorAll('#categoryTableBody tr[data-name]'));
-    const tbody   = document.getElementById('categoryTableBody');
-    const infoEl  = document.getElementById('tableInfo');
-    const pagEl   = document.getElementById('pagination');
-    let currentPage = 1;
-
-    function getFilters() {
-        return {
-            search  : document.getElementById('searchInput').value.toLowerCase().trim(),
-            status  : document.getElementById('filterStatus').value,
-            sort    : document.getElementById('filterSort').value,
-            perPage : parseInt(document.getElementById('perPage').value, 10),
-        };
-    }
-
-    function applySort(rows, sort) {
-        return [...rows].sort((a, b) => {
-            if (sort === 'newest')    return b.dataset.created - a.dataset.created;
-            if (sort === 'oldest')    return a.dataset.created - b.dataset.created;
-            if (sort === 'name_asc')  return a.dataset.name.localeCompare(b.dataset.name);
-            if (sort === 'name_desc') return b.dataset.name.localeCompare(a.dataset.name);
-            if (sort === 'code_asc')  return a.dataset.code.localeCompare(b.dataset.code);
-            return 0;
-        });
-    }
-
-    function render() {
-        const { search, status, sort, perPage } = getFilters();
-
-        let visible = allRows.filter(row => {
-            const matchSearch = !search ||
-                row.dataset.name.includes(search) ||
-                row.dataset.code.includes(search) ||
-                row.dataset.status.includes(search);
-            const matchStatus = !status || row.dataset.status === status;
-            return matchSearch && matchStatus;
-        });
-
-        visible = applySort(visible, sort);
-
-        const total      = visible.length;
-        const totalPages = Math.max(1, Math.ceil(total / perPage));
-        if (currentPage > totalPages) currentPage = totalPages;
-
-        const start = (currentPage - 1) * perPage;
-        const end   = Math.min(start + perPage, total);
-        const paged = visible.slice(start, end);
-
-        allRows.forEach(row => { row.style.display = 'none'; });
-
-        const existingEmpty = tbody.querySelector('.js-empty');
-
-        if (paged.length === 0) {
-            if (!existingEmpty) {
-                const empty = document.createElement('tr');
-                empty.className = 'empty-row js-empty';
-                empty.innerHTML = `
-                    <td colspan="5">
-                        <i class="ti ti-inbox" aria-hidden="true" style="font-size:28px;display:block;margin:0 auto 8px;color:#d1d5db"></i>
-                        No units found
-                    </td>`;
-                tbody.appendChild(empty);
-            } else {
-                existingEmpty.style.display = '';
-            }
-        } else {
-            if (existingEmpty) existingEmpty.style.display = 'none';
-            paged.forEach(r => {
-                r.style.display = '';
-                tbody.appendChild(r);
-            });
-        }
-
-        infoEl.innerHTML = total > 0
-            ? `Showing <strong>${start + 1}–${end}</strong> of <strong>${total}</strong> units`
-            : 'No units to display';
-
-        renderPagination(currentPage, totalPages);
-
-        const hasFilter = search || status;
-        document.getElementById('btnClear').classList.toggle('visible', !!hasFilter);
-        document.getElementById('filterStatus').classList.toggle('has-filter', !!status);
-    }
-
-    function renderPagination(current, total) {
-        pagEl.innerHTML = '';
-        if (total <= 1) return;
-
-        const btn = (label, page, disabled = false, active = false, isIcon = false) => {
-            const b = document.createElement('button');
-            b.className = 'pg-btn' + (active ? ' active' : '');
-            b.disabled  = disabled;
-            b.innerHTML = isIcon ? `<i class="${label}" aria-hidden="true"></i>` : label;
-            if (!disabled) b.addEventListener('click', () => { currentPage = page; render(); });
-            return b;
-        };
-
-        pagEl.appendChild(btn('ti ti-chevron-left', current - 1, current === 1, false, true));
-
-        getPageNumbers(current, total).forEach(p => {
-            if (p === '...') {
-                const span = document.createElement('span');
-                span.className   = 'pg-ellipsis';
-                span.textContent = '…';
-                pagEl.appendChild(span);
-            } else {
-                pagEl.appendChild(btn(p, p, false, p === current));
-            }
-        });
-
-        pagEl.appendChild(btn('ti ti-chevron-right', current + 1, current === total, false, true));
-    }
-
-    function getPageNumbers(current, total) {
-        if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-        const pages = [1];
-        if (current > 3) pages.push('...');
-        for (let p = Math.max(2, current - 1); p <= Math.min(total - 1, current + 1); p++) pages.push(p);
-        if (current < total - 2) pages.push('...');
-        pages.push(total);
-        return pages;
-    }
-
-    // ── Event listeners ────────────────────────────────────────────────────
-    ['searchInput', 'filterStatus', 'filterSort', 'perPage'].forEach(id => {
-        const el = document.getElementById(id);
-        el.addEventListener('input',  () => { currentPage = 1; render(); });
-        el.addEventListener('change', () => { currentPage = 1; render(); });
-    });
-
     document.getElementById('btnClear').addEventListener('click', () => {
         document.getElementById('searchInput').value  = '';
         document.getElementById('filterStatus').value = '';
         currentPage = 1;
         render();
     });
-
-    // ── Init ───────────────────────────────────────────────────────────────
     render();
 
 })();

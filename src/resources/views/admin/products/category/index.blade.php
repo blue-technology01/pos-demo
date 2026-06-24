@@ -5,24 +5,12 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <style>
         @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(100%); opacity: 0; }
+            to   { transform: translateX(0);    opacity: 1; }
         }
         @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
+            from { transform: translateX(0);    opacity: 1; }
+            to   { transform: translateX(100%); opacity: 0; }
         }
     </style>
 @endpush
@@ -30,86 +18,71 @@
 @section('title', 'Product Category')
 
 @section('content')
+
+<x-alert />
+
 <div class="page">
-    {{-- Toolbar --}}
-    <div class="toolbar">
+
+    {{-- ══ Toolbar ══ --}}
+    <form method="GET" action="{{ route('admin.category.index') }}" class="toolbar" id="filterForm">
         <div class="toolbar-left">
 
-            {{-- Search --}}
             <div class="search-box">
                 <i class="ti ti-search"></i>
-                <input type="text" id="searchInput" placeholder="Search categories...">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search category...">
             </div>
 
-            {{-- Status filter --}}
-            <select id="filterStatus" class="filter-select">
+            <select name="status" class="filter-select">
                 <option value="">All status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+                <option value="active"   {{ request('status') === 'active'   ? 'selected' : '' }}>Active</option>
+                <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
             </select>
 
-            {{-- Sort filter --}}
-            <select id="filterSort" class="filter-select">
-                <option value="newest">Newest first</option>
-                <option value="oldest">Oldest first</option>
-                <option value="name_asc">Name A–Z</option>
-                <option value="name_desc">Name Z–A</option>
-                <option value="code_asc">Code A–Z</option>
+            <select name="sort" class="filter-select">
+                <option value="newest"   {{ request('sort', 'newest') === 'newest'   ? 'selected' : '' }}>Newest first</option>
+                <option value="oldest"   {{ request('sort')           === 'oldest'   ? 'selected' : '' }}>Oldest first</option>
+                <option value="name_asc" {{ request('sort')           === 'name_asc' ? 'selected' : '' }}>Name A–Z</option>
+                <option value="name_desc"{{ request('sort')           === 'name_desc'? 'selected' : '' }}>Name Z–A</option>
+                <option value="code_asc" {{ request('sort')           === 'code_asc' ? 'selected' : '' }}>Code A–Z</option>
             </select>
 
-            {{-- Clear filters button --}}
-            <button id="btnClear" class="btn-clear">
-                <i class="ti ti-x" style="font-size:12px"></i> Clear filters
+            <button type="submit" class="btn-add">
+                <i class="ti ti-filter"></i> Filter
             </button>
 
-        </div>
-        <div class="toolbar-right">
-            {{-- Per page --}}
-            <div class="per-page-wrap">
-                <label for="perPage">Show</label>
-                <select id="perPage" class="filter-select" style="width:70px">
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                </select>
-            </div>
+            @if(request()->hasAny(['search', 'status', 'sort']))
+                <a href="{{ route('admin.category.index') }}" class="btn-clear">
+                    <i class="ti ti-x"></i> Clear filters
+                </a>
+            @endif
 
-            <button type="button" id="open-create-modal" class="btn-add">
-                <i class="ti ti-plus" style="font-size:15px"></i> Add Category
-            </button>
         </div>
-    </div>
+    </form>
 
-    {{-- Table --}}
+    {{-- ══ Table ══ --}}
     <div class="table-card">
         <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
-                        <th data-col="code">Code <i class="ti ti-selector sort-icon"></i></th>
-                        <th data-col="name">Name <i class="ti ti-selector sort-icon"></i></th>
+                        <th>Code</th>
+                        <th>Name</th>
                         <th>Description</th>
                         <th>Image</th>
-                        <th data-col="status">Status <i class="ti ti-selector sort-icon"></i></th>
-                        <th data-col="created">Created <i class="ti ti-selector sort-icon"></i></th>
+                        <th>Status</th>
+                        <th>Created</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="categoryTableBody">
                     @forelse ($categories as $category)
-                    <tr
-                        data-code="{{ strtolower($category->code) }}"
-                        data-name="{{ strtolower($category->name) }}"
-                        data-description="{{ strtolower($category->description ?? '') }}"
-                        data-status="{{ $category->status }}"
-                        data-created="{{ $category->created_at->timestamp }}"
-                    >
+                    <tr>
                         <td><strong>{{ $category->code }}</strong></td>
                         <td>{{ $category->name }}</td>
-                        <td style="color:#9ca3af">{{ Str::limit($category->description, 50) ?? '—' }}</td>
+                        <td style="color:#9ca3af">{{ Str::limit($category->description, 50) ?: '—' }}</td>
                         <td>
                             @if ($category->image)
-                                <img src="{{ Storage::url($category->image) }}" class="img-thumb" alt="">
+                                <img src="{{ Storage::url($category->image) }}" class="img-thumb" alt="{{ $category->name }}">
                             @else
                                 <div class="img-placeholder"><i class="ti ti-photo"></i></div>
                             @endif
@@ -129,7 +102,6 @@
                                     title="Edit Category">
                                 <span class="material-symbols-outlined">edit</span>
                             </button>
-
                             <button class="btn-icon btn-delete delete-btn"
                                     data-code="{{ $category->code }}"
                                     data-name="{{ $category->name }}"
@@ -150,10 +122,29 @@
             </table>
         </div>
 
-        {{-- Table footer: info + pagination --}}
+        {{-- ══ Table footer ══ --}}
         <div class="table-footer" id="tableFooter">
-            <div class="table-info" id="tableInfo"></div>
-            <div class="pagination" id="pagination"></div>
+            <span class="table-footer-left">
+                <div class="table-info">
+                    Showing {{ $categories->firstItem() ?? 0 }}–{{ $categories->lastItem() ?? 0 }}
+                    of {{ $categories->total() }} categories
+                </div>
+
+                <form method="GET" action="{{ request()->url() }}">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+                    <select name="per_page" onchange="this.form.submit()">
+                        <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                        <option value="25" {{ request('per_page')     == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page')     == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+            </span>
+
+            <div class="pagination">
+                {{ $categories->links('vendor.pagination.numbers-only') }}
+            </div>
         </div>
     </div>
 
@@ -270,283 +261,95 @@
 <script>
 (function () {
 
-    // message when success or error, auto hide after 3s
-    function showNotification(message, type = 'info') {
-        const colors = {
-            success: '#4ade80',
-            warning: '#fbbf24',
-            error: '#f87171',
-            info: '#60a5fa'
-        };
+    /* ══ Modal ══ */
 
-        const toast = document.createElement('div');
+    function openModal(id) {
+        document.getElementById(id).classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
 
-        Object.assign(toast.style, {
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            background: colors[type] || '#60a5fa',
-            color: 'white',
-            padding: '12px 16px',
-            borderRadius: '6px',
-            zIndex: 99999,
-            fontSize: '14px',
-            fontWeight: '500',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-            animation: 'slideIn 0.3s ease-out'
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('[data-close]').forEach(btn => {
+        btn.addEventListener('click', () => closeModal(btn.dataset.close));
+    });
+
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', e => {
+            if (e.target === overlay) closeModal(overlay.id);
         });
-
-        toast.textContent = message;
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            toast.style.animation = 'slideOut 0.3s ease-out';
-            toast.addEventListener('animationend', () => toast.remove());
-        }, 3000);
-    }
-    // slide in/out keyframes
-    document.addEventListener('DOMContentLoaded', () => {
-
-        @if(session('success'))
-            showNotification(@json(session('success')), 'success');
-        @endif
-
-        @if(session('error'))
-            showNotification(@json(session('error')), 'error');
-        @endif
     });
 
-    /* ── Modal ── */
-    function openModal(id)  { 
-        document.getElementById(id).classList.add('open');    
-        document.body.style.overflow = 'hidden'; 
-    }
-    function closeModal(id) { 
-        document.getElementById(id).classList.remove('open'); 
-        document.body.style.overflow = ''; 
-    }
-
-    document.querySelectorAll('[data-close]').forEach(btn =>
-        btn.addEventListener('click', () => closeModal(btn.dataset.close))
-    );
-    document.querySelectorAll('.modal-overlay').forEach(overlay =>
-        overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(overlay.id); })
-    );
     document.addEventListener('keydown', e => {
-        if (e.key === 'Escape')
+        if (e.key === 'Escape') {
             document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
+        }
     });
 
-    document.getElementById('open-create-modal').addEventListener('click', () => openModal('createModal'));
+    document.getElementById('open-create-modal')
+        ?.addEventListener('click', () => openModal('createModal'));
 
-    document.querySelectorAll('.open-edit-modal').forEach(btn =>
+    /* ══ Edit Modal ══ */
+
+    document.querySelectorAll('.open-edit-modal').forEach(btn => {
         btn.addEventListener('click', () => {
-            const code = btn.dataset.code;
-            document.getElementById('edit_code').value          = code;
-            document.getElementById('edit_name').value          = btn.dataset.name;
-            document.getElementById('edit_description').value   = btn.dataset.description || '';
-            document.getElementById('edit_status').value        = btn.dataset.status;
-            document.getElementById('edit_chip_name').textContent = btn.dataset.name;
+            const { code, name, description, status } = btn.dataset;
+
+            document.getElementById('edit_code').value        = code;
+            document.getElementById('edit_name').value        = name;
+            document.getElementById('edit_description').value = description || '';
+            document.getElementById('edit_status').value      = status;
+            document.getElementById('edit_chip_name').textContent = name;
             document.getElementById('edit_chip_code').textContent = code;
+
             document.getElementById('editForm').action =
                 '{{ route("admin.category.update", ":code") }}'.replace(':code', code);
-            openModal('editModal');
-        })
-    );
 
-    /* File labels */
-    function bindFile(inputId, spanId) {
-        document.getElementById(inputId).addEventListener('change', function () {
-            document.getElementById(spanId).textContent =
-                this.files[0] ? this.files[0].name : 'Click to upload image';
+            openModal('editModal');
+        });
+    });
+
+    /* ══ File input label ══ */
+
+    function bindFileInput(inputId, labelId) {
+        const input = document.getElementById(inputId);
+        const label = document.getElementById(labelId);
+        if (!input || !label) return;
+
+        input.addEventListener('change', function () {
+            label.textContent = this.files[0]?.name ?? 'Click to upload image';
         });
     }
-    bindFile('createFileInput', 'createFileName');
-    bindFile('editFileInput',   'editFileName');
+
+    bindFileInput('createFileInput', 'createFileName');
+    bindFileInput('editFileInput',   'editFileName');
+
+    /* ══ Delete ══ */
 
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', function () {
-            const code = this.dataset.code;
-            const name = this.dataset.name;
+            const { code, name } = this.dataset;
 
-            if (confirm(`Are you sure you want to delete category "${name}" (${code})?\n\nThis action cannot be undone.`)) {
-                // Create and submit delete form
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ route("admin.category.destroy", ":code") }}'.replace(':code', code);
-                form.style.display = 'none';
+            if (!confirm(`Are you sure you want to delete "${name}" (${code})?\n\nThis action cannot be undone.`)) return;
 
-                const csrf = document.createElement('input');
-                csrf.type = 'hidden';
-                csrf.name = '_token';
-                csrf.value = '{{ csrf_token() }}';
+            showLoader();
 
-                const method = document.createElement('input');
-                method.type = 'hidden';
-                method.name = '_method';
-                method.value = 'DELETE';
+            const form   = document.createElement('form');
+            form.method  = 'POST';
+            form.action  = '{{ route("admin.category.destroy", ":code") }}'.replace(':code', code);
 
-                form.appendChild(csrf);
-                form.appendChild(method);
-                document.body.appendChild(form);
-                form.submit();
-            }
+            form.innerHTML = `
+                <input type="hidden" name="_token"  value="{{ csrf_token() }}">
+                <input type="hidden" name="_method" value="DELETE">
+            `;
+
+            document.body.appendChild(form);
+            form.submit();
         });
     });
-
-    /* ── Filter + Sort + Pagination engine ── */
-    const allRows  = Array.from(document.querySelectorAll('#categoryTableBody tr[data-name]'));
-    const tbody    = document.getElementById('categoryTableBody');
-    const infoEl   = document.getElementById('tableInfo');
-    const pagEl    = document.getElementById('pagination');
-
-    let currentPage = 1;
-    let sortCol     = 'created';
-    let sortDir     = 'desc';
-
-    function getFilters() {
-        return {
-            search:  document.getElementById('searchInput').value.toLowerCase().trim(),
-            status:  document.getElementById('filterStatus').value,
-            sort:    document.getElementById('filterSort').value,
-            perPage: parseInt(document.getElementById('perPage').value, 10),
-        };
-    }
-
-    function applySort(rows, sort) {
-        return [...rows].sort((a, b) => {
-            if (sort === 'newest')    return b.dataset.created - a.dataset.created;
-            if (sort === 'oldest')    return a.dataset.created - b.dataset.created;
-            if (sort === 'name_asc')  return a.dataset.name.localeCompare(b.dataset.name);
-            if (sort === 'name_desc') return b.dataset.name.localeCompare(a.dataset.name);
-            if (sort === 'code_asc')  return a.dataset.code.localeCompare(b.dataset.code);
-            return 0;
-        });
-    }
-
-    function render() {
-        const { search, status, sort, perPage } = getFilters();
-
-        /* Filter */
-        let visible = allRows.filter(row => {
-            const matchSearch = !search ||
-                row.dataset.name.includes(search) ||
-                row.dataset.code.includes(search) ||
-                row.dataset.description.includes(search);
-            const matchStatus = !status || row.dataset.status === status;
-            return matchSearch && matchStatus;
-        });
-
-        /* Sort */
-        visible = applySort(visible, sort);
-
-        const total      = visible.length;
-        const totalPages = Math.max(1, Math.ceil(total / perPage));
-        if (currentPage > totalPages) currentPage = totalPages;
-
-        const start = (currentPage - 1) * perPage;
-        const end   = Math.min(start + perPage, total);
-        const paged = visible.slice(start, end);
-
-        /* Render rows */
-        allRows.forEach(r => { r.style.display = 'none'; });
-
-        if (paged.length === 0) {
-            /* show empty state */
-            let empty = tbody.querySelector('.js-empty');
-            if (!empty) {
-                empty = document.createElement('tr');
-                empty.className = 'empty-row js-empty';
-                empty.innerHTML = `<td colspan="7">
-                    <i class="ti ti-inbox" style="font-size:24px;display:block;margin:0 auto 8px;color:#d1d5db"></i>
-                    No categories found
-                </td>`;
-                tbody.appendChild(empty);
-            }
-            empty.style.display = '';
-        } else {
-            const empty = tbody.querySelector('.js-empty');
-            if (empty) empty.style.display = 'none';
-            paged.forEach(r => {
-                r.style.display = '';
-                tbody.appendChild(r); /* re-order */
-            });
-        }
-
-        /* Info */
-        if (total === 0) {
-            infoEl.innerHTML = 'No results';
-        } else {
-            infoEl.innerHTML = `Showing <b>${start + 1}–${end}</b> of <b>${total}</b> categories`;
-        }
-
-        /* Pagination */
-        renderPagination(currentPage, totalPages);
-
-        /* Clear button visibility */
-        const hasFilter = search || status;
-        document.getElementById('btnClear').classList.toggle('visible', !!hasFilter);
-        document.getElementById('filterStatus').classList.toggle('has-filter', !!status);
-        document.getElementById('searchInput').style.borderColor = search ? '#111827' : '';
-    }
-
-    function renderPagination(page, total) {
-        pagEl.innerHTML = '';
-        if (total <= 1) return;
-
-        const btn = (label, p, disabled = false, active = false, isIcon = false) => {
-            const b = document.createElement('button');
-            b.className = 'pg-btn' + (active ? ' active' : '');
-            b.disabled  = disabled;
-            if (isIcon) b.innerHTML = `<i class="${label}"></i>`;
-            else        b.textContent = label;
-            if (!disabled) b.addEventListener('click', () => { currentPage = p; render(); });
-            return b;
-        };
-
-        pagEl.appendChild(btn('ti ti-chevron-left',  page - 1, page === 1,     false, true));
-
-        const pages = getPageNumbers(page, total);
-        pages.forEach(p => {
-            if (p === '...') {
-                const span = document.createElement('span');
-                span.className = 'pg-ellipsis';
-                span.textContent = '…';
-                pagEl.appendChild(span);
-            } else {
-                pagEl.appendChild(btn(p, p, false, p === page));
-            }
-        });
-
-        pagEl.appendChild(btn('ti ti-chevron-right', page + 1, page === total, false, true));
-    }
-
-    function getPageNumbers(current, total) {
-        if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-        const pages = [];
-        pages.push(1);
-        if (current > 3)        pages.push('...');
-        for (let p = Math.max(2, current - 1); p <= Math.min(total - 1, current + 1); p++) pages.push(p);
-        if (current < total - 2) pages.push('...');
-        pages.push(total);
-        return pages;
-    }
-
-    /* Event listeners */
-    ['searchInput', 'filterStatus', 'filterSort', 'perPage'].forEach(id => {
-        document.getElementById(id).addEventListener('input', () => { currentPage = 1; render(); });
-        document.getElementById(id).addEventListener('change', () => { currentPage = 1; render(); });
-    });
-
-    document.getElementById('btnClear').addEventListener('click', () => {
-        document.getElementById('searchInput').value  = '';
-        document.getElementById('filterStatus').value = '';
-        currentPage = 1;
-        render();
-    });
-
-    /* Initial render */
-    render();
 
 })();
 </script>

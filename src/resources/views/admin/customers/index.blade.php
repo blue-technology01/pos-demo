@@ -9,19 +9,11 @@
 @section('title', 'Customer List')
 
 @section('content')
-
 <div class="customer-list-container">
 
-    {{-- ── Page Title ── --}}
     <h1>Customer list</h1>
-
-    {{-- ── Alert ── --}}
-    <x-alert />
-
-    {{-- ── Actions Bar ── --}}
     <div class="customer-list-actions">
 
-        {{-- Search --}}
         <form action="{{ route('admin.customers.index') }}" method="GET" class="customer-search-form">
             <input
                 type="text"
@@ -31,11 +23,11 @@
                 class="customer-search-input"
                 autocomplete="off"
             >
-            <button type="submit" class="btn btn-search">
+            <button type="submit" class="btn btn-search" onclick="showLoader()">
                 <i class="ti ti-search" aria-hidden="true"></i> Search
             </button>
             @if (request('search'))
-                <a href="{{ route('admin.customers.index') }}" class="btn btn-clear">
+                <a href="{{ route('admin.customers.index') }}" class="btn btn-clear" onclick="showLoader()" >
                     <i class="ti ti-x" aria-hidden="true"></i> Clear
                 </a>
             @endif
@@ -45,7 +37,6 @@
         <button type="button" onclick="openModal('create')" class="btn btn-add-customer">
             <i class="ti ti-plus" aria-hidden="true"></i> Add customer
         </button>
-
     </div>
 
     {{-- ── Table Card ── --}}
@@ -103,30 +94,37 @@
                 @endforelse
             </tbody>
         </table>
-        <div class="table-footer" id="tableFooter">
-            <div class="table-info">
-                Showing
-                {{ $customers->firstItem() ?? 0 }}
-                -
-                {{ $customers->lastItem() ?? 0 }}
-                of
-                {{ $customers->total() }}
-                units
-            </div>
+
+        {{-- pagination --}}
+        <div class="table-footer" style="width: 100%; display: flex; justify-content: space-between" id="tableFooter">
+            <span class="table-footer-left">
+                <div class="table-info">
+                    showing
+                    {{ $customers->firstItem() ?? 0 }}
+                    -
+                    {{ $customers->lastItem() ?? 0 }}
+                    of
+                    {{ $customers->total() }}
+                    sales
+                </div>
+
+                {{-- per page --}}
+                <form method="GET" action="{{ request()->url() }}">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+
+                    <select name="per_page" onchange="showLoader(); this.form.submit()">
+                        <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+            </span>
+
             <div class="pagination">
-                {{ $customers->links() }}
+                {{ $customers->links('vendor.pagination.numbers-only') }}
             </div>
-            {{-- per page --}}
-            <form method="GET" action="{{ url()->current() }}">
-                @foreach(request()->except('per_page', 'page') as $key => $value)
-                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                @endforeach
-                <select name="per_page" onchange="this.form.submit()">
-                    <option value="15" {{ request('per_page') == 15 ? 'selected' : '' }}>15</option>
-                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
-                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-                </select>
-            </form>
         </div>
     </div>
 </div>
@@ -192,7 +190,7 @@
                 <button type="button" onclick="closeModal()" class="btn-modal-close">
                     Cancel
                 </button>
-                <button type="submit" id="saveCustomerBtn" class="btn-modal-save">
+                <button type="submit" id="saveCustomerBtn" class="btn-modal-save" onclick="showLoader()" >
                     <i class="ti ti-device-floppy" aria-hidden="true"></i> Save
                 </button>
             </div>
@@ -267,7 +265,6 @@
         if (e.key === 'Escape' && modal.style.display === 'flex') closeModal();
     });
 
-    // ── Delete ─────────────────────────────────────────────────────────────
     window.confirmDelete = function (id, name) {
         if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
         const deleteForm = document.getElementById('deleteForm');

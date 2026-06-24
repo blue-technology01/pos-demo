@@ -146,7 +146,11 @@
 /* ---------- Table card ---------- */
 .table-card {
     background: var(--color-background-primary, #fff);
-    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    border: none;
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 4px 16px rgba(15, 23, 42, 0.06);
+        
     border-radius: 16px;
     overflow: hidden;
 }
@@ -315,6 +319,7 @@
 .table-footer {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     flex-wrap: wrap;
     gap: 10px;
     padding: 12px 16px;
@@ -327,16 +332,44 @@
     color: var(--color-text-secondary, #6b7280);
 }
 
-/* Pagination wrapper */
+/* ===== TABLE FOOTER WRAPPER ===== */
+.table-footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* LEFT SIDE (info + select) */
+.table-footer-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* INFO TEXT */
+.table-info {
+    font-size: 13px;
+    color: #374151;
+}
+
+/* ===== PAGINATION WRAPPER ===== */
 .pagination {
     display: flex;
     align-items: center;
 }
 
-.pagination nav {
+.pagination nav ul {
     display: flex;
     align-items: center;
     gap: 4px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.pagination nav li {
+    display: flex;
 }
 
 .pagination span,
@@ -348,58 +381,82 @@
     height: 30px;
     padding: 0 8px;
     border-radius: 50px;
-    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
-    background: var(--color-background-primary, #fff);
-    color: var(--color-text-primary, #111);
+    border: 0.5px solid #e5e7eb;
+    background: #fff;
+    color: #111;
     font-size: 12px;
     font-weight: 500;
     text-decoration: none;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition: all 0.15s ease;
 }
 
-.pagination [aria-current="page"] > span,
-.pagination .active > span {
+/* ACTIVE PAGE */
+.pagination .active span {
     background: #2563eb;
     color: #fff;
     border-color: #2563eb;
     font-weight: 600;
 }
 
+/* HOVER */
 .pagination a:hover {
     background: #eff6ff;
     border-color: #bfdbfe;
     color: #2563eb;
 }
 
-.pagination [disabled] span {
+/* DISABLED */
+.pagination .disabled span,
+.pagination [aria-disabled="true"] span {
     opacity: 0.35;
-    cursor: default;
     pointer-events: none;
 }
 
-/* Per-page select */
-.table-footer > form select {
-    font-family: 'Inter', sans-serif;
+/* ===== PER PAGE SELECT ===== */
+.table-footer select {
+    font-family: Inter, sans-serif;
     font-size: 12px;
     padding: 5px 28px 5px 12px;
     border-radius: 50px;
-    border: 0.5px solid var(--color-border-secondary, #d1d5db);
-    background: var(--color-background-primary, #fff);
-    color: var(--color-text-secondary, #6b7280);
+    border: 0.5px solid #d1d5db;
+    background: #fff;
+    color: #6b7280;
     outline: none;
     cursor: pointer;
     appearance: none;
-    -webkit-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
-    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.table-footer > form select:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+.pagination-numbers{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    align-items:center;
 }
+
+.pagination-numbers a,
+.pagination-numbers span{
+    width:36px;
+    height:36px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #ddd;
+    border-radius:8px;
+    text-decoration:none;
+}
+
+.pagination-numbers .active{
+    background:#111827;
+    color:#fff;
+}
+
+.pagination-numbers .dots{
+    border:none;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
     .product-section__header {

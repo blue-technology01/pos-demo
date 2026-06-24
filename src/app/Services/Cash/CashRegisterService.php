@@ -29,15 +29,43 @@ class CashRegisterService
     public function getAllHistory(Request $request): LengthAwarePaginator
     {
         return CashRegister::query()
-            ->with('user:id,name') // get name cashier that sale
-            ->when($request->status, function ($query) use ($request) {
-                $query->where('status', $request->status);
+            ->with('user:id,name')
+
+            // search
+            ->when($request->search, function ($query) use ($request) {
+                $search = trim($request->search);
+
+                $query->where(function ($q) use ($search) {
+
+                    // 1. invoice / id search
+                    if (is_numeric($search)) {
+                        $q->where('id', (int) $search);
+                    } else {
+
+                        // 2. cashier name search (FULL MATCH FLEXIBLE)
+                        $q->whereHas('user', function ($u) use ($search) {
+                            $u->where('name', 'like', "%{$search}%");
+                        })
+
+                        // 3. optional fallback: also search id as string
+                        ->orWhere('id', 'like', "%{$search}%");
+                    }
+                });
             })
-            ->when($request->date, function ($query) use ($request) {
-                $query->whereDate('opened_at', $request->date);
+            // filter data by rang of date
+            ->when($request->start_date && $request->end_date, function ($query) use ($request) {
+                $query->whereBetween('opened_at', [
+                    $request->start_date . ' 00:00:00',
+                    $request->end_date . ' 23:59:59'
+                ]);
+            })
+            // single date
+            ->when($request->start_date && !$request->end_date, function ($query) use ($request) {
+                $query->whereDate('opened_at', $request->start_date);
             })
             ->orderByDesc('id')
-            ->paginate($request->per_page ?? 15);
+            ->paginate($request->per_page ?? 15)
+            ->withQueryString();
     }
 
     /**

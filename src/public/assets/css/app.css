@@ -1,8 +1,5 @@
-/* ════════════════════════════════════════════
-   ROOT VARIABLES
-════════════════════════════════════════════ */
 :root {
-    --sidebar-width: 240px;
+    --sidebar-width: 220px;
     --sidebar-collapsed-width: 64px;
     --sidebar-bg: #ffffff;
     --sidebar-border: #e5e7eb;
@@ -41,17 +38,17 @@ html, body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #e5e7eb;
+    background:white;
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #d1d5db;
+    background: white;
 }
 
 body {
     font-family: 'Segoe UI', sans-serif;
-    background: #f8fafc;
+    background: white;
     color: #111827;
     font-size: 14px;
 }

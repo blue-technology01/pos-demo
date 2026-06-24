@@ -2,6 +2,7 @@
 
 namespace App\Services\Report;
 
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 
@@ -14,87 +15,82 @@ class SalePerformanceService
     public function getStaffPerformance(
         string $startDate,
         string $endDate,
-        string $search  = '',
-        int    $perPage = 15,
-        int    $page    = 1
+        string $search = '',
+        int $perPage = 15,
+        int $page = 1
     ): array {
-        // Guard: prevent division by zero
+
         $perPage = max(1, $perPage);
 
-        // Guard: swap dates if inverted
         if ($startDate > $endDate) {
             [$startDate, $endDate] = [$endDate, $startDate];
         }
 
-        // Base query builder (reused for count + maxRevenue + rows)
         $baseQuery = DB::table('sales')
             ->join('users', 'users.id', '=', 'sales.user_id')
             ->whereBetween('sales.sale_date', [$startDate, $endDate])
             ->where('sales.status', 'completed')
             ->when(
                 $search,
-                fn($q) => $q->where('users.name', 'like', "%{$search}%")
+                fn ($q) => $q->where('users.name', 'like', "%{$search}%")
             );
 
-        // Total count for pagination (DB-level, no full fetch)
         $total = (clone $baseQuery)
             ->groupBy('users.id', 'users.name', 'users.avatar')
             ->select('users.id')
             ->get()
             ->count();
 
-        // Max revenue across ALL matching staff (for performance %)
-        // Separate query so pagination doesn't affect it
         $maxRevenue = (clone $baseQuery)
             ->groupBy('users.id')
             ->selectRaw('SUM(sales.total_amount) as total_revenue')
             ->orderByDesc('total_revenue')
             ->value('total_revenue') ?: 1;
 
-        // Paginated rows from DB
         $offset = ($page - 1) * $perPage;
 
-        $rows = (clone $baseQuery)
+        $items = (clone $baseQuery)
             ->groupBy('users.id', 'users.name', 'users.avatar')
             ->select(
                 'users.id',
-                DB::raw('users.name    as staff_name'),
+                DB::raw('users.name as staff_name'),
                 'users.avatar',
-                DB::raw('COUNT(sales.id)            as total_orders'),
-                DB::raw('SUM(sales.total_amount)    as total_revenue'),
-                DB::raw('AVG(sales.total_amount)    as avg_per_order'),
-                DB::raw('SUM(sales.discount_amount) as total_discount'),
+                DB::raw('COUNT(sales.id) as total_orders'),
+                DB::raw('SUM(sales.total_amount) as total_revenue'),
+                DB::raw('AVG(sales.total_amount) as avg_per_order'),
+                DB::raw('SUM(sales.discount_amount) as total_discount')
             )
             ->orderByDesc('total_revenue')
             ->offset($offset)
             ->limit($perPage)
             ->get()
-            ->map(fn($row) => [
-                'id'             => $row->id,
-                'staff_name'     => $row->staff_name,
-                'avatar'         => $row->avatar,
-                'total_orders'   => (int)   $row->total_orders,
-                'total_revenue'  => (float) $row->total_revenue,
-                'avg_per_order'  => (float) $row->avg_per_order,
-                'total_discount' => (float) $row->total_discount,
-                'performance'    => (int) round(
-                    (float) $row->total_revenue / $maxRevenue * 100
-                ),
-            ])
-            ->toArray(); // Ensure clean JSON serialization
+            ->map(function ($row) use ($maxRevenue) {
 
-        $lastPage = (int) ceil($total / $perPage) ?: 1;
+                $row->total_orders = (int) $row->total_orders;
+                $row->total_revenue = (float) $row->total_revenue;
+                $row->avg_per_order = (float) $row->avg_per_order;
+                $row->total_discount = (float) $row->total_discount;
+
+                $row->performance = (int) round(
+                    ($row->total_revenue / $maxRevenue) * 100
+                );
+
+                return $row;
+            });
+
+        $rows = new LengthAwarePaginator(
+            $items,
+            $total,
+            $perPage,
+            $page,
+            [
+                'path' => request()->url(),
+                'query' => request()->query(),
+            ]
+        );
 
         return [
-            'rows'       => $rows,
-            'pagination' => [
-                'total'        => $total,
-                'per_page'     => $perPage,
-                'current_page' => $page,
-                'last_page'    => $lastPage,
-                'from'         => $total > 0 ? $offset + 1 : 0,
-                'to'           => min($offset + $perPage, $total),
-            ],
+            'rows' => $rows,
         ];
     }
 

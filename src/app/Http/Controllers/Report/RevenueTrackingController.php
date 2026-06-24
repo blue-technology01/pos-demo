@@ -14,18 +14,13 @@ class RevenueTrackingController extends Controller
 
     public function index(RevenueTrackingRequest $request)
     {
-        $data = $this->revenueTrackingService->getData(
-            startDate: $request->input('start_date'),
-            endDate:   $request->input('end_date'),
-            search:    $request->input('search'),
-            perPage:   (int) $request->input('per_page', 25),
-            page:      (int) $request->input('page', 1),
-        );
+        $data = $this->revenueTrackingService->getData($request);
 
-        if ($request->ajax() || $request->expectsJson()) {
-            return response()->json($data);
-        }
-
-        return view('admin.reports.revent-tracking', $data);
+        return view('admin.reports.revent-tracking', [
+            'rows'      => $data['rows'],
+            'summary'   => $data['summary'],
+            'startDate' => $data['startDate'],
+            'endDate'   => $data['endDate'],
+        ]);
     }
 }

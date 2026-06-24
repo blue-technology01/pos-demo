@@ -1,19 +1,17 @@
-var DONUT_COLORS = [
-    '#3b82f6',
-    '#22c55e',
-    '#f59e0b',
-    '#a855f7',
-    '#ef4444',
-    '#06b6d4',
-    '#84cc16',
+const DONUT_COLORS = [
+    '#a78bfa', // purple
+    '#fb7185', // pink-red
+    '#34d399', // green
+    '#38bdf8', // sky blue
+    '#fbbf24', // amber
+    '#f472b6', // pink
+    '#60a5fa', // blue
 ];
 
-var donutChart = null;
+let donutChartInstance = null;
 
 function buildDonutOptions() {
-
     return {
-
         series: [],
         labels: [],
 
@@ -21,35 +19,38 @@ function buildDonutOptions() {
             type:       'donut',
             height:     320,
             fontFamily: 'inherit',
-            animations: { enabled: true, speed: 400 },
+            animations: {
+                enabled:          true,
+                speed:            600,
+                animateGradually: { enabled: true, delay: 120 },
+                dynamicAnimation: { enabled: true, speed: 400 },
+            },
         },
 
         colors: DONUT_COLORS,
 
-        legend: {
-            position:   'bottom',
-            fontSize:   '13px',
-            itemMargin: { horizontal: 8, vertical: 4 },
-            labels:     { colors: '#64748b' },
-        },
-
-        dataLabels: { enabled: false },
-
-        stroke: {
-            width:  2,
-            colors: ['#ffffff'],
-        },
-
+        // ── Rounded ends (the key to that look) ──
         plotOptions: {
             pie: {
+                expandOnClick: false,
                 donut: {
-                    size:   '65%',
+                    size: '78%',
+                    background: 'transparent',
                     labels: {
-                        show:  true,
+                        show: true,
+                        name: {
+                            show:       true,
+                            fontSize:   '13px',
+                            fontWeight: 500,
+                            color:      '#94a3b8',
+                            offsetY:    -4,
+                        },
                         value: {
-                            fontSize:   '18px',
-                            fontWeight: 600,
-                            color:      '#1e293b',
+                            show:       true,
+                            fontSize:   '28px',
+                            fontWeight: 700,
+                            color:      '#0f172a',
+                            offsetY:    6,
                             formatter:  formatUSD,
                         },
                         total: {
@@ -57,6 +58,7 @@ function buildDonutOptions() {
                             showAlways: true,
                             label:      'Total Revenue',
                             fontSize:   '13px',
+                            fontWeight: 500,
                             color:      '#94a3b8',
                             formatter:  function (w) {
                                 return formatUSD(
@@ -71,7 +73,39 @@ function buildDonutOptions() {
             },
         },
 
+        // ── Rounded segment ends ──
+        stroke: {
+            width:     0,
+            lineCap:   'round',
+            colors:    ['transparent'],
+        },
+
+        // ── No data labels on segments ──
+        dataLabels: { enabled: false },
+
+        // ── Clean legend ──
+        legend: {
+            position:   'bottom',
+            fontSize:   '13px',
+            fontWeight: 500,
+            itemMargin: { horizontal: 10, vertical: 6 },
+            markers: {
+                width:  8,
+                height: 8,
+                radius: 8,
+            },
+            labels: { colors: '#64748b' },
+        },
+
+        // ── Subtle hover ──
+        states: {
+            hover:  { filter: { type: 'darken', value: 0.06 } },
+            active: { filter: { type: 'darken', value: 0.10 } },
+        },
+
         tooltip: {
+            theme:           'light',
+            fillSeriesColor: false,
             y: { formatter: formatUSD },
         },
 
@@ -79,35 +113,37 @@ function buildDonutOptions() {
             text:  'No data for this period',
             style: { color: '#94a3b8', fontSize: '14px' },
         },
-
     };
-
 }
 
 function initDonutChart() {
+    if (donutChartInstance) {
+        donutChartInstance.destroy();
+        donutChartInstance = null;
+    }
 
-    var el = document.querySelector('#donutChart');
-
+    const el = document.querySelector('#donutChart');
     if (!el) {
         console.warn('[DonutChart] #donutChart element not found.');
         return;
     }
 
-    donutChart = new ApexCharts(el, buildDonutOptions());
-    donutChart.render();
-
+    try {
+        donutChartInstance = new ApexCharts(el, buildDonutOptions());
+        donutChartInstance.render();
+    } catch (err) {
+        console.error('[DonutChart] Failed to initialize ApexCharts:', err);
+    }
 }
 
 function updateDonutChart(data) {
+    if (!donutChartInstance) return;
 
-    if (!donutChart) return;
-
-    donutChart.updateOptions(
+    donutChartInstance.updateOptions(
         { labels: data.labels || [] },
         false,
         true
     );
 
-    donutChart.updateSeries(data.series || []);
-
+    donutChartInstance.updateSeries(data.series || []);
 }

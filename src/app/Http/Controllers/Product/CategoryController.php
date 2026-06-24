@@ -12,15 +12,16 @@ use Illuminate\View\View;
 class CategoryController extends Controller
 {
     public function __construct(
-        private readonly CategoryService $categoryService
+        private readonly CategoryService $service
     ) {}
 
     /**
-     * Display all active categories.
+     * Display paginated list of categories.
      */
     public function index(Request $request): View
     {
-        $categories = $this->categoryService->getAll($request);
+        $categories = $this->service->getAll($request);
+
         return view('admin.products.category', compact('categories'));
     }
 
@@ -29,11 +30,9 @@ class CategoryController extends Controller
      */
     public function store(CategoryRequest $request): RedirectResponse
     {
-        $this->categoryService->create($request->validated());
+        $this->service->create($request->validated());
 
-        return redirect()
-            ->route('admin.category')
-            ->with('success', 'Category created successfully.');
+        return $this->redirectWithSuccess('Category created successfully.');
     }
 
     /**
@@ -41,22 +40,29 @@ class CategoryController extends Controller
      */
     public function update(CategoryRequest $request, string $code): RedirectResponse
     {
-        $this->categoryService->update($code, $request->validated());
+        $this->service->update($code, $request->validated());
 
-        return redirect()
-            ->route('admin.category')
-            ->with('success', 'Category updated successfully.');
+        return $this->redirectWithSuccess('Category updated successfully.');
     }
 
     /**
-     * Deactivate a category (soft delete).
+     * Delete a category and its associated image.
      */
     public function destroy(string $code): RedirectResponse
     {
-        $this->categoryService->deactivate($code);
+        $this->service->delete($code);
 
+        return $this->redirectWithSuccess('Category deleted successfully.');
+    }
+
+    /* ─────────────────────────────────────────
+    |  Private helpers
+    ───────────────────────────────────────── */
+
+    private function redirectWithSuccess(string $message): RedirectResponse
+    {
         return redirect()
-            ->route('admin.category')
-            ->with('success', 'Category deactivated successfully.');
+            ->route('admin.category.index')
+            ->with('success', $message);
     }
 }

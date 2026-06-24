@@ -33,7 +33,7 @@
                     <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name Z-A</option>
                     <option value="code_asc" {{ request('sort') == 'code_asc' ? 'selected' : '' }}>Code A-Z</option>
                 </select>
-                <button type="submit">Filter</button>
+                <button type="submit" onclick="showLoader()" >Filter</button>
             </form>
             <button
                 type="button"
@@ -184,7 +184,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-cancel" data-close="createModal">Cancel</button>
-                <button type="submit" class="btn-submit">
+                <button type="submit" class="btn-submit" onclick="showLoader()" >  
                     <i class="ti ti-check" style="font-size:14px"></i> Save category
                 </button>
             </div>
@@ -239,7 +239,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-cancel" data-close="editModal">Cancel</button>
-                <button type="submit" class="btn-submit">
+                <button type="submit" class="btn-submit" onclick="showLoader()" >
                     <i class="ti ti-device-floppy" style="font-size:14px"></i> Save changes
                 </button>
             </div>

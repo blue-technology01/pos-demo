@@ -9,13 +9,11 @@
 @endpush
 
 @section('content')
-
+<x-spinner />
 <div class="unit-section">
-
     {{-- ── Header ── --}}
     <div class="unit-section__header">
         <h2 class="page-title">Sales history</h2>
-
         {{-- Search + Filter --}}
         <form action="{{ route('admin.sales.index') }}" method="GET" class="search-wrap">
 
@@ -23,36 +21,23 @@
                 <span class="material-symbols-outlined">search</span>
                 <input
                     type="text"
-                    name="invoice_no"
-                    value="{{ request('invoice_no') }}"
+                    name="search"
+                    value="{{ request('search') }}"
                     class="filter-input"
-                    placeholder="Search invoice number..."
+                    placeholder="Search cashier..."
                     autocomplete="off"
                 >
             </div>
 
-            <input
-                type="date"
-                name="date_from"
-                value="{{ request('date_from') }}"
-                class="filter-input"
-                title="Date from"
-            >
+            <input type="datetime-local" name="start_date" value="{{ request('start_date') }}" class="filter-input">
+            <input type="datetime-local" name="end_date"   value="{{ request('end_date') }}"   class="filter-input">
 
-            <input
-                type="date"
-                name="date_to"
-                value="{{ request('date_to') }}"
-                class="filter-input"
-                title="Date to"
-            >
-
-            <button type="submit" class="btn-filter">
+            <button type="submit" class="btn-filter" onclick="showLoader()">
                 <span class="material-symbols-outlined">filter_alt</span> Filter
             </button>
 
-            <a href="{{ route('admin.sales.index') }}" class="btn-reset">
-                <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle">refresh</span>
+            <a href="{{ route('admin.sales.index') }}" class="btn-reset" onclick="showLoader()">
+                <span class="material-symbols-outlined">refresh</span>
                 Reset
             </a>
 
@@ -68,21 +53,6 @@
             </button>
         </div>
     </div>
-
-    {{-- ── Alerts ── --}}
-    @if(session('success'))
-        <div class="sale-alert sale-alert--success">
-            <span class="material-symbols-outlined" style="font-size:18px">check_circle</span>
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="sale-alert sale-alert--error">
-            <span class="material-symbols-outlined" style="font-size:18px">error</span>
-            {{ session('error') }}
-        </div>
-    @endif
 
     {{-- ── Table ── --}}
     <div class="unit-card " >
@@ -158,9 +128,36 @@
             </table>
         </div>
 
-        {{-- Pagination --}}
-        <div class="pm-pagination" style="display: flex">
-            {{ $sales->appends(request()->query())->links() }}
+        {{-- pagination --}}
+        <div class="table-footer" style="width: 100%; display: flex; justify-content: space-between" id="tableFooter">
+            <span class="table-footer-left">
+                <div class="table-info">
+                    showing
+                    {{ $sales->firstItem() ?? 0 }}
+                    -
+                    {{ $sales->lastItem() ?? 0 }}
+                    of
+                    {{ $sales->total() }}
+                    sales
+                </div>
+
+                {{-- per page --}}
+                <form method="GET" action="{{ request()->url() }}">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+
+                    <select name="per_page" onchange="showLoader(); this.form.submit()">
+                        <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+            </span>
+
+            <div class="pagination">
+                {{ $sales->links('vendor.pagination.numbers-only') }}
+            </div>
         </div>
     </div>
 </div>
@@ -249,7 +246,7 @@
 
     const overlay = document.getElementById('invOverlay');
 
-    // ── Helpers ────────────────────────────────────────────────────────────
+    // helper
     function formatDate(str) {
         if (!str) return '';
         const d = new Date(str);
@@ -262,7 +259,7 @@
         return prefix + parseFloat(val || 0).toFixed(2);
     }
 
-    // ── Open modal ─────────────────────────────────────────────────────────
+    // open modal
     function openModal(sale) {
         document.getElementById('invNo').textContent      = sale.invoice_no;
         document.getElementById('invDate').textContent    = formatDate(sale.sale_date);
@@ -295,13 +292,11 @@
         document.body.style.overflow = 'hidden';
     }
 
-    // ── Close modal ────────────────────────────────────────────────────────
     function closeModal() {
         overlay.classList.remove('active');
         document.body.style.overflow = '';
     }
 
-    // ── Events ─────────────────────────────────────────────────────────────
     document.querySelectorAll('.btn-view').forEach(btn => {
         btn.addEventListener('click', function () {
             openModal(JSON.parse(this.getAttribute('data-sale')));
