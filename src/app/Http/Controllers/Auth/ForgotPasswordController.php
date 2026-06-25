@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\ForgotPasswordRequest;
-use App\Http\Requests\Auth\OtpVerifyRequest;
-use App\Http\Requests\Auth\ResetPasswordRequest;
-use App\Services\Auth\ForgotPasswordService;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
+use App\Services\Auth\ForgotPasswordService;
+use App\Http\Requests\Auth\OtpVerifyRequest;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
 
 class ForgotPasswordController extends Controller
 {

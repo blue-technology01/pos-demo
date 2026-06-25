@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Cash;
 
+use Illuminate\Http\Request;
+use App\Models\CashRegister;
 use App\Http\Controllers\Controller;
+use App\Services\Cash\CashRegisterService;
 use App\Http\Requests\Cash\CashRegisterStoreRequest;
 use App\Http\Requests\Cash\CashRegisterUpdateRequest;
-use App\Models\CashRegister;
-use App\Services\Cash\CashRegisterService;
-use Illuminate\Http\Request;
 
 class CashController extends Controller
 {

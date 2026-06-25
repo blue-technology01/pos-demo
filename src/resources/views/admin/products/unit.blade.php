@@ -11,19 +11,15 @@
 @section('content')
 
 <div class="page">
-    {{-- <x-alert/> --}}
-    {{-- ── Toolbar ── --}}
     <div class="toolbar">
         <div class="toolbar-left" >
             <form method="GET" action="{{ url()->current() }}" style="display:flex; gap:10px;">
-                {{-- search --}}
                 <input
                     type="text"
                     name="search"
                     value="{{ request('search') }}"
                     placeholder="Search categories..."
                 >
-                {{-- status --}}
                 <select name="status" class="border rounded px-3 py-2">
                     <option value="">All Status</option>
                     <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
@@ -46,7 +42,6 @@
         </div>
     </div>
 
-    {{-- ── Table card ── --}}
     <div class="table-card">
         <div class="table-wrap">
             <table>
@@ -77,9 +72,6 @@
                         >
                             <td>
                                 <div style="display:flex;align-items:center;gap:7px">
-                                    <span style="width:28px;height:28px;border-radius:8px;background:#eff6ff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">
-                                        <i class="ti ti-tag" style="color:#2563eb;font-size:14px" aria-hidden="true"></i>
-                                    </span>
                                     <strong>{{ $uom->code }}</strong>
                                 </div>
                             </td>

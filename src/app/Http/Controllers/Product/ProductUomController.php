@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Product;
 
+use App\Models\Uom;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Services\Product\ProductUomService;
 use App\Http\Requests\Product\ProductUomStoreRequest;
 use App\Http\Requests\Product\ProductUomUpdateRequest;
-use App\Models\Product;
-use App\Models\ProductUom;
-use App\Models\Uom;
-use App\Services\Product\ProductUomService;
 
 class ProductUomController extends Controller
 {

@@ -73,7 +73,7 @@
                     @forelse ($sales as $sale)
                         <tr>
                             <td><strong>{{ $sale->invoice_no }}</strong></td>
-                            <td>{{ \Carbon\Carbon::parse($sale->sale_date)->format('d M Y  H:i') }}</td>
+                            <td>{{ $sale->created_at->format('d M Y H:i') }}</td>
                             <td>{{ $sale->user->name ?? 'N/A' }}</td>
                             <td>
                                 <span class="payment-method">

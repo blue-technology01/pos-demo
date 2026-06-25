@@ -12,21 +12,6 @@
             <h1>Reset Password</h1>
             <p>Enter and confirm your new password below.</p>
         </div>
-        {{-- Success Message --}}
-        @if (session('success'))
-            <div style="
-                background: #f0fdf4;
-                border: 1px solid #bbf7d0;
-                border-radius: .55rem;
-                padding: .75rem 1rem;
-                margin-bottom: 1.2rem;
-                font-size: .84rem;
-                color: #16a34a;
-            ">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <form method="POST"
               action="{{ route('auth.reset-password.post') }}"
               id="reset-form"
@@ -106,7 +91,7 @@
             <div class="otp-footer" style="margin-top: 1rem;">
                 <p>
                     Remember your password?
-                    <a href="{{ route('auth.login') }}">Login</a>
+                    <a href="{{ route('login') }}">Login</a>
                 </p>
             </div>
 

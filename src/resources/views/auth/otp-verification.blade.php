@@ -11,20 +11,6 @@
         <p>Enter the 6-digit code sent to your phone</p>
       </div>
 
-      {{-- Session Error --}}
-      @if (session('error'))
-        <div style="
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            border-radius: .55rem;
-            padding: .75rem 1rem;
-            margin-bottom: 1.2rem;
-            font-size: .84rem;
-            color: #dc2626;
-        ">{{ session('error') }}</div>
-      @endif
-
-      {{-- ✅ FIXED: uncommented so JS can use it --}}
       <div id="general-error" style="
         display: none;
         background: #fef2f2;
@@ -44,7 +30,6 @@
         <div class="field-group">
           <label class="field-label">Enter OTP Code</label>
           <div id="otp-inputs" style="display: flex; gap: .6rem; justify-content: center; margin: 1rem 0;">
-            {{-- ✅ FIXED: removed stray "// loop 6 input" text --}}
             @for ($i = 0; $i < 6; $i++)
               <input
                 type="text"

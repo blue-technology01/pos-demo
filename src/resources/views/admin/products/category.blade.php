@@ -116,28 +116,36 @@
                 </tbody>
             </table>
         </div>
+        {{-- pagination --}}
+        <div class="table-footer" style="width: 100%; display: flex; justify-content: space-between" id="tableFooter">
+            <span class="table-footer-left">
+                <div class="table-info">
+                    showing
+                    {{ $categories->firstItem() ?? 0 }}
+                    -
+                    {{ $categories->lastItem() ?? 0 }}
+                    of
+                    {{ $categories->total() }}
+                    sales
+                </div>
 
-        {{-- Table footer: info + pagination --}}
-        <div class="table-footer" id="tableFooter"  >
-            <div class="table-info">
-                Showing
-                {{ $categories->firstItem() ?? 0 }}
-                -
-                {{ $categories->lastItem() ?? 0 }}
-                of
-                {{ $categories->total() }}
-                categories
-            </div>
+                {{-- per page --}}
+                <form method="GET" action="{{ request()->url() }}">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+
+                    <select name="per_page" onchange="showLoader(); this.form.submit()">
+                        <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+            </span>
+
             <div class="pagination">
-                {{ $categories->links() }}
+                {{ $categories->links('vendor.pagination.numbers-only') }}
             </div>
-            <form method="GET" action="{{ url()->current() }}">
-                <select name="per_page" onchange="this.form.submit()">
-                    <option value="15" {{ request('per_page') == 15 ? 'selected' : '' }}>15</option>
-                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
-                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-                </select>
-            </form>
         </div>
     </div>
 </div>
@@ -184,7 +192,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-cancel" data-close="createModal">Cancel</button>
-                <button type="submit" class="btn-submit" onclick="showLoader()" >  
+                <button type="submit" class="btn-submit" onclick="showLoader()" >
                     <i class="ti ti-check" style="font-size:14px"></i> Save category
                 </button>
             </div>

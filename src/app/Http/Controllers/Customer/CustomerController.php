@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Models\Customer;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
+use App\Services\Customer\CustomerService;
 use App\Http\Requests\Customer\CustomerStoreRequest;
 use App\Http\Requests\Customer\CustomerUpdateRequest;
-use App\Models\Customer;
-use App\Services\Customer\CustomerService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {

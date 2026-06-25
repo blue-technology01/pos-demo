@@ -15,12 +15,12 @@
 {{-- ── Page Header ── --}}
 <div class="page-header">
     <div>
-        <h2 class="page-title">Product UOM management</h2>
+        <h2 class="page-title">Product UOM Management</h2>
         <p class="page-subtitle">Manage product units and conversion ratios</p>
     </div>
 
     <a href="{{ route('admin.product-uom.create') }}" class="btn-add">
-        <i class="ti ti-plus"></i> Add product UOM
+        <i class="ti ti-plus"></i> Add UOM
     </a>
 </div>
 
@@ -28,9 +28,20 @@
 <div class="filter-card">
     <form action="{{ route('admin.product-uom.index') }}" method="GET">
 
+        {{-- Search --}}
+        <div class="filter-group">
+            <label>Search</label>
+            <input type="text"
+                   name="search"
+                   value="{{ request('search') }}"
+                   class="filter-control"
+                   placeholder="Product name or barcode">
+        </div>
+
+        {{-- Product --}}
         <div class="filter-group">
             <label>Filter by product</label>
-            <select name="product_code" class="filter-control" onchange="this.form.submit()">
+            <select name="product_code" class="filter-control">
                 <option value="">All products</option>
                 @foreach($products as $product)
                     <option value="{{ $product->code }}"
@@ -41,9 +52,10 @@
             </select>
         </div>
 
+        {{-- UOM --}}
         <div class="filter-group">
             <label>Filter by UOM</label>
-            <select name="uom_code" class="filter-control" onchange="this.form.submit()">
+            <select name="uom_code" class="filter-control">
                 <option value="">All UOMs</option>
                 @foreach($uoms as $uom)
                     <option value="{{ $uom->code }}"
@@ -53,17 +65,17 @@
                 @endforeach
             </select>
         </div>
-
+        {{-- Default --}}
         <div class="filter-group">
             <label>Default status</label>
-            <select name="is_default" class="filter-control" onchange="this.form.submit()">
+            <select name="is_default" class="filter-control">
                 <option value="">All</option>
                 <option value="1" {{ request('is_default') == '1' ? 'selected' : '' }}>Default only</option>
                 <option value="0" {{ request('is_default') == '0' ? 'selected' : '' }}>Sub units only</option>
             </select>
         </div>
-
-        @if(request()->filled('product_code') || request()->filled('uom_code') || request()->filled('is_default'))
+        <button type="submit" class="product-section__btn-add" onclick="showLoader()">Filter</button>
+        @if(request()->filled('search') || request()->filled('product_code') || request()->filled('uom_code') || request()->filled('is_default'))
             <a href="{{ route('admin.product-uom.index') }}" class="btn-clear">
                 <i class="ti ti-x"></i> Clear filters
             </a>
@@ -81,10 +93,11 @@
                     <th>Product</th>
                     <th>UOM</th>
                     <th>Qty / unit</th>
-                    <th>Cost price</th>
-                    <th>Selling price</th>
+                    <th>Cost</th>
+                    <th>Selling</th>
                     <th>Barcode</th>
                     <th>Role</th>
+                    <th>Status</th>
                     <th>Default</th>
                     <th>Actions</th>
                 </tr>
@@ -93,32 +106,48 @@
             <tbody>
                 @forelse($productUoms as $item)
                     <tr>
-                        {{-- PRODUCT --}}
+
+                        {{-- Product --}}
                         <td>{{ $item->product_name ?? '—' }}</td>
 
                         {{-- UOM --}}
                         <td>{{ $item->uom_name ?? '—' }}</td>
 
-                        {{-- QTY --}}
-                        <td>{{ number_format($item->quantity_per_unit) }}</td>
+                        {{-- Qty --}}
+                        <td class="text-right">
+                            {{ number_format($item->quantity_per_unit, 2) }}
+                        </td>
 
-                        {{-- COST --}}
-                        <td>${{ number_format($item->cost_price ?? 0, 2) }}</td>
+                        {{-- Cost --}}
+                        <td class="text-right">
+                            ${{ number_format($item->cost_price ?? 0, 2) }}
+                        </td>
 
-                        {{-- SELLING --}}
-                        <td>${{ number_format($item->selling_price ?? 0, 2) }}</td>
+                        {{-- Selling --}}
+                        <td class="text-right">
+                            ${{ number_format($item->selling_price ?? 0, 2) }}
+                        </td>
 
-                        {{-- BARCODE --}}
+                        {{-- Barcode --}}
                         <td>{{ $item->barcode ?: '—' }}</td>
 
-                        {{-- ROLE --}}
+                        {{-- Role --}}
                         <td>
                             <span class="badge">
                                 {{ ucfirst($item->uom_role ?? 'retail') }}
                             </span>
                         </td>
 
-                        {{-- DEFAULT --}}
+                        {{-- Status --}}
+                        <td>
+                            @if($item->is_active ?? true)
+                                <span class="badge-success">Active</span>
+                            @else
+                                <span class="badge-muted">Inactive</span>
+                            @endif
+                        </td>
+
+                        {{-- Default --}}
                         <td>
                             @if(!empty($item->is_default))
                                 <span class="badge-default">
@@ -129,9 +158,10 @@
                             @endif
                         </td>
 
-                        {{-- ACTIONS --}}
+                        {{-- Actions --}}
                         <td>
                             <div class="action-group">
+
                                 <a href="{{ route('admin.product-uom.edit', $item->id) }}"
                                    class="btn-edit">
                                     <i class="ti ti-pencil"></i> Edit
@@ -139,55 +169,57 @@
 
                                 <form action="{{ route('admin.product-uom.destroy', $item->id) }}"
                                       method="POST"
-                                      onsubmit="return confirm('Are you sure you want to delete this item?')">
+                                      onsubmit="return confirm('Deactivate this UOM?')">
                                     @csrf
                                     @method('DELETE')
 
                                     <button type="submit" class="btn-delete">
-                                        <i class="ti ti-trash"></i> Delete
+                                        <i class="ti ti-ban"></i> Deactivate
                                     </button>
                                 </form>
+
                             </div>
                         </td>
+
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" style="text-align:center;padding:40px;">
+                        <td colspan="10" style="text-align:center;padding:40px;">
                             <i class="ti ti-package-off" style="font-size:30px;color:#d1d5db;"></i>
                             <div>No product UOM found</div>
-                            <small>Try changing filters or add new data</small>
+                            <small>Create your first product unit</small>
                         </td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
-    </div>
-    {{-- pagination --}}
-    <div class="table-footer" style="width: 100%; display: flex; justify-content: space-between" id="tableFooter">
-        <span class="table-footer-left">
-            <div class="table-info">
-                showing
-                {{ $productUoms->firstItem() ?? 0 }}
-                -
-                {{ $productUoms->lastItem() ?? 0 }}
-                of
-                {{ $productUoms->total() }}
-                sales
+        {{-- pagination --}}
+        <div class="table-footer" style="width: 100%; display: flex; justify-content: space-between; padding-bottom: 1rem"  id="tableFooter">
+            <span class="table-footer-left">
+                <div class="table-info">
+                    showing
+                    {{ $productUoms->firstItem() ?? 0 }}
+                    -
+                    {{ $productUoms->lastItem() ?? 0 }}
+                    of
+                    {{ $productUoms->total() }}
+                    sales
+                </div>
+                {{-- per page --}}
+                <form method="GET" action="{{ request()->url() }}">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+                    <select name="per_page" onchange="showLoader(); this.form.submit()">
+                        <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+            </span>
+            <div class="pagination">
+                {{ $productUoms->links('vendor.pagination.numbers-only') }}
             </div>
-            {{-- per page --}}
-            <form method="GET" action="{{ request()->url() }}">
-                @foreach(request()->except('per_page', 'page') as $key => $value)
-                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                @endforeach
-                <select name="per_page" onchange="showLoader(); this.form.submit()">
-                    <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
-                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
-                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-                </select>
-            </form>
-        </span>
-        <div class="pagination">
-            {{ $productUoms->links('vendor.pagination.numbers-only') }}
         </div>
     </div>
 </div>

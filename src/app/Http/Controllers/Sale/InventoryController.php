@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Sale;
 
-use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\SaleItem;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class InventoryController extends Controller
 {

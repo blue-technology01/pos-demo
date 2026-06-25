@@ -5,7 +5,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard')</title>
-
+    <link rel="stylesheet" href="{{ asset('assets/css/components/alert.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/app.css') }}" data-turbo-track="reload">
     <link rel="stylesheet" href="{{ asset('assets/css/components/navbar.css') }}" data-turbo-track="reload">
     <link rel="stylesheet" href="{{ asset('assets/css/components/sidebar.css') }}" data-turbo-track="reload">
@@ -32,8 +32,6 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="{{ asset('assets/js/app.js') }}"></script>
-
-    {{-- Global loader helpers — defined before page scripts --}}
     <script>
         function showLoader() {
             const el = document.getElementById('loader');

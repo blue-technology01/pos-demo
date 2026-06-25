@@ -100,9 +100,9 @@
 
                 {{-- Pricing & stock --}}
                 <div class="form-card">
-                    <h2>Pricing & stock</h2>
+                    <h2>Stock</h2>
 
-                    <div class="form-row-2">
+                    {{-- <div class="form-row-2">
                         <div class="form-group">
                             <label for="cost_price">Cost price <span class="req">*</span></label>
                             <input
@@ -127,7 +127,7 @@
                             >
                             @error('price') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
-                    </div>
+                    </div> --}}
 
                     <div class="form-row-2">
                         <div class="form-group">

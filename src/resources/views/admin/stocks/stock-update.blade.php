@@ -11,26 +11,6 @@
 @section('content')
 <div class="pm-wrapper">
 
-    {{-- Summary stat cards --}}
-    <div class="stat-grid">
-        <div class="stat-card">
-            <div class="stat-label">Total products</div>
-            <div class="stat-value">{{ $totalProducts }}</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Low stock items</div>
-            <div class="stat-value warning">{{ $lowStock }}</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Out of stock</div>
-            <div class="stat-value danger">{{ $outOfStock }}</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Healthy stock</div>
-            <div class="stat-value success">{{ $healthyStock }}</div>
-        </div>
-    </div>
-
     {{-- Tabs --}}
     <div class="tab-bar">
         <button class="tab-btn active" data-tab="overview">
@@ -65,7 +45,7 @@
 
     {{-- Search & sync bar --}}
     <form method="GET" action="{{ url()->current() }}" class="search-bar">
-        <div class="search-wrap">
+        <div class="search-wrap "  >
             <svg class="search-icon"
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -81,16 +61,17 @@
                 type="text"
                 name="search"
                 value="{{ request('search') }}"
-                placeholder="Search product name, code or invoice..."
+                placeholder="Search product name, code."
             >
+            <button type="submit" class="btn-filter" onclick="showLoader()" >
+                Search
+            </button>
         </div>
         {{-- Keep existing filters --}}
         @foreach(request()->except('search', 'page') as $key => $value)
             <input type="hidden" name="{{ $key }}" value="{{ $value }}">
         @endforeach
-        <button type="submit" class="btn-filter" onclick="showLoader()" >
-            Search
-        </button>
+       
         <div class="sync-badge">
             <span class="sync-dot"></span>
             Live sync active

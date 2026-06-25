@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers\Sale;
 
+use App\Models\Sale;
+use Illuminate\Http\Request;
+use App\Services\Sale\SaleService;
 use App\Http\Controllers\Controller;
+use App\Services\Sale\StockGuardService;
 use App\Http\Requests\Sale\SaleStoreRequest;
 use App\Http\Requests\Sale\SaleUpdateRequest;
-use App\Models\Sale;
-use App\Services\Sale\SaleService;
-use App\Services\Sale\StockGuardService;
-use Illuminate\Http\Request;
 
 class SaleController extends Controller
 {
     protected $saleService;
     protected StockGuardService $stockGuardService;
-
 
     public function __construct(SaleService $saleService, StockGuardService $stockGuardService)
     {

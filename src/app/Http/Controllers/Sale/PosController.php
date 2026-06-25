@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Sale;
 
-use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Services\Product\ProductUomService;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Services\Product\ProductUomService;
 
 class PosController extends Controller
 {

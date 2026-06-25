@@ -2,19 +2,19 @@
 
 namespace App\Services\Sale;
 
-use App\Models\CashRegister;
+use Carbon\Carbon;
 use App\Models\Sale;
 use App\Models\Product;
 use App\Models\ProductUom;
-use App\Services\Cash\CashRegisterService;
-use App\Services\Sale\InventoryService;
-
+use App\Models\CashRegister;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use App\Services\Sale\InventoryService;
+use App\Services\Cash\CashRegisterService;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SaleService
 {
@@ -77,28 +77,48 @@ class SaleService
     {
         return Sale::query()
             ->with(['items', 'user'])
-            ->when($request->search, fn($q) =>
+
+            // search
+            ->when($request->search, function ($q) use ($request) {
                 $q->where(function ($q) use ($request) {
                     $q->where('invoice_no', 'LIKE', "%{$request->search}%")
-                    ->orWhereHas('user', fn($u) => $u->where('name', 'LIKE', "%{$request->search}%"));
-                })
+                    ->orWhereHas('user', function ($u) use ($request) {
+                        $u->where('name', 'LIKE', "%{$request->search}%");
+                    });
+                });
+            })
+
+            // status
+            ->when($request->status, fn($q) =>
+                $q->where('status', $request->status)
             )
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
-            ->when(
-                $request->start_date && $request->end_date,
-                fn($q) => $q->whereBetween('sale_date', [
-                    $request->start_date,  // e.g. 2026-06-01T08:00
-                    $request->end_date,    // e.g. 2026-06-24T18:00
-                ])
-            )
-            ->when(
-                $request->start_date && !$request->end_date,
-                fn($q) => $q->where('sale_date', '>=', $request->start_date)
-            )
-            ->when(
-                !$request->start_date && $request->end_date,
-                fn($q) => $q->where('sale_date', '<=', $request->end_date)
-            )
+
+            // date filter
+            ->when($request->start_date || $request->end_date, function ($q) use ($request) {
+                $start = $request->start_date
+                    ? Carbon::parse($request->start_date)
+                    : null;
+
+                $end = $request->end_date
+                    ? Carbon::parse($request->end_date)
+                    : null;
+
+                if ($start && $end && $start->gt($end)) {
+                    [$start, $end] = [$end, $start];
+                }
+
+                if ($start && $end) {
+                    $q->whereBetween('sale_date', [
+                        $start->startOfMinute(),
+                        $end->endOfMinute()
+                    ]);
+                } elseif ($start) {
+                    $q->where('sale_date', '>=', $start);
+                } elseif ($end) {
+                    $q->where('sale_date', '<=', $end);
+                }
+            })
+
             ->orderByDesc('id')
             ->paginate($request->per_page ?? 15)
             ->withQueryString();

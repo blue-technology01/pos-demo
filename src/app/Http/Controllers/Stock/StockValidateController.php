@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Stock;
 
-use App\Http\Controllers\Controller;
-use App\Models\BlockedSaleAttempt;
 use Illuminate\Http\Request;
+use App\Models\BlockedSaleAttempt;
+use App\Http\Controllers\Controller;
 
 class StockValidateController extends Controller
 {

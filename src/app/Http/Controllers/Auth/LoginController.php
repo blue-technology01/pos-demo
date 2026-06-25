@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+use Illuminate\Http\Request;
 use App\Services\Auth\LoginService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -54,7 +54,7 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('auth.login');
+        return redirect()->route('login');
     }
 
     private function throttleKey(Request $request): string

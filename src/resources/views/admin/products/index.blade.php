@@ -113,8 +113,8 @@
                         <th>Code</th>
                         <th>Name</th>
                         <th>Category</th>
-                        <th>Cost</th>
-                        <th>Price</th>
+                        {{-- <th>Cost</th> --}}
+                        {{-- <th>Price</th> --}}
                         <th>Stock</th>
                         <th>Min stock</th>
                         <th>Barcode</th>
@@ -140,8 +140,8 @@
 
                             <td>{{ $product->name }}</td>
                             <td>{{ $product->category->name ?? '—' }}</td>
-                            <td>${{ number_format($product->cost_price, 2) }}</td>
-                            <td>${{ number_format($product->price, 2) }}</td>
+                            {{-- <td>${{ number_format($product->cost_price, 2) }}</td> --}}
+                            {{-- <td>${{ number_format($product->price, 2) }}</td> --}}
                             <td>{{ number_format($product->stock) }}</td>
                             <td>{{ number_format($product->min_stock) }}</td>
                             <td>{{ $product->barcode ?? '—' }}</td>

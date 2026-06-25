@@ -1,73 +1,70 @@
 (function () {
     'use strict';
 
-    const CONFIG = {
-        TAX_RATE: 0.10,
-        LOW_STOCK_THRESHOLD: 10,
-        DEBOUNCE_DELAY: 250
-    };
-
     const state = {
         products: [],
-        productStock: {},
         cart: [],
-        activeCategory: 'all',
         searchQuery: '',
-        pagination: { current_page: 1, last_page: 1, per_page: 20 },
+        activeCategory: 'all',
         isLoading: false,
-    };
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Utils
-    // ─────────────────────────────────────────────────────────────────────────
-    const utils = {
-        formatCurrency(amount) {
-            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
-                .format(parseFloat(amount) || 0);
-        },
-        debounce(func, wait = CONFIG.DEBOUNCE_DELAY) {
-            let timeout;
-            return function (...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), wait);
-            };
-        },
-        showNotification(message, type = 'info') {
-            const colors = { success: '#4ade80', warning: '#fbbf24', error: '#f87171', info: '#60a5fa' };
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position:fixed;bottom:20px;right:20px;background:${colors[type]};color:#fff;
-                padding:12px 16px;border-radius:6px;z-index:99999;font-size:14px;font-weight:500;
-                box-shadow:0 2px 8px rgba(0,0,0,.2);`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        },
-        csrfToken() {
-            return window.CSRF_TOKEN
-                || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-                || '';
-        },
-        async fetchJson(url, options = {}) {
-            const res = await fetch(url, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': this.csrfToken(),
-                    'Accept': 'application/json',
-                    ...options.headers,
-                },
-                ...options,
-            });
-            if (!res.ok) {
-                const err = await res.json().catch(() => ({}));
-                throw new Error(err.message || `HTTP error ${res.status}`);
-            }
-            return res.json();
+        pagination: {
+            current_page: 1,
+            last_page: 1,
+            per_page: 20
         }
     };
+    const utils = {
+        formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(parseFloat(amount) || 0);
+        },
+
+        debounce(fn, delay = 250) {
+            let t;
+            return (...args) => {
+                clearTimeout(t);
+                t = setTimeout(() => fn.apply(this, args), delay);
+            };
+        },
+
+        notify(msg, type = 'info') {
+            const colors = {
+                success: '#22c55e',
+                error: '#ef4444',
+                warning: '#f59e0b',
+                info: '#3b82f6'
+            };
+
+            const el = document.createElement('div');
+            el.textContent = msg;
+            el.style = `
+                position:fixed;bottom:20px;right:20px;
+                background:${colors[type]};color:#fff;
+                padding:10px 14px;border-radius:6px;
+                font-size:13px;z-index:99999;
+            `;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 2500);
+        }
+    };
+
+    function getAvailableStock(code) {
+        const product = productManager.getProductByCode(code);
+        if (!product) return 0;
+
+        let used = 0;
+
+        for (const item of state.cart) {
+            if (item.product_code === code) {
+                used += item.quantity * item.uom_qty_per_unit;
+            }
+        }
+        return product.stock - used;
+    }
+
     const productManager = {
-        // ─── all products across ALL categories (loaded once on init) ───────────
-        _allProducts: [],
 
         init() {
             this.bindEvents();
@@ -75,609 +72,252 @@
         },
 
         buildUrl(page = 1) {
-            const params = new URLSearchParams({ per_page: state.pagination.per_page, page });
-            if (state.searchQuery) params.set('search', state.searchQuery);
-            return `${window.ROUTES.posProducts}?${params.toString()}`;
+            const params = new URLSearchParams({
+                page,
+                per_page: state.pagination.per_page
+            });
+
+            if (state.searchQuery) {
+                params.set('search', state.searchQuery);
+            }
+
+            if (state.activeCategory !== 'all') {
+                params.set('category', state.activeCategory);
+            }
+
+            return `${window.ROUTES.posProducts}?${params}`;
         },
 
         async fetchProducts(page = 1) {
-            if (state.isLoading) return;
-            state.isLoading = true;
-            this.renderSkeleton();
             try {
-                const response  = await utils.fetchJson(this.buildUrl(page));
-                const paginator = response.data;
+                state.isLoading = true;
 
-                const mapped = (paginator.data || []).map(p => {
-                    const sellingPrice = parseFloat(p.selling_price ?? p.price ?? p.unit_price) || 0;
-                    return {
-                        product_code:  p.product_code,
-                        name:          p.product_name,
-                        image:         p.product_image ? `/storage/${p.product_image}` : '/assets/images/no-image.png',
-                        stock:         parseFloat(p.stock) || 0,
-                        low_stock:     p.low_stock || false,
-                        uoms:          p.uoms || [],
-                        price:         sellingPrice,
-                        cost_price:    parseFloat(p.cost_price) || 0,
-                        category_code: p.category_code || null, // ✅ needed for client-side filter
-                    };
-                });
+                const res = await fetch(this.buildUrl(page)).then(r => r.json());
+                const paginator = res.data;
 
-                // ✅ when no search — store full set so category filter works offline
-                if (!state.searchQuery) {
-                    this._allProducts = mapped;
-                }
+                state.products = (paginator.data || []).map(p => ({
+                    product_code: p.product_code,
+                    name: p.product_name,
+                    image: p.product_image
+                        ? `/storage/${p.product_image}`
+                        : '/assets/images/no-image.png',
+                    stock: parseFloat(p.stock) || 0,
+                    uoms: p.uoms || [],
+                    price: parseFloat(p.selling_price ?? p.price ?? 0),
+                    cost_price: parseFloat(p.cost_price) || 0,
+                    category_code: p.category_code || null
+                }));
 
-                state.products = mapped;
-                this.updateLocalStock();
                 state.pagination.current_page = paginator.current_page;
-                state.pagination.last_page    = paginator.last_page;
+                state.pagination.last_page = paginator.last_page;
 
-                this.renderFiltered();   // ✅ always go through renderFiltered, not render()
-                this.renderPagination();
-            } catch (err) {
-                console.error('fetchProducts error:', err);
-                utils.showNotification('មិនអាចទាញទិន្នន័យផលិតផលបានទេ', 'error');
+                this.renderGrid();
+
+            } catch (e) {
+                console.error(e);
+                utils.notify('Failed to load products', 'error');
             } finally {
                 state.isLoading = false;
             }
         },
 
-        updateLocalStock() {
-            state.products.forEach(p => { state.productStock[p.product_code] = p.stock; });
-        },
-        //
-        _localSearch(query) {
-            const q = query.toLowerCase();
-            const filtered = this._allProducts.filter(p =>
-                p.name.toLowerCase().includes(q) ||
-                p.product_code.toLowerCase().includes(q)
-            );
-
-            // update state but don't overwrite _allProducts
-            state.products = filtered;
-            this.updateLocalStock();
-            this.renderFiltered();
-            $('#product-pagination').html('');
+        getProductByCode(code) {
+            return state.products.find(p => p.product_code === code);
         },
 
-        // ✅ silent background fetch — updates grid when done, no skeleton
-        async _serverSearch(query) {
-            try {
-                const response  = await utils.fetchJson(this.buildUrl(1));
-                const paginator = response.data;
-
-                // if user already changed the query, discard stale result
-                if (state.searchQuery !== query) return;
-
-                const mapped = (paginator.data || []).map(p => {
-                    const sellingPrice = parseFloat(p.selling_price ?? p.price ?? p.unit_price) || 0;
-                    return {
-                        product_code:  p.product_code,
-                        name:          p.product_name,
-                        image:         p.product_image ? `/storage/${p.product_image}` : '/assets/images/no-image.png',
-                        stock:         parseFloat(p.stock) || 0,
-                        low_stock:     p.low_stock || false,
-                        uoms:          p.uoms || [],
-                        price:         sellingPrice,
-                        cost_price:    parseFloat(p.cost_price) || 0,
-                        category_code: p.category_code || null,
-                    };
-                });
-
-                state.products = mapped;
-                state.pagination.current_page = paginator.current_page;
-                state.pagination.last_page    = paginator.last_page;
-                this.updateLocalStock();
-                this.renderFiltered();
-                this.renderPagination();
-            } catch (err) {
-                console.error('_serverSearch error:', err);
-            }
-        },
-
-        filterByCategory(category) {
-            state.activeCategory = category;
-
-            const source = state.searchQuery ? state.products : this._allProducts;
-
-            const filtered = category === 'all'
-                ? source
-                : source.filter(p => p.category_code === category);
-
-            state.products = filtered;
-            this.updateLocalStock();
-            this.renderFiltered();
-            $('#product-pagination').html('');
-        },
-
-        renderFiltered() {
+        renderGrid() {
             const $grid = $('#product-grid');
 
-            if (state.products.length === 0) {
-                $grid.html(`
-                    <div style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;font-size:14px;">
-                        រកមិនឃើញផលិតផល
-                    </div>`);
+            if (!state.products.length) {
+                $grid.html('<div style="padding:20px;text-align:center;">No products</div>');
                 return;
             }
 
-            $grid.html(state.products.map(product => {
-                const stock        = this.getAvailableStock(product.product_code);
-                const isOutOfStock = stock <= 0;
-                const cartItem     = state.cart.find(i => i.product_code === product.product_code);
-                const qtyInCart    = cartItem ? cartItem.quantity : 0;
-                const cartItemId   = cartItem ? cartItem.id : '';
-
-                const priceFormatted = utils.formatCurrency(product.price || 0);
+            $grid.html(state.products.map(p => {
+                const stock = getAvailableStock(p.product_code);
+                const out = stock <= 0;
 
                 return `
-                <div class="product-card ${isOutOfStock ? 'stock-out-card' : ''}"
-                    data-product-code="${product.product_code}">
+                    <div class="product-card ${out ? 'disabled' : ''}">
+                        <img src="${p.image}" />
 
-                    <!-- Image Area -->
-                    <div class="product-card__image js-card-add"
-                        data-product-code="${product.product_code}">
-                        <img src="${product.image}"
-                            alt="${product.name}"
-                            loading="lazy"
-                            onerror="this.src='/assets/images/no-image.png'">
+                        <div class="name">${p.name}</div>
 
-                        <!-- Stock Badge -->
-                        <div class="stock-badge ${isOutOfStock ? 'stock-out' : 'stock-good'}">
-                            ${isOutOfStock ? 'Out of stock' : `${stock} left`}
-                        </div>
+                        <div class="price">${utils.formatCurrency(p.price)}</div>
+
+                        <button class="add-btn"
+                            data-code="${p.product_code}"
+                            ${out ? 'disabled' : ''}>
+                            Add
+                        </button>
+
+                        <small>${stock} left</small>
                     </div>
-
-                    <!-- Product Info -->
-                    <div class="product-card__info">
-                        <div class="product-card__name">${product.name}</div>
-                        <div class="product-card__price">${priceFormatted}</div>
-
-                        <!-- Action Area -->
-                        <div class="product-card__action">
-                            ${qtyInCart === 0
-                                ? `<button class="order-btn js-card-add"
-                                        data-product-code="${product.product_code}"
-                                        ${isOutOfStock ? 'disabled' : ''}>
-                                        Order
-                                </button>`
-                                : `<div class="qty-stepper">
-                                        <button class="js-grid-minus" data-cart-id="${cartItemId}">−</button>
-                                        <span class="qty-value">${qtyInCart}</span>
-                                        <button class="js-grid-plus" data-cart-id="${cartItemId}">+</button>
-                                </div>`
-                            }
-                        </div>
-                    </div>
-                </div>`;
+                `;
             }).join(''));
 
-            // ✅ bind grid buttons via delegation on $grid — no inline onclick needed
-            this._bindGridEvents($grid);
+            this.bindGrid();
         },
 
-        // ✅ separate method — clean delegation, no conflicts with card click
-        _bindGridEvents($grid) {
-            $grid.off('click.grid')
-
-                // image or Order button → add to cart
-                .on('click.grid', '.js-card-add:not([disabled])', (e) => {
-                    e.stopPropagation();
-                    const code = $(e.currentTarget).data('product-code');
-                    productManager.addDefaultUom(code);
-                })
-
-                // stepper minus
-                .on('click.grid', '.js-grid-minus', (e) => {
-                    e.stopPropagation();
-                    const id  = $(e.currentTarget).data('cart-id');
-                    const qty = parseInt($(e.currentTarget).data('qty'));
-                    cartManager.updateQuantity(id, qty);
-                })
-
-                // stepper plus
-                .on('click.grid', '.js-grid-plus', (e) => {
-                    e.stopPropagation();
-                    const id  = $(e.currentTarget).data('cart-id');
-                    const qty = parseInt($(e.currentTarget).data('qty'));
-                    cartManager.updateQuantity(id, qty);
+        bindGrid() {
+            $('#product-grid')
+                .off('click')
+                .on('click', '.add-btn', (e) => {
+                    const code = $(e.currentTarget).data('code');
+                    cartManager.addDefault(code);
                 });
         },
 
-        renderSkeleton() {
-            $('#product-grid').html(Array(8).fill(`
-                <div style="background:#f1f5f9;border-radius:8px;padding:12px;">
-                    <div style="background:#e2e8f0;height:100px;border-radius:6px;margin-bottom:10px;"></div>
-                    <div style="background:#e2e8f0;height:14px;border-radius:4px;margin-bottom:6px;"></div>
-                    <div style="background:#e2e8f0;height:12px;border-radius:4px;width:60%;"></div>
-                </div>`).join(''));
-        },
-
-        renderPagination() {
-            const { current_page, last_page } = state.pagination;
-            if (last_page <= 1) { $('#product-pagination').html(''); return; }
-            $('#product-pagination').html(`
-                <div style="display:flex;justify-content:center;align-items:center;gap:12px;padding:12px 0;">
-                    <button id="pg-prev" ${current_page <= 1 ? 'disabled' : ''}
-                        style="padding:6px 14px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;cursor:pointer;${current_page <= 1 ? 'opacity:.4;' : ''}">← Prev</button>
-                    <span style="font-size:13px;color:#64748b;">Page ${current_page} / ${last_page}</span>
-                    <button id="pg-next" ${current_page >= last_page ? 'disabled' : ''}
-                        style="padding:6px 14px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;cursor:pointer;${current_page >= last_page ? 'opacity:.4;' : ''}">Next →</button>
-                </div>`);
-            $('#pg-prev').on('click', () => this.fetchProducts(current_page - 1));
-            $('#pg-next').on('click', () => this.fetchProducts(current_page + 1));
-        },
-
-        async addDefaultUom(productCode) {
-            // ✅ search _allProducts too, not just current filtered state.products
-            const product = this._allProducts.find(p => p.product_code === productCode)
-                        || state.products.find(p => p.product_code === productCode);
-            if (!product) { utils.showNotification('រកមិនឃើញផលិតផល', 'error'); return; }
-
-            try {
-                if (!product.uoms || product.uoms.length === 0) {
-                    const res  = await utils.fetchJson(`/cashier/pos/products/${productCode}/uoms`);
-                    product.uoms = Array.isArray(res) ? res : (res.data ?? []);
-                }
-
-                const selectedUom = product.uoms.find(u => u.is_default)
-                                || product.uoms[0]
-                                || {
-                                        uom_code:         'UNIT',
-                                        uom_name:         'Unit',
-                                        quantity_per_unit: 1,
-                                        selling_price:    product.price,
-                                        cost_price:       product.cost_price,
-                                        is_default:       true,
-                                    };
-
-                cartManager.addItem(product, selectedUom);
-            } catch (err) {
-                console.error('addDefaultUom error:', err);
-                utils.showNotification('កំហុសក្នុងការបន្ថែម', 'error');
-            }
-        },
-
-        // ✅ search _allProducts first so category-filtered view doesn't hide cart items
-        getProductByCode(code) {
-            return this._allProducts.find(p => p.product_code === code)
-                || state.products.find(p => p.product_code === code);
-        },
-        getAvailableStock(code) { return state.productStock[code] ?? 0; },
         bindEvents() {
-            $('#product-grid').off('click', '.product-card').on(
-                'click', '.product-card:not(.product-card--disabled)',
-                function () { productManager.addDefaultUom($(this).data('product-code')); }
-            );
-
-            $(document).off('click', '.pos-catalog__filter-pill')
-                .on('click', '.pos-catalog__filter-pill', (e) => {
-                    $('.pos-catalog__filter-pill').removeClass('pos-catalog__filter-pill--active');
-                    $(e.currentTarget).addClass('pos-catalog__filter-pill--active');
-
-                    const category = $(e.currentTarget).data('category');
-
-                    if (this._allProducts.length > 0 && !state.searchQuery) {
-                        this.filterByCategory(category);
-                        return;
-                    }
-
-                    state.activeCategory = category;
-                    this.fetchProducts(1);
-                });
-
-            $('#product-search').off('input').on('input', utils.debounce((e) => {
-                const query = e.target.value.trim();
-                state.searchQuery = query;
-
-                if (!query) {
-                    this.filterByCategory(state.activeCategory);
-                    return;
-                }
-
-                this._localSearch(query);
-                this._serverSearch(query);
+            $('#product-search').on('input', utils.debounce((e) => {
+                state.searchQuery = e.target.value.trim();
+                this.fetchProducts(1);
             }, 300));
-        },
-    };
 
-    // cart manager
-   const cartManager = {
-        addItem(product, uom) {
-            if (!product || !uom) return;
-
-            const uomQtyPerUnit = parseFloat(uom.quantity_per_unit) || 1;
-            const initialPrice  = parseFloat(uom.selling_price)     || 0;
-            const cartItemId    = `${product.product_code}-${uom.uom_code}`;
-
-            const availableStock = productManager.getAvailableStock(product.product_code);
-            if (availableStock < uomQtyPerUnit) {
-                utils.showNotification('ស្តុកទំនិញនេះមិនគ្រប់គ្រាន់ឡើយ។', 'error');
-                return;
-            }
-
-            const existing = state.cart.find(i => i.id === cartItemId);
-            if (existing) {
-                this.updateQuantity(cartItemId, existing.quantity + 1);
-            } else {
-                state.cart.push({
-                    id:                  cartItemId,
-                    product_code:        product.product_code,
-                    name:                product.name,
-                    price:               initialPrice,
-                    cost_price:          (parseFloat(product.cost_price) || 0) * uomQtyPerUnit,
-                    quantity:            1,
-                    uom_code:            uom.uom_code,
-                    uom_name:            uom.uom_name,
-                    uom_qty_per_unit:    uomQtyPerUnit,
-                    discount_percentage: 0,
-                    discount_amount:     0,
-                    subtotal:            initialPrice,
-                    _original_stock:     product.stock,
-                });
-                this.syncAndRender();
-            }
-            utils.showNotification(`បានបន្ថែម [${product.name}] ទៅក្នុងកន្ត្រក`, 'success');
-        },
-
-        _getOriginalStock(productCode) {
-            return productManager.getProductByCode(productCode)?.stock ?? 0;
-        },
-
-        switchItemUOM(cartItemId, targetUomCode) {
-            const item = state.cart.find(i => i.id === cartItemId);
-            if (!item) return;
-            const product = productManager.getProductByCode(item.product_code);
-            if (!product) return;
-            const newUom = (product.uoms || []).find(u => u.uom_code === targetUomCode);
-            if (!newUom) return;
-
-            const newQtyPerUnit = parseFloat(newUom.quantity_per_unit) || 1;
-            const newPrice      = parseFloat(newUom.selling_price)     || 0;
-
-            const otherQty  = state.cart
-                .filter(i => i.product_code === item.product_code && i.id !== cartItemId)
-                .reduce((s, i) => s + i.quantity * i.uom_qty_per_unit, 0);
-            const available = this._getOriginalStock(item.product_code) - otherQty;
-
-            if (item.quantity * newQtyPerUnit > available) {
-                utils.showNotification(`ស្តុកមិនគ្រប់គ្រាន់សម្រាប់ [${newUom.uom_name}]`, 'warning');
-                this.renderCart();
-                return;
-            }
-
-            const newId     = `${item.product_code}-${newUom.uom_code}`;
-            const duplicate = state.cart.find(i => i.id === newId && i.id !== cartItemId);
-            if (duplicate) {
-                duplicate.quantity += item.quantity;
-                duplicate.subtotal  = duplicate.price * duplicate.quantity;
-                state.cart = state.cart.filter(i => i.id !== cartItemId);
-            } else {
-                item.id               = newId;
-                item.uom_code         = newUom.uom_code;
-                item.uom_name         = newUom.uom_name;
-                item.uom_qty_per_unit = newQtyPerUnit;
-                item.price            = newPrice;
-                item.subtotal         = newPrice * item.quantity;
-            }
-            this.syncAndRender();
-        },
-
-        updateQuantity(cartItemId, newQty) {
-            const item = state.cart.find(i => i.id === cartItemId);
-            if (!item) return;
-            if (newQty <= 0) { this.removeItem(cartItemId); return; }
-
-            const otherQty = state.cart
-                .filter(i => i.product_code === item.product_code && i.id !== cartItemId)
-                .reduce((s, i) => s + i.quantity * i.uom_qty_per_unit, 0);
-
-            if (newQty * item.uom_qty_per_unit > this._getOriginalStock(item.product_code) - otherQty) {
-                utils.showNotification('ស្តុកមិនគ្រប់គ្រាន់។', 'warning');
-                this.renderCart();
-                return;
-            }
-
-            item.quantity = newQty;
-            item.subtotal = item.price * newQty;
-
-            // ✅ FIX 3: patch only the changed row — no full list rebuild
-            this.updateCatalogStockTracking();
-            this._patchCartRow(cartItemId);
-            this.renderSidebarTotals();
-        },
-
-        removeItem(cartItemId) {
-            state.cart = state.cart.filter(i => i.id !== cartItemId);
-            this.syncAndRender();
-        },
-
-        syncAndRender() {
-            this.updateCatalogStockTracking();
-            this.renderCart();
-            this.renderSidebarTotals();
-        },
-
-        // ✅ FIX 2: single-pass totals — replaces getSubtotal/getTotalDiscount/getTax/getTotal
-        computeTotals() {
-            let subtotal = 0, discount = 0, count = 0;
-            for (const i of state.cart) {
-                subtotal += i.price * i.quantity;
-                discount += i.discount_amount || 0;
-                count    += i.quantity;
-            }
-            const tax   = (subtotal - discount) * CONFIG.TAX_RATE;
-            const total = subtotal - discount + tax;
-            return { subtotal, discount, tax, total, count };
-        },
-
-        // kept as thin wrappers so paymentManager can still call them
-        getSubtotal()      { return this.computeTotals().subtotal; },
-        getTotalDiscount() { return this.computeTotals().discount; },
-        getTax()           { return this.computeTotals().tax;      },
-        getTotal()         { return this.computeTotals().total;    },
-
-        updateCatalogStockTracking() {
-            state.products.forEach(p => { state.productStock[p.product_code] = p.stock; });
-            state.cart.forEach(item => {
-                if (state.productStock[item.product_code] !== undefined) {
-                    state.productStock[item.product_code] -= item.quantity * item.uom_qty_per_unit;
-                }
+            $(document).on('click', '.category-btn', (e) => {
+                state.activeCategory = $(e.currentTarget).data('category');
+                this.fetchProducts(1);
             });
+        }
+    };
+    // cart manager
+    const cartManager = {
+        addDefault(code) {
+            const product = productManager.getProductByCode(code);
+            if (!product) return;
+
+            const uom = product.uoms?.find(u => u.is_default)
+                || product.uoms?.[0]
+                || {
+                    uom_code: 'UNIT',
+                    uom_name: 'Unit',
+                    quantity_per_unit: 1,
+                    selling_price: product.price
+                };
+
+            this.addItem(product, uom);
         },
 
-        isEmpty() { return state.cart.length === 0; },
+        addItem(product, uom) {
+            const id = `${product.product_code}-${uom.uom_code}`;
 
-        renderSidebarTotals() {
-            // one computeTotals() call instead of four separate reduce loops
-            const { subtotal, discount, tax, total, count } = this.computeTotals();
+            const existing = state.cart.find(i => i.id === id);
 
-            $('#receipt-subtotal').text(utils.formatCurrency(subtotal));
-            $('#receipt-discount').text(utils.formatCurrency(discount));
-            $('#receipt-tax').text(utils.formatCurrency(tax));
-            $('#receipt-total').text(utils.formatCurrency(total));
-            $('#cart-item-count').text(`${count} មុខ`);
+            if (existing) {
+                return this.updateQty(id, existing.quantity + 1);
+            }
 
-            const $btn = $('#process-payment-btn');
-            const hasItems = state.cart.length > 0;
-            $btn.prop('disabled', !hasItems)
-                .css({ opacity: hasItems ? '1' : '0.5', cursor: hasItems ? 'pointer' : 'not-allowed' });
-        },
+            const used = state.cart.reduce((s, i) =>
+                i.product_code === product.product_code
+                    ? s + (i.quantity * i.uom_qty_per_unit)
+                    : s
+            , 0);
 
-        clear(silent = false) {
-            state.cart = [];
+            if (uom.quantity_per_unit > (product.stock - used)) {
+                utils.notify('Stock not enough', 'error');
+                return;
+            }
+
+            state.cart.push({
+                id,
+                product_code: product.product_code,
+                name: product.name,
+                price: uom.selling_price,
+                quantity: 1,
+                uom_code: uom.uom_code,
+                uom_name: uom.uom_name,
+                uom_qty_per_unit: uom.quantity_per_unit,
+                subtotal: uom.selling_price
+            });
+
             this.renderCart();
-            this.renderSidebarTotals();
-            this.updateCatalogStockTracking();
-            if (!silent) productManager.render();
+            this.renderTotals();
+        },
+
+        updateQty(id, qty) {
+            const item = state.cart.find(i => i.id === id);
+            if (!item) return;
+
+            if (qty <= 0) return this.remove(id);
+
+            const product = productManager.getProductByCode(item.product_code);
+
+            const used = state.cart.reduce((s, i) =>
+                i.product_code === item.product_code && i.id !== id
+                    ? s + (i.quantity * i.uom_qty_per_unit)
+                    : s
+            , 0);
+
+            const available = product.stock - used;
+
+            if (qty * item.uom_qty_per_unit > available) {
+                utils.notify('Not enough stock', 'warning');
+                return;
+            }
+
+            item.quantity = qty;
+            item.subtotal = item.price * qty;
+
+            this.patch(id);
+            this.renderTotals();
+        },
+
+        remove(id) {
+            state.cart = state.cart.filter(i => i.id !== id);
+            this.renderCart();
+            this.renderTotals();
         },
 
         renderCart() {
-            const $list  = $('#cart-list');
-            const $empty = $('#cart-empty-state');
-
-            if (state.cart.length === 0) { $list.html(''); $empty.show(); return; }
-            $empty.hide();
-
-            $list.html(state.cart.map(item => {
-                const product     = productManager.getProductByCode(item.product_code);
-                const uoms        = product?.uoms || [];
-                const hasMultiUom = uoms.length > 1;
-
-                const uomHtml = hasMultiUom
-                    ? `<select class="js-cart-uom-select" data-item-id="${item.id}"
-                        style="padding:2px 6px;border:1px solid #e2e8f0; display:flex; justify-content:center; align-item:center ;border-radius:10px;
-                                font-size:11px;color:#475569;background:#f8fafc;
-                                cursor:pointer;max-width:80px;">
-                        ${uoms.map(u =>
-                            `<option value="${u.uom_code}" ${u.uom_code === item.uom_code ? 'selected' : ''}>
-                                ${u.uom_name || u.uom_code}
-                            </option>`
-                        ).join('')}
-                    </select>`
-                    : `<span style="font-size:11px;color:#94a3b8;">${item.uom_name || 'Unit'}</span>`;
-
-                return `
-                <li data-cart-id="${item.id}"
-                    style="display:flex;align-items:center;gap:12px;
-                        padding:12px 0;border-bottom:1px solid #f1f5f9;">
-
-                    <!-- Product image -->
-                    <img src="${product?.image || '/assets/images/not-product.png'}"
-                        onerror="this.src='/assets/images/not-product.png'"
-                        style="width:52px;height:52px;object-fit:cover;
-                                border-radius:12px;flex-shrink:0;">
-
-                    <!-- Name + price + stepper -->
-                    <div style="flex:1;min-width:0;">
-
-                        <p style="margin:0 0 2px;font-size:13px;font-weight:700;
-                                color:#0f172a;white-space:nowrap;
-                                overflow:hidden;text-overflow:ellipsis;">
-                            ${item.name}
-                        </p>
-
-                        <!-- price + uom -->
-                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
-                            <span style="font-size:12px;font-weight:600;color:#16a34a;">
-                                ${utils.formatCurrency(item.price)}
-                            </span>
-                            ${uomHtml}
-                        </div>
-
-                        <!-- Stepper -->
-                        <div style="display:inline-flex;align-items:center;gap:0;">
-                            <button class="js-qty-minus" data-item-id="${item.id}"
-                                style="width:28px;height:28px;border:none;
-                                    background:#0f172a;color:#fff;font-size:18px;font-weight:700;
-                                    border-radius:50%;cursor:pointer;
-                                    display:flex;align-items:center;justify-content:center;line-height:1;">−</button>
-
-                            <span class="js-qty-display"
-                                style="min-width:32px;text-align:center;
-                                        font-size:14px;font-weight:800;color:#0f172a;">
-                                ${item.quantity}
-                            </span>
-
-                            <button class="js-qty-plus" data-item-id="${item.id}"
-                                style="width:28px;height:28px;border:none;
-                                    background:#0f172a;color:#fff;font-size:18px;font-weight:700;
-                                    border-radius:50%;cursor:pointer;
-                                    display:flex;align-items:center;justify-content:center;line-height:1;">+</button>
-                        </div>
-                    </div>
-
-                    <!-- Delete -->
-                    <button class="js-remove-item" data-item-id="${item.id}"
-                        style="background:none;border:none;cursor:pointer;
-                            color:#cbd5e1;padding:4px;flex-shrink:0;
-                            display:flex;align-items:center;justify-content:center;
-                            transition:color .15s;"
-                        onmouseover="this.style.color='#ef4444'"
-                        onmouseout="this.style.color='#cbd5e1'">
-                        <span class="material-symbols-outlined" style="font-size:20px;">delete</span>
-                    </button>
-                </li>`;
-            }).join(''));
-        },
-
-        _patchCartRow(cartItemId) {
-            const item = state.cart.find(i => i.id === cartItemId);
-            if (!item) return;
-            const $row = $(`#cart-list [data-cart-id="${cartItemId}"]`);
-            if (!$row.length) return;
-            // update both qty display and the ×qty label in the price line
-            $row.find('.js-qty-display').text(item.quantity);
-            $row.find('.js-qty-label').text(`×${item.quantity}`);
-        },
-
-        bindEvents() {
             const $list = $('#cart-list');
 
-            //  only fires for products with multiple UOMs
-            $list.on('change', '.js-cart-uom-select', (e) => {
-                cartManager.switchItemUOM(
-                    $(e.currentTarget).data('item-id'),
-                    $(e.currentTarget).val()
-                );
-            });
-            $list.on('click', '.js-qty-plus', (e) => {
-                const id   = $(e.currentTarget).data('item-id');
-                const item = state.cart.find(i => i.id === id);
-                if (item) cartManager.updateQuantity(id, item.quantity + 1);
-            });
-            $list.on('click', '.js-qty-minus', (e) => {
-                const id   = $(e.currentTarget).data('item-id');
-                const item = state.cart.find(i => i.id === id);
-                if (item) cartManager.updateQuantity(id, item.quantity - 1);
-            });
-            $list.on('click', '.js-remove-item', (e) => {
-                cartManager.removeItem($(e.currentTarget).data('item-id'));
-            });
-        },
-    };
+            $list.html(state.cart.map(i => `
+                <li data-id="${i.id}">
+                    ${i.name}
+                    <button class="minus" data-id="${i.id}">-</button>
+                    <span>${i.quantity}</span>
+                    <button class="plus" data-id="${i.id}">+</button>
+                    ${utils.formatCurrency(i.subtotal)}
+                </li>
+            `).join(''));
 
+            this.bindCart();
+        },
+
+        patch(id) {
+            const item = state.cart.find(i => i.id === id);
+            const $el = $(`[data-id="${id}"]`);
+
+            if (!$el.length || !item) return;
+
+            $el.find('span').text(item.quantity);
+        },
+
+        renderTotals() {
+            let total = 0;
+
+            for (const i of state.cart) {
+                total += i.price * i.quantity;
+            }
+
+            $('#cart-total').text(utils.formatCurrency(total));
+        },
+
+        bindCart() {
+            $('#cart-list')
+                .off('click')
+                .on('click', '.plus', (e) => {
+                    const id = $(e.currentTarget).data('id');
+                    const item = state.cart.find(i => i.id === id);
+                    this.updateQty(id, item.quantity + 1);
+                })
+                .on('click', '.minus', (e) => {
+                    const id = $(e.currentTarget).data('id');
+                    const item = state.cart.find(i => i.id === id);
+                    this.updateQty(id, item.quantity - 1);
+                });
+        }
+    };
     const paymentManager = {
         selectedMethodId:   null,
         selectedMethodCode: 'cash',
@@ -811,7 +451,7 @@
                 });
 
                 if (data.success) {
-                    // ✅ receipt already visible — just swap placeholder with real invoice number
+                   
                     $('#receipt-invoice').text(`#${data.invoice_no}`);
                     utils.showNotification(`ការលក់ជោគជ័យ! លេខវិក្កយបត្រ៖ ${data.invoice_no}`, 'success');
                 } else {
@@ -921,10 +561,6 @@
             }
         } catch (e) { console.error('Register popup error:', e); }
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Init
-    // ─────────────────────────────────────────────────────────────────────────
     $(document).ready(() => {
         productManager.init();
         paymentManager.init();

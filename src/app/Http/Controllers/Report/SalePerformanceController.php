@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Report;
 
+use Illuminate\View\View;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Services\Report\SalePerformanceService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class SalePerformanceController extends Controller
 {

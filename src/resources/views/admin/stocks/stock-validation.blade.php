@@ -43,16 +43,6 @@
                 <option value="blocked"  {{ request('status') === 'blocked'  ? 'selected' : '' }}>Blocked</option>
             </select>
         </div>
-
-        {{-- Per page --}}
-        <div class="filter-wrap">
-            <select name="per_page">
-                <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15 / page</option>
-                <option value="24" {{ request('per_page', 15) == 24 ? 'selected' : '' }}>24 / page</option>
-                <option value="50" {{ request('per_page', 15) == 50 ? 'selected' : '' }}>50 / page</option>
-            </select>
-        </div>
-
         {{-- Filter button --}}
         <button type="submit" class="pm-btn-filter">
             <i class="ti ti-filter" aria-hidden="true"></i> Filter
@@ -131,25 +121,35 @@
                 @endforelse
             </tbody>
         </table>
-    </div>
-
-    {{-- ── Pagination ── --}}
-    <div class="pm-pagination">
-        <div class="pm-pagination__info">
-            <i class="ti ti-list-numbers" aria-hidden="true"></i>
-            Showing
-            <strong>{{ $attempts->firstItem() ?? 0 }}</strong>
-            –
-            <strong>{{ $attempts->lastItem() ?? 0 }}</strong>
-            of
-            <strong>{{ $attempts->total() }}</strong>
-            records
+        {{-- pagination --}}
+        <div class="table-footer" style="width: 100%; display: flex; justify-content: space-between" id="tableFooter">
+            <span class="table-footer-left">
+                <div class="table-info">
+                    showing
+                    {{ $attempts->firstItem() ?? 0 }}
+                    -
+                    {{ $attempts->lastItem() ?? 0 }}
+                    of
+                    {{ $attempts->total() }}
+                    sales
+                </div>
+                {{-- per page --}}
+                <form method="GET" action="{{ request()->url() }}">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+                    <select name="per_page" onchange="showLoader(); this.form.submit()">
+                        <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15 / page</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25 / page</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 / page</option>
+                    </select>
+                </form>
+            </span>
+            <div class="pagination">
+                {{ $attempts->links('vendor.pagination.numbers-only') }}
+            </div>
         </div>
-        <div class="pm-pagination__links">
-            {{ $attempts->links() }}
-        </div>
     </div>
-
 </div>
 
 @endsection
@@ -157,7 +157,6 @@
 @push('scripts')
 <script>
 (function () {
-    // Filter dropdown toggle (if needed in future)
     const filterBtn      = document.getElementById('filter-btn');
     const filterDropdown = document.getElementById('filter-dropdown');
 

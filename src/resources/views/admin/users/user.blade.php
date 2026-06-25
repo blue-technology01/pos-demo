@@ -21,36 +21,29 @@
 
     {{-- FILTER --}}
     <form method="GET" class="um-filter">
+        <span style="display: flex; gap: 12px" >
+            <div class="um-search-box">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Search name or email…"
+                    autocomplete="off">
+            </div>
+            <select name="role" class="um-filter-select">
+                <option value="">All Roles</option>
+                @foreach($roles as $r)
+                    <option value="{{ $r->name }}"
+                        {{ request('role') == $r->name ? 'selected' : '' }}>
+                        {{ ucfirst($r->name) }}
+                    </option>
+                @endforeach
+            </select>
+            <button type="submit" class="product-section__btn-add" onclick="showLoader()">Filter</button>
 
-        <div class="um-search-box">
-            <span class="material-symbols-outlined">search</span>
-            <input type="text"
-                   name="search"
-                   value="{{ request('search') }}"
-                   placeholder="Search name or email…"
-                   autocomplete="off">
-        </div>
-
-        <select name="role" class="um-filter-select">
-            <option value="">All Roles</option>
-            @foreach($roles as $r)
-                <option value="{{ $r->name }}"
-                    {{ request('role') == $r->name ? 'selected' : '' }}>
-                    {{ ucfirst($r->name) }}
-                </option>
-            @endforeach
-        </select>
-
-        <select name="per_page" class="um-filter-select">
-            <option value="15" {{ request('per_page') == 15 ? 'selected' : '' }}>15</option>
-            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
-            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-        </select>
-
-        <button type="submit" class="btn btn-primary">Apply</button>
-
-        <a href="{{ url()->current() }}" class="um-btn-reset">Clear</a>
-
+            <a href="{{ url()->current() }}" class="um-btn-reset">Clear</a>
+        </span>
+        
         <button type="button" class="btn btn-primary" id="btnCreateUser">
             <span class="material-symbols-outlined">person_add</span>
             New User
@@ -129,16 +122,35 @@
                 </tbody>
             </table>
         </div>
+        {{-- Pagination --}}
+        <div class="table-footer" style="width: 100%; display: flex;  justify-content: space-between" id="tableFooter">
+            <span class="table-footer-left">
+                <div class="table-info">
+                    showing
+                    {{ $users->firstItem() ?? 0 }}
+                    -
+                    {{ $users->lastItem() ?? 0 }}
+                    of
+                    {{ $users->total() }}
+                    sales
+                </div>
 
-        {{-- PAGINATION --}}
-        <div class="um-table-footer">
-            <div class="um-table-info">
-                Showing {{ $users->firstItem() }} - {{ $users->lastItem() }}
-                of {{ $users->total() }}
-            </div>
+                {{-- per page --}}
+                <form method="GET" action="{{ request()->url() }}">
+                    @foreach(request()->except('per_page', 'page') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
 
-            <div>
-                {{ $users->appends(request()->query())->links() }}
+                    <select name="per_page" onchange="showLoader(); this.form.submit()">
+                        <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                </form>
+            </span>
+
+            <div class="pagination">
+                {{ $users->links('vendor.pagination.numbers-only') }}
             </div>
         </div>
     </div>
@@ -161,8 +173,7 @@
     const defaultAvatar = @json(asset('assets/img/default-avatar.png'));
     const storageUrl = @json(asset('storage'));
     const userForm = document.getElementById('userForm');
-
-    // ===================== CREATE USER =====================
+    // create new user
     document.getElementById('btnCreateUser')?.addEventListener('click', () => {
         userForm?.reset();
         if (userForm) userForm.action = config.urls.store;
@@ -205,8 +216,7 @@
         })
         .catch(err => alert(err.message));
     });
-
-    // ===================== EDIT / DELETE =====================
+    // edit and remove user
     document.addEventListener('click', (e) => {
 
         // EDIT USER

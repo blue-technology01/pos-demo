@@ -57,7 +57,7 @@
 
 .customer-search-input:focus {
     border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    /* box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); */
 }
 
 .customer-search-input::placeholder {
@@ -131,7 +131,7 @@
     color: #fff;
 }
 
-.btn-clear {
+.btn-clear {    
     background: transparent;
     color: var(--color-text-secondary, #6b7280);
     border: 0.5px solid var(--color-border-secondary, #d1d5db);

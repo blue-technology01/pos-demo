@@ -10,39 +10,6 @@
             <h1>Forgot Password</h1>
             <p>Enter your phone number to receive an OTP</p>
         </div>
-
-        {{-- Session Error --}}
-        @if (session('error'))
-            <div style="
-                background: #fef2f2;
-                border: 1px solid #fecaca;
-                border-radius: .55rem;
-                padding: .75rem 1rem;
-                margin-bottom: 1.2rem;
-                font-size: .84rem;
-                color: #dc2626;
-            ">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        {{-- Validation Errors --}}
-        @if ($errors->any())
-            <div style="
-                background: #fef2f2;
-                border: 1px solid #fecaca;
-                border-radius: .55rem;
-                padding: .75rem 1rem;
-                margin-bottom: 1.2rem;
-                font-size: .84rem;
-                color: #dc2626;
-            ">
-                @foreach ($errors->all() as $error)
-                    <div>{{ $error }}</div>
-                @endforeach
-            </div>
-        @endif
-
         <form method="POST" action="{{ route('auth.forgot-password.send-otp') }}">
             @csrf
 
@@ -90,7 +57,7 @@
 
         </form>
 
-        <a href="{{ route('auth.login') }}"
+        <a href="{{ route('login') }}"
            class="forgot"
            style="margin-top: 1rem; display: block;">
 

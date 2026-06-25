@@ -24,22 +24,22 @@ class ProductUomUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_code' => [
-                'required',
-                'string',
-                'exists:products,code',
-            ],
+            // 'product_code' => [
+            //     'required',
+            //     'string',
+            //     'exists:products,code',
+            // ],
 
-            'uom_code' => [
-                'required',
-                'string',
-                'exists:uoms,code',
-                Rule::unique('product_uoms')
-                    ->where(function ($query) {
-                        return $query->where('product_code', $this->product_code);
-                    })
-                    ->ignore($this->route('id')),
-            ],
+            // 'uom_code' => [
+            //     'required',
+            //     'string',
+            //     'exists:uoms,code',
+            //     Rule::unique('product_uoms')
+            //         ->where(function ($query) {
+            //             return $query->where('product_code', $this->product_code);
+            //         })
+            //         ->ignore($this->route('id')),
+            // ],
 
             'quantity_per_unit' => [
                 'required',
@@ -69,11 +69,7 @@ class ProductUomUpdateRequest extends FormRequest
                 'nullable',
                 'boolean',
             ],
-            'uom_role' => [
-                'required',
-                'string',
-                Rule::in(['retail', 'bulk', 'alternative']),
-            ],
+
         ];
     }
 

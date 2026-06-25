@@ -49,7 +49,6 @@ class InventoryService
         // Deduct stock
         $product->decrement('stock', $requiredStock);
 
-        // Log the movement (calculate remaining locally — no extra DB query)
         Log::info('Stock deducted', [
             'product_code' => $productCode,
             'uom_code'     => $uomCode,

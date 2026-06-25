@@ -23,28 +23,28 @@ use App\Http\Controllers\Sale\SaleItemController;
 use App\Http\Controllers\Stock\StockValidateController;
 
 Route::get('/', function () {
-    return redirect()->route('auth.login');
+    return redirect()->route('login');
 });
 
 Route::middleware('guest')->group(function () {
-    // step 1 login
+    // login
     Route::get('/login', [LoginController::class, 'index'])
-        ->name('auth.login');
+        ->name('login');
     Route::post('/login', [LoginController::class, 'login'])
         ->name('auth.login.post');
-    // step 2 forgot password
+    // forgot password
     Route::get('/forgot-password', [ForgotPasswordController::class, 'index'])
         ->name('auth.forgot-password');
     Route::post('/forgot-password/send-otp', [ForgotPasswordController::class,'sendOtp'])
         ->name('auth.forgot-password.send-otp');
-    // step 3 OTP verifycation.
+    // OTP verifycation.
     Route::get('/forgot-password/otp', [ForgotPasswordController::class, 'otpForm'])
         ->name('auth.otp.show');
     Route::post('/forgot-password/otp/verify', [ForgotPasswordController::class, 'verifyOtp'])
         ->name('auth.otp.verify');
     Route::post('/forgot-password/otp/resend', [ForgotPasswordController::class, 'resendOtp'])
         ->name('auth.otp.resend');
-    //step 4 reset password
+    // reset password
     Route::get('/reset-password', [ForgotPasswordController::class, 'resetForm'])
         ->name('auth.reset-password.show');
     Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])
@@ -70,7 +70,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/preview/update', [RegisterController::class, 'updatePreview']);
         Route::get('/profile', [RegisterController::class, 'userProfile'])->name('profile');
         Route::get('/preview-settings', [RegisterController::class, 'previewSetting'])->name('preview-settings');
-
         // category
         Route::get('/category',[CategoryController::class,'index'])->name('category');
         Route::post('/category', [CategoryController::class, 'store'])->name('category.store');
@@ -117,7 +116,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/revenue-tracking', [RevenueTrackingController::class, 'index'])->name('revenue-tracking');
         Route::get('/sale-person', [SalePerformanceController::class, 'index'])->name('sale-person');
         Route::get('/top-product', [TopProductController::class, 'index'])->name('top-product');
-
     });
 
     // pos for cashiar
@@ -132,7 +130,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/pos/products', [ProductUomController::class, 'posProducts'])->name('pos.products');
         Route::get('/pos/products/{productCode}/uoms', [ProductUomController::class, 'getByProduct'])->name('pos.products.uoms');
         Route::prefix('sale-items')->name('sale-items.')->group(function () {
-
             Route::post('/',            [SaleItemController::class, 'store'])->name('store');
             Route::put('/{rowId}',      [SaleItemController::class, 'update'])->name('update');
             Route::delete('/{rowId}',   [SaleItemController::class, 'destroy'])->name('destroy');

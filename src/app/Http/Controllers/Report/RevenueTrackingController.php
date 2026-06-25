@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Report\RevenueTrackingRequest;
 use App\Services\Report\RevenueTrackingService;
+use App\Http\Requests\Report\RevenueTrackingRequest;
 
 class RevenueTrackingController extends Controller
 {

@@ -1,20 +1,11 @@
-/* ============================================================
-   Top Products Report — top-product.css
-   Primary: #2563eb  |  Border-radius pills: 50px
-   Font: -apple-system, Inter fallback
-   ============================================================ */
 
-/* ---------- Base ---------- */
 .tp-page {
     padding: 1.75rem 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
     color: var(--color-text-primary, #111);
 }
 
-/* ============================================================
-   Page Header
-   ============================================================ */
 .tp-page__header {
     display: flex;
     align-items: flex-start;
@@ -38,10 +29,6 @@
     color: var(--color-text-secondary, #6b7280);
     margin: 0;
 }
-
-/* ============================================================
-   Filter Bar
-   ============================================================ */
 .tp-filter-bar {
     display: flex;
     align-items: center;
@@ -168,9 +155,6 @@
 .tp-view-btn.active          { background: #2563eb; color: #fff; }
 .tp-view-btn:not(.active):hover { background: #eff6ff; }
 
-/* ============================================================
-   KPI Cards
-   ============================================================ */
 .tp-kpi-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -179,17 +163,15 @@
 }
 
 .tp-kpi-card {
-    background: var(--color-background-primary, #fff);
     border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    background: var(--color-background-primary, #fff);
+    border: none;
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 4px 16px rgba(15, 23, 42, 0.06);
     border-radius: 16px;
     padding: 1rem 1.25rem;
     text-align: center;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.tp-kpi-card:hover {
-    border-color: rgba(37, 99, 235, 0.25);
-    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.05);
 }
 
 .tp-kpi-card__label {
@@ -214,12 +196,13 @@
 .tp-kpi-card__value--purple { color: #7c3aed; }
 .tp-kpi-card__value--red    { color: #dc2626; }
 
-/* ============================================================
-   Panel (chart & list wrapper)
-   ============================================================ */
 .tp-panel {
-    background: var(--color-background-primary, #fff);
     border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    background: var(--color-background-primary, #fff);
+    border: none;
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 4px 16px rgba(15, 23, 42, 0.06);
     border-radius: 16px;
     padding: 1.25rem 1.5rem;
     margin-bottom: 12px;
@@ -257,9 +240,6 @@
     align-self: flex-end;
 }
 
-/* ============================================================
-   Table
-   ============================================================ */
 .table-responsive {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -304,9 +284,6 @@
 
 .table-custom tbody tr:hover td { background: #f8faff; }
 
-/* ============================================================
-   Rank badge
-   ============================================================ */
 .rank-badge {
     display: inline-flex;
     align-items: center;
@@ -323,10 +300,6 @@
 .rank-2     { background: #9ca3af; color: #1f2937; }
 .rank-3     { background: #b45309; color: #fff; }
 .rank-other { background: var(--color-background-secondary, #f1f5f9); color: var(--color-text-secondary, #374151); }
-
-/* ============================================================
-   Product cell
-   ============================================================ */
 .tp-product-cell {
     display: flex;
     align-items: center;
@@ -351,10 +324,6 @@
     font-weight: 500;
     color: var(--color-text-primary, #111);
 }
-
-/* ============================================================
-   Performance bar
-   ============================================================ */
 .tp-bar-wrap {
     display: flex;
     align-items: center;
@@ -385,9 +354,6 @@
     text-align: right;
 }
 
-/* ============================================================
-   Stock badges
-   ============================================================ */
 .stock-badge {
     display: inline-flex;
     align-items: center;
@@ -402,9 +368,6 @@
 .stock-low { background: #fef3c7; color: #92400e; }
 .stock-out { background: #fee2e2; color: #991b1b; }
 
-/* ============================================================
-   Table footer — info + per-page + pagination
-   ============================================================ */
 .table-footer {
     display: flex;
     align-items: center;
@@ -509,14 +472,7 @@
     color: #2563eb;
 }
 
-/* ============================================================
-   Utility
-   ============================================================ */
 .hidden { display: none !important; }
-
-/* ============================================================
-   Responsive
-   ============================================================ */
 @media (max-width: 900px) {
     .tp-kpi-row { grid-template-columns: repeat(2, 1fr); }
 }

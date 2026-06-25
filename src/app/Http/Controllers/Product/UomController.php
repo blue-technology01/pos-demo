@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Product;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Product\UomRequest;
-use Illuminate\Http\RedirectResponse;
-use App\Services\Product\UomService;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\Request;
+use App\Services\Product\UomService;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\Product\UomRequest;
 
 class UomController extends Controller
 {

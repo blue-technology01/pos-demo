@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Product;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Product\CategoryRequest;
-use App\Services\Product\CategoryService;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
+use App\Services\Product\CategoryService;
+use App\Http\Requests\Product\CategoryRequest;
 
 class CategoryController extends Controller
 {

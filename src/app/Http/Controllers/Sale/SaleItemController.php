@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Sale;
 
+use Illuminate\Http\Request;
+use App\Services\Sale\SaleService;
 use App\Http\Controllers\Controller;
+use App\Services\Sale\SaleItemService;
 use App\Http\Requests\Sale\SaleItemStoreRequest;
 use App\Http\Requests\Sale\SaleItemUpdateRequest;
-use App\Services\Sale\SaleItemService;
-use App\Services\Sale\SaleService;
-use Illuminate\Http\Request;
 
 class SaleItemController extends Controller
 {
