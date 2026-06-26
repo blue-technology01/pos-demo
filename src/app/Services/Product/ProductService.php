@@ -2,8 +2,9 @@
 
 namespace App\Services\Product;
 
-use App\Models\Category;
+use Carbon\Carbon;
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -20,16 +21,15 @@ class ProductService
                 'code',
                 'name',
                 'category_code',
-                // 'price',
-                // 'cost_price',
                 'stock',
                 'min_stock',
                 'barcode',
                 'image',
                 'status',
+                'expiry_date',
                 'created_at'
             ])
-            // load only category
+            ->where('status','active')
             ->with(['category:code,name'])
             ->orderBy('code');
 

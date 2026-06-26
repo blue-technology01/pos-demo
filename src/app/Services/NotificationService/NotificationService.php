@@ -1,33 +1,64 @@
 <?php
 
-namespace App\Services\NotificationService;
+namespace App\Services\Notification;
 
-use App\Models\Product;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\Notification;
+use App\Models\User;
+use Illuminate\Support\Collection;
 
 class NotificationService
 {
     /**
-     * Get all active products where stock <= min_stock.
+     * Get unread notifications
      */
-    public function getLowStockProducts(): Collection
+    public function getUnread(User $user): Collection
     {
-        return Product::query()
-            ->select(['code', 'name', 'stock', 'min_stock', 'image'])
-            ->where('status', 'active')
-            ->whereColumn('stock', '<=', 'min_stock')
-            ->orderBy('stock')
+        return Notification::query()
+            ->where('user_id', $user->id)
+            ->whereNull('read_at')
+            ->latest()
             ->get();
     }
 
     /**
-     * Get count of low stock products.
+     * Create notification
      */
-    public function getLowStockCount(): int
+    public function create(
+        int $userId,
+        string $type,
+        string $title,
+        string $message,
+        ?string $refCode = null
+    ): Notification {
+        return Notification::create([
+            'user_id'  => $userId,
+            'type'     => $type,
+            'title'    => $title,
+            'message'  => $message,
+            'ref_code' => $refCode,
+            'read_at'  => null,
+        ]);
+    }
+
+    /**
+     * Mark one notification as read
+     */
+    public function markAsRead(Notification $notification): void
     {
-        return Product::query()
-            ->where('status', 'active')
-            ->whereColumn('stock', '<=', 'min_stock')
-            ->count();
+        $notification->update([
+            'read_at' => now(),
+        ]);
+    }
+
+    /**
+     * Mark all as read
+     */
+    public function markAllAsRead(User $user): void
+    {
+        Notification::where('user_id', $user->id)
+            ->whereNull('read_at')
+            ->update([
+                'read_at' => now(),
+            ]);
     }
 }

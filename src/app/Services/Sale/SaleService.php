@@ -22,17 +22,23 @@ class SaleService
     protected $inventoryService;
     protected $stockGuardService;
 
-    // Cache schema checks to avoid running inside every transaction
     private static ?bool $hasCashSalesColumn       = null;
     private static ?bool $hasExpectedBalanceColumn = null;
 
-    public function __construct(CashRegisterService $cashRegisterService, InventoryService $inventoryService, StockGuardService $stockGuardService)
-    {
+    public function __construct(
+        CashRegisterService $cashRegisterService,
+        InventoryService    $inventoryService,
+        StockGuardService   $stockGuardService
+    ) {
         $this->cashRegisterService = $cashRegisterService;
-        $this->inventoryService = $inventoryService;
-        $this->stockGuardService = $stockGuardService;
+        $this->inventoryService    = $inventoryService;
+        $this->stockGuardService   = $stockGuardService;
     }
-    // check column helper
+
+    // ─────────────────────────────────────────────
+    // SCHEMA HELPERS (cached)
+    // ─────────────────────────────────────────────
+
     private function hasCashSalesColumn(): bool
     {
         if (self::$hasCashSalesColumn === null) {
@@ -49,82 +55,79 @@ class SaleService
         return self::$hasExpectedBalanceColumn;
     }
 
-    /**
-     * Resolve the base quantity multiplier for a product/UOM combination.
-     * Returns 1 if no UOM record is found (safe default).
-     */
-    private function getQtyPerUnit(string $productCode, string $uomCode): float
-    {
-        $productUom = DB::table('product_uoms')
-            ->where('product_code', $productCode)
-            ->where('uom_code', $uomCode)
-            ->first();
-
-        return $productUom ? (float) $productUom->quantity_per_unit : 1.0;
-    }
+    // ─────────────────────────────────────────────
+    // UOM HELPERS
+    // ─────────────────────────────────────────────
 
     /**
-     * Returns the full product_uom row (or null) for use when creating sale items.
+     * Return the product_uoms row for a given product + UOM combination, or null.
+     * A missing row is NOT an error — some products use a simple base UOM (e.g. UNIT)
+     * that is stored in the uoms table but has no product_uoms entry.
      */
-    private function getProductUom(string $productCode, string $uomCode): ?object
+    private function getProductUom(string $productCode, ?string $uomCode): ?object
     {
+        if (!$uomCode) {
+            return null;
+        }
+
         return ProductUom::where('product_code', $productCode)
             ->where('uom_code', $uomCode)
             ->first();
     }
-    // listing
+
+    /**
+     * Resolve cost price for a sale item.
+     * Falls back to the product's own cost_price when no product_uom row exists.
+     */
+    private function resolveCostPrice(?object $productUom, Product $product): float
+    {
+        return (float) ($productUom?->cost_price ?? $product->cost_price ?? 0);
+    }
+
+    // ─────────────────────────────────────────────
+    // LISTING
+    // ─────────────────────────────────────────────
+
     public function getAllSales(Request $request): LengthAwarePaginator
     {
         return Sale::query()
             ->with(['items', 'user'])
-
-            // search
             ->when($request->search, function ($q) use ($request) {
                 $q->where(function ($q) use ($request) {
                     $q->where('invoice_no', 'LIKE', "%{$request->search}%")
-                    ->orWhereHas('user', function ($u) use ($request) {
-                        $u->where('name', 'LIKE', "%{$request->search}%");
-                    });
+                      ->orWhereHas('user', fn($u) =>
+                          $u->where('name', 'LIKE', "%{$request->search}%")
+                      );
                 });
             })
-
-            // status
             ->when($request->status, fn($q) =>
                 $q->where('status', $request->status)
             )
-
-            // date filter
             ->when($request->start_date || $request->end_date, function ($q) use ($request) {
-                $start = $request->start_date
-                    ? Carbon::parse($request->start_date)
-                    : null;
-
-                $end = $request->end_date
-                    ? Carbon::parse($request->end_date)
-                    : null;
+                $start = $request->start_date ? Carbon::parse($request->start_date) : null;
+                $end   = $request->end_date   ? Carbon::parse($request->end_date)   : null;
 
                 if ($start && $end && $start->gt($end)) {
                     [$start, $end] = [$end, $start];
                 }
 
                 if ($start && $end) {
-                    $q->whereBetween('sale_date', [
-                        $start->startOfMinute(),
-                        $end->endOfMinute()
-                    ]);
+                    $q->whereBetween('sale_date', [$start->startOfDay(), $end->endOfDay()]);
                 } elseif ($start) {
-                    $q->where('sale_date', '>=', $start);
+                    $q->where('sale_date', '>=', $start->startOfDay());
                 } elseif ($end) {
-                    $q->where('sale_date', '<=', $end);
+                    $q->where('sale_date', '<=', $end->endOfDay());
                 }
             })
-
             ->orderByDesc('id')
             ->paginate($request->per_page ?? 15)
             ->withQueryString();
     }
 
-    // create / confirm
+    // ─────────────────────────────────────────────
+    // CREATE / CONFIRM
+    // ─────────────────────────────────────────────
+
     public function confirmSale(array $data): Sale
     {
         return $this->createSale($data);
@@ -132,29 +135,36 @@ class SaleService
 
     public function createSale(array $data): Sale
     {
-        // Pre-validate stock for every item BEFORE opening the transaction,
-        // so blocked attempts are logged even if the sale itself doesn't proceed.
+        // Pre-validate stock BEFORE opening the transaction so blocked
+        // attempts are logged even when the sale does not proceed.
         $validatedItems = [];
 
         foreach ($data['items'] as $item) {
+            // FIX: productUom can be null for base UOMs (e.g. UNIT).
+            // We no longer throw here — stock guard uses the product_uom id
+            // only when the row exists.
             $productUom = $this->getProductUom(
                 $item['product_code'],
-                $item['uom_code']
+                $item['uom_code'] ?? null
             );
 
-            if (!$productUom) {
-                throw new \Exception("UOM not found: {$item['uom_code']}");
-            }
+            // Only run the stock guard when we have a product_uom row.
+            // Products with a base UOM (no product_uoms entry) skip the guard
+            // and stock is deducted directly by InventoryService.
+            if ($productUom) {
+                $check = $this->stockGuardService->checkAndBlock(
+                    $productUom->id,
+                    $item['quantity']
+                );
 
-            $check = $this->stockGuardService->checkAndBlock($productUom->id, $item['quantity']);
-
-            if (!$check['allowed']) {
-                throw new \Exception("{$check['product_name']} blocked: {$check['reason']}");
+                if (!$check['allowed']) {
+                    throw new \Exception("{$check['product_name']} blocked: {$check['reason']}");
+                }
             }
 
             $validatedItems[] = [
-                'item'        => $item,
-                'productUom'  => $productUom,
+                'item'       => $item,
+                'productUom' => $productUom, // may be null
             ];
         }
 
@@ -166,14 +176,14 @@ class SaleService
                 'invoice_no'      => $invoiceNo,
                 'register_id'     => $data['register_id'],
                 'user_id'         => Auth::id(),
-                'customer_id'     => $data['customer_id'] ?? null,
+                'customer_id'     => $data['customer_id']     ?? null,
                 'sub_total'       => $data['sub_total'],
                 'discount_amount' => $data['discount_amount'] ?? 0,
-                'tax_amount'      => $data['tax_amount'] ?? 0,
+                'tax_amount'      => $data['tax_amount']      ?? 0,
                 'total_amount'    => $data['total_amount'],
                 'paid_amount'     => $data['paid_amount'],
-                'change_amount'   => $data['change_amount'] ?? 0,
-                'payment_method'  => $data['payment_method'] ?? 'cash',
+                'change_amount'   => $data['change_amount']   ?? 0,
+                'payment_method'  => $data['payment_method']  ?? 'cash',
                 'sale_date'       => now(),
                 'status'          => 'completed',
             ]);
@@ -184,16 +194,11 @@ class SaleService
 
                 $product = Product::where('code', $item['product_code'])
                     ->lockForUpdate()
-                    ->first();
+                    ->firstOrFail();
 
-                if (!$product) {
-                    throw new \Exception("Product not found: {$item['product_code']}");
-                }
-
-                // Stock was already validated above — deduct directly.
                 $this->inventoryService->deductStockWithCheck(
                     $item['product_code'],
-                    $item['uom_code'],
+                    $item['uom_code'] ?? null,
                     $item['quantity']
                 );
 
@@ -202,14 +207,13 @@ class SaleService
                     'product_code' => $product->code,
                     'product_name' => $product->name,
                     'quantity'     => $item['quantity'],
-                    'uom_code'     => $item['uom_code'],
-                    'cost_price'   => $productUom->cost_price ?? $product->cost_price,
+                    'uom_code'     => $item['uom_code'] ?? null,
+                    'cost_price'   => $this->resolveCostPrice($productUom, $product),
                     'unit_price'   => $item['unit_price'],
                     'amount'       => $item['quantity'] * $item['unit_price'],
                 ]);
             }
 
-            // Update cash register totals
             if (!empty($data['register_id'])) {
                 $this->addCashTransaction(
                     registerId:    $data['register_id'],
@@ -228,19 +232,21 @@ class SaleService
         });
     }
 
-    // update sale
+    // ─────────────────────────────────────────────
+    // UPDATE
+    // ─────────────────────────────────────────────
+
     public function updateSale(int $id, array $data): Sale
     {
         $sale = Sale::with('items')->findOrFail($id);
 
         if ($sale->status === 'voided') {
-            // Clear error message
             throw new \Exception('Voided receipts cannot be edited.');
         }
 
         return DB::transaction(function () use ($sale, $data) {
 
-            // Restore old stock for every old item
+            // Restore stock for every old item
             foreach ($sale->items as $oldItem) {
                 $this->inventoryService->restoreStock(
                     $oldItem->product_code,
@@ -248,63 +254,55 @@ class SaleService
                     $oldItem->quantity
                 );
             }
-            // Reverse old cash transaction if sale was completed
+
             if ($sale->status === 'completed') {
                 $this->reverseCashTransaction($sale);
             }
-            // Delete old items
+
             $sale->items()->delete();
-            // Insert new items and deduct new stock
+
             foreach ($data['items'] as $item) {
-                // get product with lock
                 $product = Product::where('code', $item['product_code'])
                     ->lockForUpdate()
-                    ->first();
+                    ->firstOrFail();
 
-                if (!$product) {
-                    throw new \Exception("Product not found: {$item['product_code']}");
-                }
-                // get product uom
-                $productUom = $this->getproductUom(
+                // FIX: same as createSale — productUom may be null for base UOMs
+                $productUom = $this->getProductUom(
                     $item['product_code'],
-                    $item['uom_code']
+                    $item['uom_code'] ?? null
                 );
-                if(!$productUom) {
-                    throw new \Exception("UOM not found: {$item['uom_code']}");
+
+                if ($productUom) {
+                    $check = $this->stockGuardService->checkAndBlock(
+                        $productUom->id,
+                        $item['quantity']
+                    );
+
+                    if (!$check['allowed']) {
+                        throw new \Exception("{$check['product_name']} blocked: {$check['reason']}");
+                    }
                 }
-                // stock check
-                $check = $this->stockGuardService->checkAndBlock(
-                    $productUom->id,
-                    $item['quantity'],
-                );
 
                 $this->inventoryService->deductStockWithCheck(
                     $item['product_code'],
-                    $item['uom_code'],
+                    $item['uom_code'] ?? null,
                     $item['quantity']
                 );
-
-                if(!$check['allowed']) {
-
-                }
-
-                $productUom = $this->getProductUom($item['product_code'], $item['uom_code']);
 
                 $sale->items()->create([
                     'product_id'   => $product->id,
                     'product_code' => $product->code,
                     'product_name' => $product->name,
                     'quantity'     => $item['quantity'],
-                    'uom_code'     => $item['uom_code'],
-                    'cost_price'   => $productUom ? $productUom->cost_price : $product->cost_price,
+                    'uom_code'     => $item['uom_code'] ?? null,
+                    'cost_price'   => $this->resolveCostPrice($productUom, $product),
                     'unit_price'   => $item['unit_price'],
                     'amount'       => $item['quantity'] * $item['unit_price'],
                 ]);
             }
 
-            // Capture new status BEFORE updating, then use it for cash register logic
             $newStatus = $data['status'] ?? 'completed';
-            // update sale header
+
             $sale->update([
                 'sale_date'       => $data['sale_date']      ?? now(),
                 'sub_total'       => $data['sub_total'],
@@ -317,7 +315,7 @@ class SaleService
                 'status'          => $newStatus,
                 'note'            => $data['note']           ?? null,
             ]);
-            // Add new cash transaction if new status is completed
+
             if ($newStatus === 'completed') {
                 $this->addCashTransaction(
                     registerId:    $sale->register_id,
@@ -325,16 +323,21 @@ class SaleService
                     paymentMethod: $data['payment_method'] ?? 'cash'
                 );
             }
+
             Log::info('Sale updated', [
                 'invoice_no'   => $sale->invoice_no,
                 'total_amount' => $data['total_amount'],
                 'new_status'   => $newStatus,
             ]);
+
             return $sale->refresh()->load('items');
         });
     }
 
-    // Cancel / void
+    // ─────────────────────────────────────────────
+    // VOID / CANCEL
+    // ─────────────────────────────────────────────
+
     public function cancelSale(int $id): Sale
     {
         $sale = Sale::with('items')->findOrFail($id);
@@ -349,7 +352,6 @@ class SaleService
 
         return DB::transaction(function () use ($sale) {
 
-            // Restore stock for each item via InventoryService
             foreach ($sale->items as $item) {
                 $this->inventoryService->restoreStock(
                     $item->product_code,
@@ -357,26 +359,23 @@ class SaleService
                     $item->quantity
                 );
             }
-            // Reverse cash register if sale was completed
+
             if ($sale->status === 'completed') {
                 $this->reverseCashTransaction($sale);
             }
 
             $sale->update(['status' => 'voided']);
 
-            Log::info('Sale voided', [
-                'invoice_no' => $sale->invoice_no,
-            ]);
+            Log::info('Sale voided', ['invoice_no' => $sale->invoice_no]);
 
             return $sale->refresh();
         });
     }
 
-    // Cash register helper
-    /**
-     * Add a sale's amount to the cash register totals.
-     * Uses increment() instead of raw DB::raw() to prevent SQL injection.
-    */
+    // ─────────────────────────────────────────────
+    // CASH REGISTER HELPERS
+    // ─────────────────────────────────────────────
+
     private function addCashTransaction(int $registerId, float $amount, string $paymentMethod): void
     {
         $register = CashRegister::where('id', $registerId)
@@ -404,10 +403,7 @@ class SaleService
             $register->increment('expected_balance', $amount);
         }
     }
-    /**
-     * Subtract a completed sale's amount from the cash register.
-     * Called when a sale is voided or before an update.
-    */
+
     private function reverseCashTransaction(Sale $sale): void
     {
         $register = CashRegister::where('id', $sale->register_id)

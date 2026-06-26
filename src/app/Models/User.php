@@ -55,4 +55,8 @@ class User extends Authenticatable
     {
         return $query->where('is_active', true);
     }
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 }

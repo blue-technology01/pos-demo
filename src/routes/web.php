@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Cash\CashController;
 use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\NotificationController;
 // use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Product\CategoryController;
 use App\Http\Controllers\Product\ProductController;
@@ -28,36 +29,33 @@ Route::get('/', function () {
 
 Route::middleware('guest')->group(function () {
     // login
-    Route::get('/login', [LoginController::class, 'index'])
-        ->name('login');
-    Route::post('/login', [LoginController::class, 'login'])
-        ->name('auth.login.post');
+    Route::get('/login', [LoginController::class, 'index'])->name('login');
+    Route::post('/login', [LoginController::class, 'login'])->name('auth.login.post');
     // forgot password
-    Route::get('/forgot-password', [ForgotPasswordController::class, 'index'])
-        ->name('auth.forgot-password');
-    Route::post('/forgot-password/send-otp', [ForgotPasswordController::class,'sendOtp'])
-        ->name('auth.forgot-password.send-otp');
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'index'])->name('auth.forgot-password');
+    Route::post('/forgot-password/send-otp', [ForgotPasswordController::class,'sendOtp'])->name('auth.forgot-password.send-otp');
     // OTP verifycation.
-    Route::get('/forgot-password/otp', [ForgotPasswordController::class, 'otpForm'])
-        ->name('auth.otp.show');
-    Route::post('/forgot-password/otp/verify', [ForgotPasswordController::class, 'verifyOtp'])
-        ->name('auth.otp.verify');
-    Route::post('/forgot-password/otp/resend', [ForgotPasswordController::class, 'resendOtp'])
-        ->name('auth.otp.resend');
+    Route::get('/forgot-password/otp', [ForgotPasswordController::class, 'otpForm'])->name('auth.otp.show');
+    Route::post('/forgot-password/otp/verify', [ForgotPasswordController::class, 'verifyOtp'])->name('auth.otp.verify');
+    Route::post('/forgot-password/otp/resend', [ForgotPasswordController::class, 'resendOtp'])->name('auth.otp.resend');
     // reset password
-    Route::get('/reset-password', [ForgotPasswordController::class, 'resetForm'])
-        ->name('auth.reset-password.show');
-    Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])
-        ->name('auth.reset-password.post');
+    Route::get('/reset-password', [ForgotPasswordController::class, 'resetForm'])->name('auth.reset-password.show');
+    Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('auth.reset-password.post');
 
 });
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('auth.logout');
-    // notification
-    // Route::get('/notifications/low-stock', [NotificationController::class, 'lowStock'])->name('notifications.low-stock');
+    // Notifications
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/fetch', [NotificationController::class, 'fetch'])->name('fetch');
+        Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('read');
+        Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])->name('read-all');
+        Route::post('/generate', [NotificationController::class, 'generate'])->name('generate');
+    });
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/customers/search', [CustomerController::class, 'searchAjax'])->name('customers.search.ajax');
+        // feature report
         // Route::get('/admin/sales/{id}/pdf', [InvoiceController::class, 'exportSingleInvoicePdf'])->name('admin.sales.single-pdf');
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

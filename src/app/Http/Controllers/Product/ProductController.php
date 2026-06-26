@@ -11,7 +11,7 @@ use App\Http\Requests\Product\ProductUpdateRequest;
 class ProductController extends Controller
 {
     public function __construct(
-        private readonly ProductService $productService
+        private readonly ProductService $productService,
     ) {}
 
     /**
@@ -72,4 +72,6 @@ class ProductController extends Controller
             ->route('admin.products.index')
             ->with('success', 'Product deleted successfully.');
     }
+
+
 }

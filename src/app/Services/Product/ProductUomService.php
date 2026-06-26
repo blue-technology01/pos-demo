@@ -12,8 +12,8 @@ class ProductUomService
 {
     public function getPOSProducts(Request $request): Paginator
     {
-        $perPage = (int) $request->get('per_page',25);
-        // product query
+        $perPage = (int) $request->get('per_page', 25);
+
         $query = DB::table('products as p')
             ->select([
                 'p.code as product_code',
@@ -25,38 +25,36 @@ class ProductUomService
             ])
             ->where('p.status', 'active');
 
-        // category filter
         if ($request->filled('category_code') && $request->category_code !== 'all') {
             $query->where('p.category_code', $request->category_code);
         }
 
-        // search filter (FAST prefix search)
         if ($request->filled('search')) {
             $search = trim($request->search);
-
             $query->where(function ($q) use ($search) {
                 $q->where('p.name', 'like', "{$search}%")
-                  ->orWhere('p.code', 'like', "{$search}%");
+                ->orWhere('p.code', 'like', "{$search}%");
             });
         }
-
 
         $paginator = $query
             ->orderBy('p.name')
             ->simplePaginate($perPage);
 
         $products = $paginator->getCollection();
-        // get product code
-        $codes = $products->pluck('product_code')->all();
+        $codes    = $products->pluck('product_code')->all();
 
         if (empty($codes)) {
             return $paginator;
         }
 
+        // join uoms table to get the display name
         $uoms = DB::table('product_uoms as pu')
+            ->join('uoms as u', 'u.code', '=', 'pu.uom_code')
             ->select([
                 'pu.product_code',
                 'pu.uom_code',
+                'u.name as uom_name',
                 'pu.quantity_per_unit',
                 'pu.selling_price',
                 'pu.cost_price',
@@ -67,16 +65,15 @@ class ProductUomService
             ->orderByDesc('pu.is_default')
             ->get();
 
-
         $uomMap = [];
-
         foreach ($uoms as $u) {
             $uomMap[$u->product_code][] = [
-                'uom_code'          => $u->uom_code,
-                'quantity_per_unit' => (float) $u->quantity_per_unit,
-                'selling_price'     => (float) $u->selling_price,
-                'cost_price'        => (float) $u->cost_price,
-                'is_default'        => (bool) $u->is_default,
+                'uom_code'         => $u->uom_code,
+                'uom_name'         => $u->uom_name,             //now has real name
+                'quantity_per_unit'=> (float) $u->quantity_per_unit,
+                'selling_price'    => (float) $u->selling_price,
+                'cost_price'       => (float) $u->cost_price,
+                'is_default'       => (bool)  $u->is_default,
             ];
         }
 

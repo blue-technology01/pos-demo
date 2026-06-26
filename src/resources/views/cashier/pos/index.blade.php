@@ -202,6 +202,115 @@
             border-radius: 99px;
             pointer-events: none;
         }
+
+
+        /* Card */
+        .product-card {
+            background: var(--surface-2, #fff);
+            border: 0.5px solid var(--border, #e9ecef);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border-color 0.15s;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover { border-color: var(--border-strong, #ced4da); }
+        .product-card--disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+        /* Image */
+        .product-card__image {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #f8f9fa;
+            overflow: hidden;
+        }
+        .product-card__image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Body */
+        .product-card__body {
+            padding: 8px 10px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+        .product-card__name {
+            font-size: 12.5px;
+            font-weight: 500;
+            color: #212529;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .product-card__price {
+            font-size: 13px;
+            font-weight: 500;
+            color: #2563a8;
+        }
+
+        /* Footer row */
+        .product-card__uom-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 6px;
+        }
+
+        /* Add button */
+        .product-card__add-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 0.5px solid #ced4da;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #212529;
+            transition: background 0.15s, border-color 0.15s;
+            flex-shrink: 0;
+        }
+        .product-card__add-btn:hover {
+            background: #e8f0fd;
+            color: #2563a8;
+            border-color: #2563a8;
+        }
+        .product-card__add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .product-card__add-btn .material-symbols-outlined { font-size: 16px; }
+
+        /* Stock badges */
+        .product-card__stock {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 2px 7px;
+            border-radius: 99px;
+        }
+        .stock-good { background: #d3f9d8; color: #2b8a3e; }
+        .stock-low  { background: #fff3bf; color: #e67700; }
+        .stock-out  { background: #ffe3e3; color: #c92a2a; }
+        * Grid — 4 columns default, 6 on large monitors */
+        #product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 16px 0;
+        }
+
+        /* @media (min-width: 1280px) {
+            #product-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        } */
     </style>
 @endpush
 
@@ -217,7 +326,7 @@
             <div class="pos-catalog__search-wrap" style="padding:10px;">
                 <div class="pos-catalog__search">
                     <input type="text" id="product-search" class="pos-catalog__search-input"
-                           placeholder="ស្វែងរកឈ្មោះ ឬស្កេនបាកូដ..." autocomplete="off">
+                           placeholder="finding product or barcode..." autocomplete="off">
                     <button class="search-submit-btn">
                         <span class="material-symbols-outlined">search</span>
                     </button>
@@ -228,7 +337,7 @@
                 </button>
 
                 <button class="action-icon-btn action-icon-btn--register" id="open-register-btn"
-                        title="គ្រប់គ្រងវេនលុយ" onclick="openRegisterPopup()">
+                        title="Cash register" onclick="openRegisterPopup()">
                     <span class="material-symbols-outlined">point_of_sale</span>
                     <span class="register-status-dot" id="register-dot"></span>
                 </button>
@@ -254,7 +363,7 @@
             {{-- Category Filter Pills --}}
             <div class="pos-catalog__filters-wrap" style="padding:6px 10px 4px;">
                 <div class="pos-catalog__filters" id="category-filters">
-                    <button class="pos-catalog__filter-pill pos-catalog__filter-pill--active" data-category="all">ទាំងអស់</button>
+                    <button class="pos-catalog__filter-pill pos-catalog__filter-pill--active" data-category="all">All</button>
                     @foreach($categories ?? [] as $category)
                         <button class="pos-catalog__filter-pill" data-category="{{ $category->code }}">
                             {{ $category->name }}
@@ -279,12 +388,12 @@
         <aside class="pos-sidebar">
             <div class="pos-sidebar__header">
                 <span class="pos-sidebar__order-badge">ការបញ្ជាទិញ</span>
-                <span id="cart-item-count" class="pos-sidebar__item-count">0 មុខ</span>
+                <span id="cart-item-count" class="pos-sidebar__item-count">0 items</span>
             </div>
 
             <div class="pos-sidebar__cart-body">
                 <div class="pos-sidebar__cart-empty" id="cart-empty-state">
-                    <p class="pos-sidebar__cart-empty-text">មិនទាន់មានទំនិញក្នុងកន្ត្រកឡើយ</p>
+                    <p class="pos-sidebar__cart-empty-text">Don't have items</p>
                 </div>
                 <ul class="pos-sidebar__cart-list" id="cart-list"
                     style="display:flex;flex-direction:column;gap:10px;padding:0;margin:0;list-style:none;">
@@ -327,9 +436,13 @@
             <div class="cr-header-left">
                 <div class="cr-icon"><span class="material-symbols-outlined">point_of_sale</span></div>
                 <div>
-                    <h3 class="cr-title">បញ្ជរតុលុយ (Cash Register)</h3>
+                    <h3 class="cr-title">Cash Register(Cash Register)</h3>
                     <p class="cr-subtitle" id="cr-subtitle">
-                        @if($currentShift) វេនលក់កំពុងបើកដំណើរការ @else មិនទាន់មានវេនលក់នៅឡើយទេ @endif
+                         @if($currentShift)
+                            Shift is currently open
+                        @else
+                            No shift is currently open
+                        @endif
                     </p>
                 </div>
             </div>
@@ -546,7 +659,7 @@
     window.CUSTOMER_STORE_URL   = "{!! route('admin.customers.store') !!}";
 
     window.ROUTES = {
-        posProducts: "{!! route('cashier.pos.products') !!}",   {{-- ← NEW: API endpoint --}}
+        posProducts: "{!! route('cashier.pos.products') !!}",
         addItem:     "{!! route('cashier.sale-items.store') !!}",
         updateItem:  "{!! route('cashier.sale-items.update', ':rowId') !!}",
         removeItem:  "{!! route('cashier.sale-items.destroy', ':rowId') !!}",
