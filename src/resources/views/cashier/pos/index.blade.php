@@ -4,317 +4,16 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard/sale/cashe-register.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard/customer/customer-pos.css') }}">
-    <style>
-        /* ── Icon sizing fix ─────────────────────────────────── */
-        .pos-dashboard .material-symbols-outlined {
-            font-size: 20px !important;
-            width: 20px; height: 20px;
-            display: inline-flex; align-items: center; justify-content: center;
-            vertical-align: middle; line-height: 1;
-        }
-
-        /* ── Product Grid ────────────────────────────────────── */
-        .pos-catalog__grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-            padding: 10px;
-        }
-
-        /* ── Product Card ────────────────────────────────────── */
-        .product-card {
-            position: relative;
-            background: #fff;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 10px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: box-shadow 0.18s, border-color 0.18s, transform 0.12s;
-            display: flex;
-            flex-direction: column;
-            user-select: none;
-        }
-        .product-card:hover:not(.product-card--disabled) {
-            box-shadow: 0 4px 16px rgba(59,130,246,0.13);
-            border-color: #93c5fd;
-            transform: translateY(-2px);
-        }
-        .product-card:active:not(.product-card--disabled) {
-            transform: scale(0.97);
-        }
-        .product-card--disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            filter: grayscale(0.4);
-        }
-
-        /* ── Card Image ──────────────────────────────────────── */
-        .product-card__image {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            background: #f8fafc;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-        .product-card__image img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        /* ── Card Body ───────────────────────────────────────── */
-        .product-card__body {
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 1;
-        }
-        .product-card__name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #1e293b;
-            line-height: 1.3;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .product-card__price {
-            font-size: 14px;
-            font-weight: 700;
-            color: #2563eb;
-        }
-
-        /* ── UOM Row ─────────────────────────────────────────── */
-        .product-card__uom-row {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin-top: 2px;
-        }
-        .product-card__uom-select {
-            flex: 1;
-            font-size: 11px;
-            padding: 2px 4px;
-            border: 1px solid #cbd5e1;
-            border-radius: 5px;
-            background: #f8fafc;
-            color: #475569;
-            cursor: pointer;
-            appearance: auto;
-            min-width: 0;
-        }
-        .product-card__uom-select:focus {
-            outline: none;
-            border-color: #93c5fd;
-        }
-
-        /* ── Add Button ──────────────────────────────────────── */
-        .product-card__add-btn {
-            width: 26px; height: 26px;
-            flex-shrink: 0;
-            border: none;
-            border-radius: 6px;
-            background: #2563eb;
-            color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: 700;
-            line-height: 1;
-            transition: background 0.15s;
-        }
-        .product-card__add-btn:hover { background: #1d4ed8; }
-        .product-card__add-btn .material-symbols-outlined { font-size: 16px !important; }
-
-        /* ── Stock Badge ─────────────────────────────────────── */
-        .product-card__stock {
-            font-size: 10px;
-            font-weight: 500;
-            padding: 1px 6px;
-            border-radius: 99px;
-            display: inline-block;
-            width: fit-content;
-        }
-        .stock-good { background: #dcfce7; color: #166534; }
-        .stock-low  { background: #fef9c3; color: #854d0e; }
-        .stock-out  { background: #fee2e2; color: #991b1b; }
-
-        /* ── Out-of-stock overlay ────────────────────────────── */
-        .product-card--disabled .product-card__add-btn {
-            background: #94a3b8;
-            cursor: not-allowed;
-        }
-
-        /* ── Skeleton shimmer ────────────────────────────────── */
-        @keyframes shimmer {
-            0%   { background-position: -400px 0; }
-            100% { background-position: 400px 0; }
-        }
-        .skeleton {
-            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
-            background-size: 400px 100%;
-            animation: shimmer 1.4s ease-in-out infinite;
-            border-radius: 10px;
-            aspect-ratio: 1 / 1.3;
-        }
-
-        /* ── Pagination ──────────────────────────────────────── */
-        #product-pagination {
-            padding: 8px 10px 12px;
-        }
-        .pg-btn {
-            padding: 5px 14px;
-            border: 1.5px solid #cbd5e1;
-            border-radius: 7px;
-            background: #fff;
-            font-size: 13px;
-            cursor: pointer;
-            color: #334155;
-            transition: background 0.14s, border-color 0.14s;
-        }
-        .pg-btn:hover:not(:disabled) { background: #eff6ff; border-color: #93c5fd; }
-        .pg-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-        /* ── Low-stock badge on card ─────────────────────────── */
-        .uom-badge {
-            position: absolute;
-            top: 6px; right: 6px;
-            background: rgba(17,24,39,0.78);
-            color: #fff;
-            font-size: 9px;
-            font-weight: 700;
-            padding: 2px 7px;
-            border-radius: 99px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            pointer-events: none;
-        }
-        .low-stock-badge {
-            position: absolute;
-            top: 6px; left: 6px;
-            background: #fef08a;
-            color: #713f12;
-            font-size: 9px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 99px;
-            pointer-events: none;
-        }
-
-
-        /* Card */
-        .product-card {
-            background: var(--surface-2, #fff);
-            border: 0.5px solid var(--border, #e9ecef);
-            border-radius: 12px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: border-color 0.15s;
-            display: flex;
-            flex-direction: column;
-        }
-        .product-card:hover { border-color: var(--border-strong, #ced4da); }
-        .product-card--disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
-
-        /* Image */
-        .product-card__image {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            background: #f8f9fa;
-            overflow: hidden;
-        }
-        .product-card__image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        /* Body */
-        .product-card__body {
-            padding: 8px 10px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 1;
-        }
-        .product-card__name {
-            font-size: 12.5px;
-            font-weight: 500;
-            color: #212529;
-            line-height: 1.3;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .product-card__price {
-            font-size: 13px;
-            font-weight: 500;
-            color: #2563a8;
-        }
-
-        /* Footer row */
-        .product-card__uom-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: auto;
-            padding-top: 6px;
-        }
-
-        /* Add button */
-        .product-card__add-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            border: 0.5px solid #ced4da;
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: #212529;
-            transition: background 0.15s, border-color 0.15s;
-            flex-shrink: 0;
-        }
-        .product-card__add-btn:hover {
-            background: #e8f0fd;
-            color: #2563a8;
-            border-color: #2563a8;
-        }
-        .product-card__add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .product-card__add-btn .material-symbols-outlined { font-size: 16px; }
-
-        /* Stock badges */
-        .product-card__stock {
-            font-size: 11px;
-            font-weight: 500;
-            padding: 2px 7px;
-            border-radius: 99px;
-        }
-        .stock-good { background: #d3f9d8; color: #2b8a3e; }
-        .stock-low  { background: #fff3bf; color: #e67700; }
-        .stock-out  { background: #ffe3e3; color: #c92a2a; }
-        * Grid — 4 columns default, 6 on large monitors */
-        #product-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            padding: 16px 0;
-        }
-
-        /* @media (min-width: 1280px) {
-            #product-grid {
-                grid-template-columns: repeat(6, 1fr);
-            }
-        } */
-    </style>
 @endpush
 
 @section('content')
+<x-payment-success/>
+<div id="webcam-container" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#000; padding:10px; border-radius:8px; z-index:9999; box-shadow:0 0 20px rgba(0,0,0,0.5);">
+    <video id="webcam" width="400" height="300" autoplay playsinline></video>
+    <div style="text-align:center; margin-top:8px;">
+        <button id="stop-scan-btn" class="btn btn-danger">Stop Scanning</button>
+    </div>
+</div>
 <div class="pos-dashboard">
     @include('components.navbar-pos')
     <main class="pos-dashboard__main">
@@ -332,7 +31,7 @@
                     </button>
                 </div>
 
-                <button class="action-icon-btn action-icon-btn--scan" title="ស្កេនបាកូដ">
+                <button class="action-icon-btn action-icon-btn--scan" title="ស្កេនបាកូដ" id="start-btn">
                     <span class="material-symbols-outlined">document_scanner</span>
                 </button>
 
@@ -347,19 +46,6 @@
                     <span class="material-symbols-outlined">person_add</span>
                 </button>
             </div>
-
-            {{-- Flash Messages --}}
-            @if(session('success'))
-                <div style="color:#155724;background:#d4edda;padding:10px 12px;margin:0 10px 6px;border-radius:6px;font-size:13px;">
-                    {{ session('success') }}
-                </div>
-            @endif
-            @if(session('error'))
-                <div style="color:#721c24;background:#f8d7da;padding:10px 12px;margin:0 10px 6px;border-radius:6px;font-size:13px;">
-                    {{ session('error') }}
-                </div>
-            @endif
-
             {{-- Category Filter Pills --}}
             <div class="pos-catalog__filters-wrap" style="padding:6px 10px 4px;">
                 <div class="pos-catalog__filters" id="category-filters">
@@ -372,22 +58,17 @@
                 </div>
             </div>
 
-            {{-- Product Grid --}}
             <div class="pos-catalog__grid-container">
-                <div class="pos-catalog__grid" id="product-grid">
-                    {{-- Filled by pos.js via API --}}
+                <div class="pos-catalog__grid horizontal-grid" id="product-grid">
+                    {{-- Products will be filled by JavaScript --}}
                 </div>
             </div>
 
-            {{-- Pagination --}}
-            <div id="product-pagination"></div>
-
         </section>
 
-        {{-- ══════════════════ CART SIDEBAR ══════════════════ --}}
         <aside class="pos-sidebar">
             <div class="pos-sidebar__header">
-                <span class="pos-sidebar__order-badge">ការបញ្ជាទិញ</span>
+                <span class="pos-sidebar__order-badge">Orders</span>
                 <span id="cart-item-count" class="pos-sidebar__item-count">0 items</span>
             </div>
 
@@ -411,12 +92,9 @@
             </div>
 
             <div class="pos-sidebar__cta">
-                <button class="btn-checkout btn-checkout--print" type="button" title="Print preview">
-                    <span class="material-symbols-outlined">print</span>
-                </button>
                 <button class="pos-sidebar__process-btn" id="process-payment-btn" type="button" disabled
                         style="opacity:0.5;cursor:not-allowed;">
-                    ទូទាត់ប្រាក់ (Place Order)
+                        Place Order
                 </button>
             </div>
         </aside>
@@ -510,8 +188,9 @@
     <div class="payment-modal-content">
         <div class="payment-receipt-side">
             <div class="receipt-header">
-                <div class="shop-brand">ShopPoint POS</div>
-                <h3 id="modal-customer-name">Walk-in Customer</h3>
+                <img src="{{ asset('assets/images/logo.png') }}" alt="POS Logo" width="120" >
+                {{-- <div class="shop-brand">ShopPoint POS</div> --}}
+                <h3 id="modal-customer-name">View</h3>
                 <p id="modal-invoice-no" class="font-mono">#INV-{{ date('Ymd') }}-0001</p>
             </div>
             <h4>Items</h4>
@@ -540,7 +219,7 @@
                 </button>
             </div>
             <div class="amount-due-box">
-                <p style="color:#fff;">Amount Due</p>
+                <p style="color:black">Amount Due</p>
                 <div id="modal-amount-due">$0.00</div>
             </div>
             <div class="mb-6">
@@ -562,7 +241,9 @@
     <div class="receipt-modal-content">
         <div class="receipt-paper">
             <div class="receipt-header">
-                <h2>ShopPoint POS</h2>
+                {{-- <h2>ShopPoint POS</h2> --}}
+                {{-- logo --}}
+                <img src="{{ asset('assets/images/logo.png') }}" alt="POS Logo" width="120" height="40">
                 <p id="receipt-date" class="text-sm text-gray-500"></p>
                 <p id="receipt-invoice" class="font-mono text-sm"></p>
             </div>
@@ -574,7 +255,7 @@
                 <div class="flex justify-between"><span>Tax (10%)</span><span id="r-tax"></span></div>
                 <div class="flex justify-between font-bold text-lg"><span>Total</span><span id="r-total"></span></div>
             </div>
-            <hr>
+            <hr>s
             <div class="receipt-payment-info">
                 <div class="flex justify-between"><span>Payment</span><span id="r-payment-method">Cash</span></div>
                 <div class="flex justify-between"><span>Received</span><span id="r-cash-received"></span></div>
@@ -651,7 +332,9 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
 <script>
+
     window.PREVIEW_RECEIPT   = {{ auth()->user()->preview_receipt ? 'true' : 'false' }};
     window.isShiftOpen       = {{ $currentShift ? 'true' : 'false' }};
     window.expectedShiftBalance = parseFloat("{{ $currentShift ? ($currentShift->opening_balance + $currentShift->total_sales) : 0 }}");
@@ -678,6 +361,27 @@
             ->value('id') ?? 'null'
     }};
     window.selectedCustomerId = null;
+
+    const startBtn = document.getElementById('start-btn');
+        const video = document.getElementById('webcam');
+
+        startBtn.addEventListener('click', async () => {
+        try {
+            // 1. Request camera access
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+            // 2. Set the video source
+            video.srcObject = stream;
+
+            // 3. Make the video visible
+            video.style.display = 'block';
+            startBtn.style.display = 'none'; // Hide button once camera is active
+
+        } catch (err) {
+            console.error("Camera access denied or failed:", err);
+            alert("Could not access the camera. Please check permissions.");
+        }
+        });
 </script>
 <script src="{{ asset('assets/js/components/togglescreen.js') }}" defer></script>
 <script src="{{ asset('assets/js/dashboard/pos/pos.js') }}" defer></script>

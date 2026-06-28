@@ -5,7 +5,6 @@
         : 'https://ui-avatars.com/api/?name=' . urlencode($user?->name ?? 'Guest') . '&background=2563a8&color=fff&size=80&bold=true';
 @endphp
 
-{{-- @push('styles') --}}
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
 <style>
     .navbar {
@@ -108,7 +107,6 @@
         overflow: hidden;
     }
 
-    .nav-pill-wrap:focus-within .nav-pill-dropdown,
     .nav-pill-wrap.open .nav-pill-dropdown {
         display: block;
     }
@@ -168,7 +166,6 @@
         background: #f8f9fa;
     }
 
-    /* Icon circle per type */
     .notif-icon {
         width: 34px;
         height: 34px;
@@ -302,7 +299,7 @@
         font-size: 18px;
         color: #868e96;
     }
-    /* user dropdown */
+
     .navbar-dropdown {
         position: absolute;
         top: calc(100% + 10px);
@@ -318,8 +315,8 @@
         padding: 6px;
     }
 
-    .nav-pill-wrap.open .navbar-dropdown,
-    .navbar-user-wrap.open .navbar-dropdown {
+    /* ✅ Fixed: use nav-pill-wrap.open for user dropdown too */
+    .nav-pill-wrap.open .navbar-dropdown {
         display: block;
     }
 
@@ -405,7 +402,6 @@
         border-radius: 4px;
     }
 </style>
-{{-- @endpush --}}
 
 <nav class="navbar">
 
@@ -433,10 +429,10 @@
 
         {{-- Language Switcher --}}
         <div class="nav-pill-wrap" id="langWrap">
-            <button class="nav-pill-btn" id="langBtn" aria-label="Switch Language" aria-expanded="false">
+            <button class="nav-pill-btn" id="langBtn" aria-label="Switch Language">
                 <img src="{{ asset('assets/images/icon-flag/cambodia.svg') }}" style="width:20px" alt="Khmer">
             </button>
-            <div class="nav-pill-dropdown lang-dropdown-flags" id="langDropdown">
+            <div class="nav-pill-dropdown lang-dropdown-flags">
                 <button class="pill-dropdown-item" data-lang="km">
                     <img src="{{ asset('assets/images/icon-flag/cambodia.svg') }}" style="width:18px" alt="Khmer">
                     <span>ខ្មែរ</span>
@@ -455,14 +451,11 @@
 
         {{-- Notifications --}}
         <div class="nav-pill-wrap" id="notifWrap">
-            <button class="nav-pill-btn" id="notifBtn" aria-label="Notifications" aria-expanded="false">
+            <button class="nav-pill-btn" id="notifBtn" aria-label="Notifications">
                 <span class="material-symbols-outlined">notifications</span>
                 <span class="notif-badge" id="notifBadge"></span>
             </button>
-
             <div class="nav-pill-dropdown notif-dropdown" id="notifDropdown">
-
-                {{-- Header --}}
                 <div class="notif-dropdown-header">
                     <h6>Notifications</h6>
                     <form action="{{ route('notifications.read-all') }}" method="POST" style="margin:0">
@@ -471,19 +464,16 @@
                         <button type="submit" class="notif-mark-all">Mark all read</button>
                     </form>
                 </div>
-
-                {{-- Items injected by JS --}}
                 <div id="notifList">
                     <div class="notif-loading">Loading…</div>
                 </div>
-
             </div>
         </div>
 
         {{-- User Profile --}}
         @auth
-        <div class="navbar-user-wrap nav-pill-wrap" id="userWrap">
-            <button class="navbar-user" id="userBtn" aria-expanded="false">
+        <div class="nav-pill-wrap" id="userWrap">
+            <button class="navbar-user" id="userBtn">
                 <img src="{{ $avatarUrl }}" alt="Avatar" class="avatar-img-sm">
                 <div class="user-info">
                     <span class="user-name">{{ $user->name }}</span>
@@ -492,7 +482,7 @@
                 <span class="material-symbols-outlined">arrow_drop_down</span>
             </button>
 
-            <div class="navbar-dropdown" id="userDropdown">
+            <div class="navbar-dropdown">
                 <div class="dropdown-user-header">
                     <img src="{{ $avatarUrl }}" alt="" class="avatar-img-lg">
                     <div>
@@ -529,22 +519,44 @@
 <script>
 (function () {
 
-    const wrap = document.getElementById('notifWrap');
-    const btn = document.getElementById('notifBtn');
-    const list = document.getElementById('notifList');
-    const badge = document.getElementById('notifBadge');
+    // ─────────────────────────────────────────
+    // Helper: toggle dropdown, close others
+    // ─────────────────────────────────────────
+    const dropdowns = [];
 
-    const FETCH_URL = "{{ route('notifications.fetch') }}";
+    function registerDropdown(wrapId, btnId) {
+        const wrap = document.getElementById(wrapId);
+        const btn  = document.getElementById(btnId);
+        if (!wrap || !btn) return;
 
-    // toggle dropdown
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        wrap.classList.toggle('open');
-    });
+        dropdowns.push(wrap);
 
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = wrap.classList.contains('open');
+            // close all first
+            dropdowns.forEach(d => d.classList.remove('open'));
+            // toggle current
+            if (!isOpen) wrap.classList.add('open');
+        });
+    }
+
+    // Close all when clicking outside
     document.addEventListener('click', () => {
-        wrap.classList.remove('open');
+        dropdowns.forEach(d => d.classList.remove('open'));
     });
+
+    // ✅ Register all dropdowns
+    registerDropdown('notifWrap', 'notifBtn');
+    registerDropdown('langWrap',  'langBtn');
+    registerDropdown('userWrap',  'userBtn');
+
+    // ─────────────────────────────────────────
+    // Notifications
+    // ─────────────────────────────────────────
+    const list  = document.getElementById('notifList');
+    const badge = document.getElementById('notifBadge');
+    const FETCH_URL = "{{ route('notifications.fetch') }}";
 
     function escapeHtml(text) {
         return String(text)
@@ -554,9 +566,8 @@
     }
 
     function render(data, count) {
-
         badge.style.display = count > 0 ? 'flex' : 'none';
-        badge.textContent = count > 9 ? '9+' : count;
+        badge.textContent   = count > 9 ? '9+' : count;
 
         if (!data || data.length === 0) {
             list.innerHTML = `<div class="notif-empty">No notifications</div>`;
@@ -575,16 +586,9 @@
 
     async function load() {
         try {
-            const res = await fetch(FETCH_URL, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-
+            const res  = await fetch(FETCH_URL, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             const json = await res.json();
-
             render(json.data || [], json.count || 0);
-
         } catch (e) {
             list.innerHTML = `<div class="notif-error">Failed to load</div>`;
         }
