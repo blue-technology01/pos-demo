@@ -18,7 +18,7 @@
     box-shadow:
         0 1px 2px rgba(15, 23, 42, 0.04),
         0 4px 16px rgba(15, 23, 42, 0.06);
-    
+
     border-radius: 16px;
     padding: 1.1rem 1.25rem;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -278,7 +278,6 @@
     background: #f8faff;
 }
 
-/* ---------- Product image ---------- */
 .product-img {
     width: 40px !important;
     height: 40px;
@@ -296,7 +295,6 @@
     border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
 }
 
-/* ---------- Cell helpers ---------- */
 .code-cell {
     font-family: 'SF Mono', 'Fira Code', monospace;
     font-size: 12px;
@@ -317,7 +315,6 @@
     font-size: 12px;
 }
 
-/* ---------- Stock number ---------- */
 .stock-num {
     display: inline-flex;
     align-items: center;
@@ -329,7 +326,6 @@
 .stock-num.warning { color: #d97706; }
 .stock-num.danger  { color: #dc2626; }
 
-/* ---------- Status badge ---------- */
 .status-badge {
     display: inline-flex;
     align-items: center;
@@ -344,14 +340,12 @@
 .status-badge.warning { background: #fef3c7; color: #92400e; }
 .status-badge.danger  { background: #fee2e2; color: #991b1b; }
 
-/* ---------- Shortage ---------- */
 .shortage {
     font-size: 12px;
     font-weight: 600;
     color: #dc2626;
 }
 
-/* ---------- Stock bar ---------- */
 .stock-bar {
     width: 80px;
     height: 6px;
@@ -370,7 +364,6 @@
 .stock-fill.warning { background: #d97706; }
 .stock-fill.danger  { background: #dc2626; }
 
-/* ---------- Activity tab ---------- */
 .time-label {
     display: block;
     font-size: 11px;
@@ -394,7 +387,6 @@
     text-decoration: underline;
 }
 
-/* Ledger box */
 .ledger-box {
     display: inline-flex;
     align-items: center;
@@ -435,7 +427,6 @@
 .ledger-after.warning { color: #d97706; }
 .ledger-after.danger  { color: #dc2626; }
 
-/* ---------- Empty state ---------- */
 .empty-state {
     text-align: center;
     padding: 2.5rem 1rem;
@@ -443,7 +434,6 @@
     font-size: 13px;
 }
 
-/* ---------- Pagination ---------- */
 .table-footer {
     display: flex;
     align-items: center;
@@ -460,7 +450,6 @@
     color: var(--color-text-secondary, #6b7280);
 }
 
-/* ===== TABLE FOOTER WRAPPER ===== */
 .table-footer {
     width: 100%;
     display: flex;
@@ -468,20 +457,17 @@
     align-items: center;
 }
 
-/* LEFT SIDE (info + select) */
 .table-footer-left {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* INFO TEXT */
 .table-info {
     font-size: 13px;
     color: #374151;
 }
 
-/* ===== PAGINATION WRAPPER ===== */
 .pagination {
     display: flex;
     align-items: center;
@@ -518,7 +504,6 @@
     transition: all 0.15s ease;
 }
 
-/* ACTIVE PAGE */
 .pagination .active span {
     background: #2563eb;
     color: #fff;
@@ -526,21 +511,18 @@
     font-weight: 600;
 }
 
-/* HOVER */
 .pagination a:hover {
     background: #eff6ff;
     border-color: #bfdbfe;
     color: #2563eb;
 }
 
-/* DISABLED */
 .pagination .disabled span,
 .pagination [aria-disabled="true"] span {
     opacity: 0.35;
     pointer-events: none;
 }
 
-/* ===== PER PAGE SELECT ===== */
 .table-footer select {
     font-family: Inter, sans-serif;
     font-size: 12px;
@@ -657,7 +639,6 @@
     flex-shrink: 0;
 }
 
-/* Per page select inside table footer */
 .table-footer form {
     display: flex;
     align-items: center;
@@ -688,7 +669,6 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* Pagination inside table-footer — override nested wrapper */
 .table-footer .pagination,
 .table-footer nav .pagination {
     display: flex;
@@ -740,23 +720,57 @@
     color: #2563eb;
 }
 
+.chart-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 16px;
+        align-items: stretch;
+    }
+    @media (max-width: 900px) {
+        .chart-row {
+            grid-template-columns: 1fr;
+        }
+    }
+    .chart-card {
+        background: #fff;
+        border: 1px solid #eef0f3;
+        border-radius: 12px;
+        padding: 18px 20px 6px;
+        margin-bottom: 16px;
+    }
+    .chart-row .chart-card {
+        margin-bottom: 0;
+    }
+    .chart-card-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+    .chart-card-header h3 {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0;
+    }
+    .chart-card-header .muted {
+        font-size: 12px;
+        color: #8a8f98;
+    }
+
 @media (max-width: 640px) {
     .table-footer {
         flex-direction: column;
         align-items: flex-start;
         padding: 10px 12px;
     }
-
     .search-bar {
         flex-direction: column;
         align-items: stretch;
     }
-
     .search-wrap {
         max-width: 100%;
         min-width: unset;
     }
-
     .btn-filter {
         width: 100%;
         justify-content: center;

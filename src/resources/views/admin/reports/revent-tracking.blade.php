@@ -42,29 +42,6 @@
             <i class="ti ti-refresh" aria-hidden="true"></i> Reset
         </a>
     </form>
-
-    {{-- KPI Cards --}}
-    <div class="rv-kpi-row">
-        <div class="rv-kpi-card">
-            <p class="rv-kpi-card__label">TOTAL ORDERS</p>
-            <p class="rv-kpi-card__value">
-                {{ number_format($summary['total_orders']) }}
-            </p>
-        </div>
-        <div class="rv-kpi-card">
-            <p class="rv-kpi-card__label">TOTAL REVENUE</p>
-            <p class="rv-kpi-card__value rv-kpi-card__value--blue">
-                ${{ number_format($summary['total_revenue'], 2) }}
-            </p>
-        </div>
-        <div class="rv-kpi-card">
-            <p class="rv-kpi-card__label">AVERAGE SALE</p>
-            <p class="rv-kpi-card__value">
-                ${{ number_format($summary['average_sale'], 2) }}
-            </p>
-        </div>
-    </div>
-
     {{-- Table Panel --}}
     <div class="rv-panel">
 

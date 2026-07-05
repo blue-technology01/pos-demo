@@ -194,7 +194,6 @@
     </div>
 </div>
 
-{{-- Script also inline — runs immediately, no dependency on @stack --}}
 <script>
 (function () {
     var loader = document.getElementById('page-loader');

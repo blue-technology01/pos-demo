@@ -3,13 +3,13 @@
 @push('styles')
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard/stock/update-stock.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css" />
 @endpush
 
 @section('title', 'Stock History')
 
 @section('content')
-<div class="pm-wrapper">
+{{-- <div class="pm-wrapper"> --}}
 
     {{-- Tabs --}}
     <div class="tab-bar">
@@ -34,18 +34,11 @@
                 <span class="tab-badge danger">{{ $lowStock }}</span>
             @endif
         </button>
-        <button class="tab-btn" data-tab="activity">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
-            Stock activity
-        </button>
     </div>
 
     {{-- Search & sync bar --}}
     <form method="GET" action="{{ url()->current() }}" class="search-bar">
-        <div class="search-wrap "  >
+        <div class="search-wrap">
             <svg class="search-icon"
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -58,20 +51,20 @@
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
             <input
+                id="product-search"
                 type="text"
                 name="search"
                 value="{{ request('search') }}"
                 placeholder="Search product name, code."
             >
-            <button type="submit" class="btn-filter" onclick="showLoader()" >
+            <button type="submit" class="btn-filter" onclick="showLoader()">
                 Search
             </button>
         </div>
-        {{-- Keep existing filters --}}
         @foreach(request()->except('search', 'page') as $key => $value)
             <input type="hidden" name="{{ $key }}" value="{{ $value }}">
         @endforeach
-       
+
         <div class="sync-badge">
             <span class="sync-dot"></span>
             Live sync active
@@ -80,6 +73,26 @@
 
     {{-- ── TAB 1: Stock overview ── --}}
     <div id="tab-overview" class="tab-content active">
+
+        {{-- Charts --}}
+        <div class="chart-row">
+            <div class="chart-card chart-card-wide">
+                <div class="chart-card-header">
+                    <h3>Current stock vs minimum stock</h3>
+                    <span class="muted">Showing products on this page</span>
+                </div>
+                <div id="chart-overview-stock"></div>
+            </div>
+
+            <div class="chart-card chart-card-narrow">
+                <div class="chart-card-header">
+                    <h3>Stock status breakdown</h3>
+                    <span class="muted">All products</span>
+                </div>
+                <div id="chart-overview-status"></div>
+            </div>
+        </div>
+
         <div class="table-card">
             <table class="pm-table">
                 <thead>
@@ -114,7 +127,7 @@
                                 @if($product->image)
                                     <img src="{{ asset('storage/' . $product->image) }}"
                                          alt="{{ $product->name }}"
-                                         class="product-img" style="width: 50px" >
+                                         class="product-img">
                                 @else
                                     <div class="product-img-placeholder"></div>
                                 @endif
@@ -122,7 +135,6 @@
                             <td>
                                 <span class="code-badge">{{ $product->code }}</span>
                             </td>
-                            {{-- <td class="code-cell">{{ $product->code }}</td> --}}
                             <td class="name-cell">{{ $product->name }}</td>
                             <td>{{ $product->category->name ?? '—' }}</td>
                             <td>
@@ -151,7 +163,7 @@
                 </tbody>
             </table>
             {{-- pagination --}}
-            <div class="table-footer" style="width: 100%; display: flex; justify-content: space-between" id="tableFooter">
+            <div class="table-footer" id="tableFooter">
                 <span class="table-footer-left">
                     <div class="table-info">
                         showing
@@ -186,6 +198,16 @@
 
     {{-- ── TAB 2: Low stock alert ── --}}
     <div id="tab-lowstock" class="tab-content">
+
+        {{-- Chart: shortage per product --}}
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <h3>Shortage by product</h3>
+                <span class="muted">Units needed to reach minimum stock</span>
+            </div>
+            <div id="chart-lowstock-shortage"></div>
+        </div>
+
         <div class="table-card">
             <table class="pm-table">
                 <thead>
@@ -217,7 +239,7 @@
                                 @if($product->image)
                                     <img src="{{ asset('storage/' . $product->image) }}"
                                          alt="{{ $product->name }}"
-                                         class="product-img" style="width: 50px" >
+                                         class="product-img">
                                 @else
                                     <div class="product-img-placeholder"></div>
                                 @endif
@@ -256,7 +278,7 @@
                 </tbody>
             </table>
             {{-- pagination --}}
-            <div class="table-footer" style="width: 100%; display: flex; justify-content: space-between" id="tableFooter">
+            <div class="table-footer" id="tableFooter">
                 <span class="table-footer-left">
                     <div class="table-info">
                         showing
@@ -289,115 +311,14 @@
         </div>
     </div>
 
-    {{-- ── TAB 3: Stock activity ── --}}
-    <div id="tab-activity" class="tab-content">
-        <div class="table-card">
-            <table class="pm-table">
-                <thead>
-                    <tr>
-                        <th>Time &amp; invoice</th>
-                        <th>Product sold</th>
-                        <th>Sold by</th>
-                        <th style="text-align: center;">Stock reduction (before − sold → after)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($activities as $item)
-                        @php
-                            $stockBefore = $item->stock_before ?? '—';
-                            $stockAfter  = $item->stock_after  ?? '—';
-                            $isLow       = is_numeric($stockAfter)
-                                            && $item->product
-                                            && $stockAfter < ($item->product->min_stock ?? 0);
-                            $afterClass  = is_numeric($stockAfter) && $stockAfter == 0
-                                            ? 'danger'
-                                            : ($isLow ? 'warning' : 'success');
-                            $afterLabel  = is_numeric($stockAfter)
-                                            ? ($stockAfter == 0
-                                                ? '0 left (Out)'
-                                                : ($isLow
-                                                    ? "{$stockAfter} left (Low)"
-                                                    : "{$stockAfter} left"))
-                                            : '—';
-                        @endphp
-                        <tr>
-                            <td>
-                                <span class="muted time-label">
-                                    {{ $item->created_at?->diffForHumans() ?? '—' }}
-                                    {{ $item->created_at ? '(' . $item->created_at->format('H:i') . ')' : '' }}
-                                </span>
-                                <a href="#" class="invoice-link">
-                                    #{{ $item->sale->invoice_no ?? '—' }}
-                                </a>
-                            </td>
-                            <td>
-                                <span class="name-cell">{{ $item->product_name }}</span>
-                                <span class="muted category-label">
-                                    {{ $item->product->category->name ?? '—' }}
-                                </span>
-                            </td>
-                            <td class="muted">
-                                {{ $item->sale->user->name ?? '—' }}
-                            </td>
-                            <td>
-                                <div class="ledger-box">
-                                    <span class="ledger-before">{{ $stockBefore }}</span>
-                                    <span class="ledger-sep">−</span>
-                                    <span class="ledger-sold">{{ $item->quantity }}</span>
-                                    <span class="ledger-arrow">→</span>
-                                    <span class="ledger-after {{ $afterClass }}">
-                                        {{ $afterLabel }}
-                                    </span>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="empty-state">
-                                No stock activity recorded today.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-            {{-- pagination --}}
-            <div class="table-footer" style="width: 100%; display: flex; justify-content: space-between" id="tableFooter">
-                <span class="table-footer-left">
-                    <div class="table-info">
-                        showing
-                        {{ $activities->firstItem() ?? 0 }}
-                        -
-                        {{ $activities->lastItem() ?? 0 }}
-                        of
-                        {{ $activities->total() }}
-                        Activities
-                    </div>
-
-                    {{-- per page --}}
-                    <form method="GET" action="{{ request()->url() }}">
-                        @foreach(request()->except('per_page', 'page') as $key => $value)
-                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                        @endforeach
-
-                        <select name="per_page" onchange="showLoader(); this.form.submit()">
-                            <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
-                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
-                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
-                        </select>
-                    </form>
-                </span>
-
-                <div class="pagination">
-                    {{ $activities->links('vendor.pagination.numbers-only') }}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+{{-- </div> --}}
 @endsection
-
 @push('scripts')
+{{-- ApexCharts --}}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.0/dist/apexcharts.min.js"></script>
+
 <script>
+    // tab
     const tabs     = document.querySelectorAll('.tab-btn');
     const contents = document.querySelectorAll('.tab-content');
     const search   = document.getElementById('product-search');
@@ -408,8 +329,10 @@
             contents.forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-            search.value = '';
-            filterRows('');
+            if (search) {
+                search.value = '';
+                filterRows('');
+            }
         });
     });
 
@@ -419,8 +342,85 @@
         });
     }
 
-    search.addEventListener('input', function () {
-        filterRows(this.value.toLowerCase());
-    });
+    if (search) {
+        search.addEventListener('input', function () {
+            filterRows(this.value.toLowerCase());
+        });
+    }
+    // chart data from blade
+    const overviewNames    = @json($products->pluck('name'));
+    const overviewStock    = @json($products->pluck('stock'));
+    const overviewMinStock = @json($products->pluck('min_stock')->map(fn ($v) => $v ?? 0));
+
+    const lowStockNames     = @json($lowStockProducts->pluck('name'));
+    const lowStockShortages = @json(
+        $lowStockProducts->map(fn ($p) => max(0, ($p->min_stock ?? 1) - $p->stock))
+    );
+    @php
+        $totalProducts   = $products->total();
+        $lowOrOutCount   = $lowStock;
+        $healthyCount    = max(0, $totalProducts - $lowOrOutCount);
+    @endphp
+    const statusLabels = @json(['Healthy stock', 'Low / out of stock']);
+    const statusCounts = @json([$healthyCount, $lowOrOutCount]);
+
+    // chart stock overview current vs min
+    if (document.getElementById('chart-overview-stock')) {
+        new ApexCharts(document.getElementById('chart-overview-stock'), {
+            chart: { type: 'bar', height: 300, toolbar: { show: false } },
+            series: [
+                { name: 'Current stock', data: overviewStock },
+                { name: 'Min stock', data: overviewMinStock },
+            ],
+            xaxis: {
+                categories: overviewNames,
+                labels: { rotate: -45, trim: true },
+            },
+            colors: ['#2e7d32', '#c62828'],
+            plotOptions: { bar: { columnWidth: '55%', borderRadius: 3 } },
+            dataLabels: { enabled: false },
+            legend: { position: 'top' },
+            noData: { text: 'No products to chart' },
+        }).render();
+    }
+
+    // chart low stock shortage
+    if (document.getElementById('chart-lowstock-shortage')) {
+        new ApexCharts(document.getElementById('chart-lowstock-shortage'), {
+            chart: { type: 'bar', height: 300, toolbar: { show: false } },
+            series: [{ name: 'Shortage', data: lowStockShortages }],
+            xaxis: {
+                categories: lowStockNames,
+                labels: { rotate: -45, trim: true },
+            },
+            colors: ['#ef6c00'],
+            plotOptions: { bar: { columnWidth: '45%', borderRadius: 3, distributed: false } },
+            dataLabels: { enabled: false },
+            legend: { show: false },
+            noData: { text: 'All products are well stocked' },
+        }).render();
+    }
+    // chart stock status breakdown donut
+    if (document.getElementById('chart-overview-status')) {
+        new ApexCharts(document.getElementById('chart-overview-status'), {
+            chart: { type: 'donut', height: 300 },
+            series: statusCounts,
+            labels: statusLabels,
+            colors: ['#2e7d32', '#c62828'],
+            legend: { position: 'bottom' },
+            dataLabels: { enabled: true, formatter: (val) => val.toFixed(0) + '%' },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        labels: {
+                            show: true,
+                            total: { show: true, label: 'Total products' },
+                        },
+                    },
+                },
+            },
+            noData: { text: 'No products to chart' },
+        }).render();
+    }
 </script>
 @endpush

@@ -5,7 +5,6 @@
     color: var(--color-text-primary, #111);
 }
 
-/* ---------- Header row ---------- */
 .product-section__header {
     display: flex;
     align-items: center;
@@ -14,7 +13,6 @@
     margin-bottom: 1.25rem;
 }
 
-/* ---------- Filter form ---------- */
 .search-wrap {
     display: flex;
     align-items: flex-end;
@@ -23,7 +21,6 @@
     flex: 1;
 }
 
-/* Filter group (label + input stacked) */
 .filter-group {
     display: flex;
     flex-direction: column;
@@ -38,7 +35,6 @@
     padding-left: 2px;
 }
 
-/* Shared input base */
 .filter-input,
 .filter-input-date,
 .filter-select {
@@ -83,7 +79,6 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* Reset / clear button */
 .btn-clear {
     display: inline-flex;
     align-items: center;
@@ -109,7 +104,6 @@
     text-decoration: none;
 }
 
-/* Add product button */
 .product-section__btn-add {
     display: inline-flex;
     align-items: center;
@@ -136,14 +130,13 @@
     text-decoration: none;
 }
 
-/* ---------- Table card ---------- */
 .table-card {
     background: var(--color-background-primary, #fff);
     border: none;
     box-shadow:
         0 1px 2px rgba(15, 23, 42, 0.04),
         0 4px 16px rgba(15, 23, 42, 0.06);
-        
+
     border-radius: 16px;
     overflow: hidden;
 }
@@ -153,7 +146,6 @@
     -webkit-overflow-scrolling: touch;
 }
 
-/* ---------- Table ---------- */
 .table-custom {
     width: 100%;
     border-collapse: collapse;
@@ -199,7 +191,6 @@
     background: #f8faff;
 }
 
-/* Empty row */
 .table-custom td[colspan] {
     text-align: center;
     padding: 2.5rem 1rem;
@@ -207,7 +198,6 @@
     white-space: normal;
 }
 
-/* ---------- Product image ---------- */
 .table-custom img {
     width: 40px;
     height: 40px;
@@ -217,7 +207,6 @@
     display: block;
 }
 
-/* ---------- Code badge ---------- */
 .barcode-badge {
     display: inline-flex;
     align-items: center;
@@ -232,7 +221,6 @@
     border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
 }
 
-/* ---------- Status badge ---------- */
 .status-badge {
     display: inline-flex;
     align-items: center;
@@ -258,7 +246,6 @@
     color: #92400e;
 }
 
-/* ---------- Action buttons ---------- */
 .action-group {
     display: flex;
     align-items: center;
@@ -308,7 +295,6 @@
     flex-shrink: 0;
 }
 
-/* ---------- Pagination ---------- */
 .table-footer {
     display: flex;
     align-items: center;
@@ -325,7 +311,6 @@
     color: var(--color-text-secondary, #6b7280);
 }
 
-/* ===== TABLE FOOTER WRAPPER ===== */
 .table-footer {
     width: 100%;
     display: flex;
@@ -333,20 +318,17 @@
     align-items: center;
 }
 
-/* LEFT SIDE (info + select) */
 .table-footer-left {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* INFO TEXT */
 .table-info {
     font-size: 13px;
     color: #374151;
 }
 
-/* ===== PAGINATION WRAPPER ===== */
 .pagination {
     display: flex;
     align-items: center;
@@ -383,7 +365,6 @@
     transition: all 0.15s ease;
 }
 
-/* ACTIVE PAGE */
 .pagination .active span {
     background: #2563eb;
     color: #fff;
@@ -391,21 +372,18 @@
     font-weight: 600;
 }
 
-/* HOVER */
 .pagination a:hover {
     background: #eff6ff;
     border-color: #bfdbfe;
     color: #2563eb;
 }
 
-/* DISABLED */
 .pagination .disabled span,
 .pagination [aria-disabled="true"] span {
     opacity: 0.35;
     pointer-events: none;
 }
 
-/* ===== PER PAGE SELECT ===== */
 .table-footer select {
     font-family: Inter, sans-serif;
     font-size: 12px;
@@ -450,29 +428,24 @@
     border:none;
 }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 900px) {
     .product-section__header {
         flex-direction: column;
         align-items: stretch;
     }
-
     .product-section__btn-add {
         justify-content: center;
     }
-
     .search-wrap {
         flex-direction: column;
         align-items: stretch;
     }
-
     .filter-input,
     .filter-input-date,
     .filter-select {
         width: 100%;
         min-width: unset;
     }
-
     .btn-clear {
         align-self: auto;
         justify-content: center;

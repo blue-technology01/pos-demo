@@ -34,13 +34,9 @@ class SaleService
         $this->inventoryService    = $inventoryService;
         $this->stockGuardService   = $stockGuardService;
     }
-
-    // ─────────────────────────────────────────────
-    // SCHEMA HELPERS (cached)
-    // ─────────────────────────────────────────────
-
     private function hasCashSalesColumn(): bool
-    {
+    {   
+        // Check if the cash_sales column exists in the cash_registers table
         if (self::$hasCashSalesColumn === null) {
             self::$hasCashSalesColumn = Schema::hasColumn('cash_registers', 'cash_sales');
         }
@@ -54,11 +50,6 @@ class SaleService
         }
         return self::$hasExpectedBalanceColumn;
     }
-
-    // ─────────────────────────────────────────────
-    // UOM HELPERS
-    // ─────────────────────────────────────────────
-
     /**
      * Return the product_uoms row for a given product + UOM combination, or null.
      * A missing row is NOT an error — some products use a simple base UOM (e.g. UNIT)
@@ -83,11 +74,6 @@ class SaleService
     {
         return (float) ($productUom?->cost_price ?? $product->cost_price ?? 0);
     }
-
-    // ─────────────────────────────────────────────
-    // LISTING
-    // ─────────────────────────────────────────────
-
     public function getAllSales(Request $request): LengthAwarePaginator
     {
         return Sale::query()
@@ -123,11 +109,6 @@ class SaleService
             ->paginate($request->per_page ?? 15)
             ->withQueryString();
     }
-
-    // ─────────────────────────────────────────────
-    // CREATE / CONFIRM
-    // ─────────────────────────────────────────────
-
     public function confirmSale(array $data): Sale
     {
         return $this->createSale($data);
@@ -140,7 +121,7 @@ class SaleService
         $validatedItems = [];
 
         foreach ($data['items'] as $item) {
-            // FIX: productUom can be null for base UOMs (e.g. UNIT).
+            // productUom can be null for base UOMs.
             // We no longer throw here — stock guard uses the product_uom id
             // only when the row exists.
             $productUom = $this->getProductUom(
@@ -221,21 +202,18 @@ class SaleService
                     paymentMethod: $data['payment_method'] ?? 'cash'
                 );
             }
-
             Log::info('Sale created', [
                 'invoice_no'   => $sale->invoice_no,
                 'total_amount' => $sale->total_amount,
                 'items_count'  => count($data['items']),
             ]);
-
             return $sale;
         });
     }
-
-    // ─────────────────────────────────────────────
-    // UPDATE
-    // ─────────────────────────────────────────────
-
+    /**
+     *  Update an existing sale. This method will restore stock for the old items,
+     *  deduct stock for the new items, and update the sale record.
+     */
     public function updateSale(int $id, array $data): Sale
     {
         $sale = Sale::with('items')->findOrFail($id);
@@ -266,7 +244,7 @@ class SaleService
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                // FIX: same as createSale — productUom may be null for base UOMs
+                // productUom may be null for base UOMs
                 $productUom = $this->getProductUom(
                     $item['product_code'],
                     $item['uom_code'] ?? null
@@ -334,22 +312,18 @@ class SaleService
         });
     }
 
-    // ─────────────────────────────────────────────
-    // VOID / CANCEL
-    // ─────────────────────────────────────────────
-
+    // void / cancel sale
     public function cancelSale(int $id): Sale
     {
         $sale = Sale::with('items')->findOrFail($id);
-
         if ($sale->status === 'voided') {
             throw new \Exception('This receipt has already been voided.');
         }
-
+        // Only allow voiding completed or pending receipts
         if (!in_array($sale->status, ['completed', 'pending'])) {
             throw new \Exception('Only completed or pending receipts can be voided.');
         }
-
+        // Restore stock for every item and reverse cash transaction if completed
         return DB::transaction(function () use ($sale) {
 
             foreach ($sale->items as $item) {
@@ -372,10 +346,10 @@ class SaleService
         });
     }
 
-    // ─────────────────────────────────────────────
-    // CASH REGISTER HELPERS
-    // ─────────────────────────────────────────────
-
+    /**
+     *  cash register helper function to add a cash transaction to the register.
+     *  This function will only update the register if it is open.
+    */
     private function addCashTransaction(int $registerId, float $amount, string $paymentMethod): void
     {
         $register = CashRegister::where('id', $registerId)
@@ -390,7 +364,7 @@ class SaleService
 
         $register->increment('total_sales', $amount);
         $register->increment('total_transactions', 1);
-
+        // Update cash_sales or non_cash_sales if the column exists
         if ($this->hasCashSalesColumn()) {
             if ($isCash) {
                 $register->increment('cash_sales', $amount);
@@ -398,7 +372,7 @@ class SaleService
                 $register->increment('non_cash_sales', $amount);
             }
         }
-
+        // Update expected_balance if the column exists and the payment method is cash
         if ($this->hasExpectedBalanceColumn() && $isCash) {
             $register->increment('expected_balance', $amount);
         }

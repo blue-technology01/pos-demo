@@ -31,7 +31,6 @@
             padding: 40px 20px;
         }
 
-        /* ── Illustration ── */
         .illustration {
             width: 160px;
             height: 160px;
@@ -49,7 +48,6 @@
             fill: #adb5bd;
         }
 
-        /* ── Error text ── */
         .error-code {
             font-size: 72px;
             font-weight: 800;
@@ -71,7 +69,6 @@
             line-height: 1.6;
         }
 
-        /* ── Buttons ── */
         .btn-row {
             display: flex;
             gap: 12px;

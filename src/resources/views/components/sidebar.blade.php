@@ -8,10 +8,10 @@
         .sidebar.collapsed .menu-icon,
         .sidebar.hover-expand .menu-icon,
         .menu-arrow svg {
-            width: 18px !important;
-            height: 18px !important;
-            min-width: 18px !important;
-            min-height: 18px !important;
+            width: 18px ;
+            height: 18px ;
+            min-width: 18px ;
+            min-height: 18px ;
             stroke: currentColor;
             stroke-width: 2px;
             display: inline-block;

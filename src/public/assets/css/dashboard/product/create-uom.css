@@ -12,7 +12,6 @@
     line-height: 1.2;
 }
 
-/* ---------- Card ---------- */
 .card {
     background: var(--color-background-primary, #fff);
     border: none;
@@ -24,7 +23,6 @@
     font-family: 'Inter', sans-serif;
 }
 
-/* ---------- Section title ---------- */
 .section-title {
     font-size: 12px;
     font-weight: 600;
@@ -41,7 +39,6 @@
     margin-top: 0;
 }
 
-/* ---------- Form grid ---------- */
 .form-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -49,7 +46,6 @@
     margin-bottom: 1.25rem;
 }
 
-/* ---------- Form group ---------- */
 .form-group {
     display: flex;
     flex-direction: column;
@@ -68,7 +64,6 @@
     letter-spacing: 0.01em;
 }
 
-/* ---------- Inputs & selects ---------- */
 .form-group input[type="text"],
 .form-group input[type="number"],
 .form-group input[type="email"],
@@ -103,7 +98,6 @@
     font-weight: 400;
 }
 
-/* Select chevron */
 .form-group select {
     appearance: none;
     -webkit-appearance: none;
@@ -114,14 +108,12 @@
     cursor: pointer;
 }
 
-/* Textarea */
 .form-group textarea {
     resize: vertical;
     min-height: 90px;
     line-height: 1.5;
 }
 
-/* ---------- Row actions ---------- */
 .row-actions {
     display: flex;
     align-items: center;
@@ -132,7 +124,6 @@
     border-top: 0.5px solid var(--color-border-tertiary, #e5e7eb);
 }
 
-/* Cancel */
 .btn-cancel {
     display: inline-flex;
     align-items: center;
@@ -157,7 +148,6 @@
     text-decoration: none;
 }
 
-/* Submit */
 .btn-submit {
     display: inline-flex;
     align-items: center;
@@ -177,7 +167,6 @@
 
 .btn-submit:hover { opacity: 0.88; }
 
-/* ---------- Validation error state ---------- */
 .form-group input.is-invalid,
 .form-group select.is-invalid {
     border-color: #dc2626;
@@ -190,21 +179,17 @@
     margin-top: 2px;
 }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 640px) {
     .card {
         padding: 1.1rem;
     }
-
     .form-grid {
         grid-template-columns: 1fr;
     }
-
     .row-actions {
         flex-direction: column-reverse;
         align-items: stretch;
     }
-
     .btn-cancel,
     .btn-submit {
         width: 100%;

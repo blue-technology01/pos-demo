@@ -30,7 +30,6 @@
             padding: 40px 20px;
         }
 
-        /* ── Pixel loader ── */
         .loader {
             --zoom: 0.3;
             position: relative;
@@ -55,7 +54,6 @@
             box-shadow: var(--shadow);
         }
 
-        /* ── Error text ── */
         .error-code {
             font-size: 72px;
             font-weight: 800;
@@ -77,7 +75,6 @@
             line-height: 1.6;
         }
 
-        /* ── Button ── */
         .btn-row {
             display: flex;
             gap: 12px;
@@ -126,7 +123,6 @@
             background: #1d4e8f;
         }
 
-        /* ── Keyframes ── */
         @keyframes mover {
             0%, 100% {
                 --shadow: 0px 0px transparent, 24px 0px transparent, 48px 0px transparent,

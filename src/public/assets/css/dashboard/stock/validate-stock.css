@@ -76,7 +76,6 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* Filter selects */
 .filter-wrap select {
     font-family: 'Inter', sans-serif;
     font-size: 13px;
@@ -100,7 +99,6 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* Filter button */
 .pm-btn-filter {
     display: inline-flex;
     align-items: center;
@@ -121,7 +119,6 @@
 
 .pm-btn-filter:hover { opacity: 0.88; }
 
-/* Reset button */
 .pm-btn-reset {
     display: inline-flex;
     align-items: center;
@@ -146,7 +143,7 @@
 }
 
 .pm-table-wrap {
-    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);    
+    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
     background: var(--color-background-primary, #fff);
     border: none;
     box-shadow:
@@ -157,7 +154,6 @@
     margin-bottom: 1rem;
 }
 
-/* table */
 .pm-table {
     width: 100%;
     border-collapse: collapse;
@@ -222,7 +218,6 @@
     flex-shrink: 0;
 }
 
-/* ---------- Status badges ---------- */
 .pm-badge {
     display: inline-flex;
     align-items: center;
@@ -244,13 +239,11 @@
     color: #991b1b;
 }
 
-/* System action column */
 .pm-table td:last-child {
     color: var(--color-text-secondary, #6b7280);
     font-size: 12px;
 }
 
-/* ---------- Empty cell ---------- */
 .pm-empty-cell {
     text-align: center;
     padding: 2.5rem 1rem !important;
@@ -258,7 +251,6 @@
     font-size: 13px;
 }
 
-/* ---------- Pagination ---------- */
 .table-footer {
     display: flex;
     align-items: center;
@@ -275,7 +267,6 @@
     color: var(--color-text-secondary, #6b7280);
 }
 
-/* ===== TABLE FOOTER WRAPPER ===== */
 .table-footer {
     width: 100%;
     display: flex;
@@ -283,20 +274,17 @@
     align-items: center;
 }
 
-/* LEFT SIDE (info + select) */
 .table-footer-left {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* INFO TEXT */
 .table-info {
     font-size: 13px;
     color: #374151;
 }
 
-/* ===== PAGINATION WRAPPER ===== */
 .pagination {
     display: flex;
     align-items: center;
@@ -333,7 +321,6 @@
     transition: all 0.15s ease;
 }
 
-/* ACTIVE PAGE */
 .pagination .active span {
     background: #2563eb;
     color: #fff;
@@ -341,21 +328,18 @@
     font-weight: 600;
 }
 
-/* HOVER */
 .pagination a:hover {
     background: #eff6ff;
     border-color: #bfdbfe;
     color: #2563eb;
 }
 
-/* DISABLED */
 .pagination .disabled span,
 .pagination [aria-disabled="true"] span {
     opacity: 0.35;
     pointer-events: none;
 }
 
-/* ===== PER PAGE SELECT ===== */
 .table-footer select {
     font-family: Inter, sans-serif;
     font-size: 12px;
@@ -399,28 +383,23 @@
 .pagination-numbers .dots{
     border:none;
 }
-/* ---------- Responsive ---------- */
 @media (max-width: 768px) {
     .pm-search-box {
         flex-direction: column;
         align-items: stretch;
     }
-
     .pm-search-wrap {
         max-width: 100%;
     }
-
     .pm-btn-filter,
     .pm-btn-reset {
         width: 100%;
         justify-content: center;
     }
-
     .pm-pagination {
         flex-direction: column;
         align-items: flex-start;
     }
-
     .pm-table th,
     .pm-table td {
         padding: 10px 12px;

@@ -21,8 +21,8 @@ class ReportIndexController extends Controller
 
         $startDate = $request->input('start_date') ?? now()->subDays(6)->format('Y-m-d');
         $endDate   = $request->input('end_date')   ?? now()->format('Y-m-d');
-
-        // Return JSON for AJAX requests
+        
+        // return json for ajax requests
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'chartData' => $this->revenueReportService->getChartData($startDate, $endDate),

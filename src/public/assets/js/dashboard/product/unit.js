@@ -1,11 +1,9 @@
 $(function () {
 
-  // Define all selectors in one place for easy maintenance
   const SEL = {
     dialog:  "#pm-dialog",
     form:    "#pm-form",
     openBtn: "#open-pm-modal",
-    // Form fields
     id:           "#pm_id",
     name:         "#pm_name",
     code:         "#pm_code",

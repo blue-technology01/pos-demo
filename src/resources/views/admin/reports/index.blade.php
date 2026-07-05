@@ -3,31 +3,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard/report/index.css') }}" data-turbo-track="reload">
-    <style>
-        .report-date svg,
-        .rnc-icon svg,
-        .rnc-arrow {
-            display: inline-block;
-            vertical-align: middle;
-            flex-shrink: 0;
-        }
-        .report-date svg {
-            width: 16px;
-            height: 16px;
-            margin-right: 6px;
-            color: #6b7280;
-        }
-        .rnc-icon svg {
-            width: 20px;
-            height: 20px;
-        }
-        .rnc-arrow {
-            width: 18px;
-            height: 18px;
-            color: #9ca3af;
-            margin-left: auto;
-        }
-    </style>
 @endpush
 
 @section('title', 'Reports Overview')

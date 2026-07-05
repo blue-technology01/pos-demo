@@ -1,4 +1,3 @@
-/* ---------- Page wrapper ---------- */
 .unit-section {
     padding: 1.75rem 0;
     font-family: 'Inter', sans-serif;
@@ -6,7 +5,6 @@
     color: var(--color-text-primary, #111);
 }
 
-/* ---------- Page header ---------- */
 .unit-section__header {
     display: flex;
     align-items: center;
@@ -24,7 +22,6 @@
     flex-shrink: 0;
 }
 
-/* ---------- Search / filter form ---------- */
 .search-wrap {
     display: flex;
     align-items: center;
@@ -33,14 +30,12 @@
     flex: 1;
 }
 
-/* Date inputs — fixed width so they don't stretch */
 .search-wrap input[type="date"].filter-input {
     width: auto;
     min-width: 150px;
     flex-shrink: 0;
 }
 
-/* Search box with icon */
 .search-box {
     position: relative;
     display: flex;
@@ -63,8 +58,6 @@
     width: 100%;
     padding-left: 38px;
 }
-
-/* Shared filter input */
 .filter-input {
     font-family: 'Inter', sans-serif;
     font-size: 13px;
@@ -75,7 +68,6 @@
     color: var(--color-text-primary, #111);
     outline: none;
     transition: border-color 0.15s, box-shadow 0.15s;
-    /* No width: 100% here — let each input control its own width */
 }
 
 .filter-input::placeholder {
@@ -87,7 +79,6 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* Filter button */
 .btn-filter {
     display: inline-flex;
     align-items: center;
@@ -113,7 +104,6 @@
 
 .btn-filter:hover { opacity: 0.88; }
 
-/* Reset button */
 .btn-reset {
     display: inline-flex;
     align-items: center;
@@ -138,7 +128,6 @@
     text-decoration: none;
 }
 
-/* ---------- Export buttons ---------- */
 .export-actions {
     display: flex;
     align-items: center;
@@ -216,7 +205,6 @@
     -webkit-overflow-scrolling: touch;
 }
 
-/* ---------- Table ---------- */
 .table-custom {
     width: 100%;
     border-collapse: collapse;
@@ -261,19 +249,16 @@
     background: #f8faff;
 }
 
-/* Invoice number */
 .table-custom td strong {
     font-weight: 600;
     color: var(--color-text-primary, #111);
 }
 
-/* Amount */
 .amount {
     font-weight: 600;
     color: #2563eb;
 }
 
-/* Payment method pill */
 .payment-method {
     display: inline-flex;
     align-items: center;
@@ -286,7 +271,6 @@
     letter-spacing: 0.03em;
 }
 
-/* ---------- Status badges ---------- */
 .status-badge {
     display: inline-flex;
     align-items: center;
@@ -318,7 +302,6 @@
     color: #5b21b6;
 }
 
-/* ---------- Action buttons ---------- */
 .action-flex {
     display: flex;
     align-items: center;
@@ -379,7 +362,6 @@
     border-color: #f87171;
 }
 
-/* ---------- Pagination ---------- */
 .unit-card > div:last-child {
     padding: 12px 16px;
     border-top: 0.5px solid var(--color-border-tertiary, #e5e7eb);
@@ -433,10 +415,6 @@
     color: #2563eb;
 }
 
-/* ============================================================
-   Invoice Modal
-   ============================================================ */
-
 .inv-overlay {
     display: none;
     position: fixed;
@@ -460,7 +438,6 @@
     to   { opacity: 1; }
 }
 
-/* ---------- Modal box ---------- */
 .inv-modal {
     background: #fff;
     border-radius: 20px;
@@ -479,12 +456,10 @@
     to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Scrollbar styling */
 .inv-modal::-webkit-scrollbar { width: 4px; }
 .inv-modal::-webkit-scrollbar-track { background: transparent; }
 .inv-modal::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 99px; }
 
-/* ---------- Close button ---------- */
 .inv-close-btn {
     position: absolute;
     top: 14px;
@@ -511,7 +486,6 @@
     border-color: #fecaca;
 }
 
-/* ---------- Invoice header ---------- */
 .inv-header {
     display: flex;
     align-items: flex-start;
@@ -550,7 +524,6 @@
     margin-top: 3px;
 }
 
-/* ---------- Invoice meta row ---------- */
 .inv-meta {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -583,7 +556,6 @@
     color: #111;
 }
 
-/* ---------- Invoice body / items table ---------- */
 .inv-body {
     padding: 1rem 1.5rem;
 }
@@ -628,7 +600,6 @@
     margin-top: 2px;
 }
 
-/* ---------- Invoice footer ---------- */
 .inv-foot {
     display: flex;
     align-items: flex-end;
@@ -671,7 +642,6 @@
     color: #2563eb;
 }
 
-/* ---------- Pagination ---------- */
 .table-footer {
     display: flex;
     align-items: center;
@@ -688,7 +658,6 @@
     color: var(--color-text-secondary, #6b7280);
 }
 
-/* ===== TABLE FOOTER WRAPPER ===== */
 .table-footer {
     width: 100%;
     display: flex;
@@ -696,20 +665,17 @@
     align-items: center;
 }
 
-/* LEFT SIDE (info + select) */
 .table-footer-left {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* INFO TEXT */
 .table-info {
     font-size: 13px;
     color: #374151;
 }
 
-/* ===== PAGINATION WRAPPER ===== */
 .pagination {
     display: flex;
     align-items: center;
@@ -746,7 +712,6 @@
     transition: all 0.15s ease;
 }
 
-/* ACTIVE PAGE */
 .pagination .active span {
     background: #2563eb;
     color: #fff;
@@ -754,21 +719,18 @@
     font-weight: 600;
 }
 
-/* HOVER */
 .pagination a:hover {
     background: #eff6ff;
     border-color: #bfdbfe;
     color: #2563eb;
 }
 
-/* DISABLED */
 .pagination .disabled span,
 .pagination [aria-disabled="true"] span {
     opacity: 0.35;
     pointer-events: none;
 }
 
-/* ===== PER PAGE SELECT ===== */
 .table-footer select {
     font-family: Inter, sans-serif;
     font-size: 12px;
@@ -813,46 +775,36 @@
     border:none;
 }
 
-
-/* ---------- Responsive ---------- */
 @media (max-width: 768px) {
     .unit-section__header {
         flex-direction: column;
         align-items: flex-start;
     }
-
     .search-wrap {
         width: 100%;
     }
-
     .search-box {
         max-width: 100%;
     }
-
     .export-actions {
         margin-left: 0;
         width: 100%;
     }
-
     .btn-export {
         flex: 1;
         justify-content: center;
     }
-
     .inv-meta {
         grid-template-columns: 1fr 1fr;
     }
-
     .inv-meta-cell:nth-child(2),
     .inv-meta-cell:nth-child(4) {
         border-right: none;
     }
-
     .inv-foot {
         flex-direction: column;
         align-items: flex-start;
     }
-
     .inv-totals {
         width: 100%;
     }

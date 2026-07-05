@@ -8,6 +8,7 @@ use App\Http\Controllers\Cash\CashController;
 use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Printer\PrinterController;
 use App\Http\Controllers\Product\CategoryController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Product\ProductUomController;
@@ -40,6 +41,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset-password',              [ForgotPasswordController::class, 'resetPassword'])->name('auth.reset-password.post');
 });
 
+Route::get('/cashier/customer-display', function () {
+            return view('cashier.customer-display');
+})->name('cashier.customer.display');
+
 Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('auth.logout');
@@ -51,42 +56,29 @@ Route::middleware('auth')->group(function () {
         Route::post('/generate',                [NotificationController::class, 'generate'])->name('generate');
     });
 
-    /*
-    |----------------------------------------------------------------------
-    | ADMIN — role:admin protects everything inside
-    | Admin has all 40 permissions so no inner permission middleware needed
-    |----------------------------------------------------------------------
-    */
-
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
-
         // Dashboard
         Route::get('/dashboard',        [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/data',   [DashboardController::class, 'data'])->name('dashboard.data');
-
         // Profile
         Route::get('/profile',          [RegisterController::class, 'userProfile'])->name('profile');
         Route::get('/preview-settings', [RegisterController::class, 'previewSetting'])->name('preview-settings');
-        Route::post('/preview/update',  [RegisterController::class, 'updatePreview'])->name('preview.update');
-
+        Route::post('/preview/update',  [PrinterController::class, 'updatePreview'])->name('preview.update');
         // Users
         Route::get('/users',                [RegisterController::class, 'showFormRegister'])->name('users');
         Route::post('/users/register',      [RegisterController::class, 'register'])->name('users.register');
         Route::put('/users/{user}',         [RegisterController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}',      [RegisterController::class, 'destroy'])->name('users.destroy');
-
         // Category
         Route::get('/category',             [CategoryController::class, 'index'])->name('category');
         Route::post('/category',            [CategoryController::class, 'store'])->name('category.store');
         Route::put('/category/{code}',      [CategoryController::class, 'update'])->name('category.update');
         Route::delete('/category/{code}',   [CategoryController::class, 'destroy'])->name('category.destroy');
-
         // Unit
         Route::get('/unit',             [UomController::class, 'index'])->name('unit');
         Route::post('/unit',            [UomController::class, 'store'])->name('unit.store');
         Route::put('/unit/{code}',      [UomController::class, 'update'])->name('unit.update');
         Route::delete('/unit/{code}',   [UomController::class, 'destroy'])->name('unit.destroy');
-
         // Products
         Route::get('/products',             [ProductController::class, 'index'])->name('products.index');
         Route::get('/products/create',      [ProductController::class, 'create'])->name('products.create');
@@ -94,7 +86,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/products/{code}/edit', [ProductController::class, 'edit'])->name('products.edit');
         Route::put('/products/{code}',      [ProductController::class, 'update'])->name('products.update');
         Route::delete('/products/{code}',   [ProductController::class, 'destroy'])->name('products.destroy');
-
         // Product UOM
         Route::get('/product-uom',              [ProductUomController::class, 'index'])->name('product-uom.index');
         Route::get('/product-uom/create',       [ProductUomController::class, 'create'])->name('product-uom.create');
@@ -102,14 +93,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/product-uom/{id}/edit',    [ProductUomController::class, 'edit'])->name('product-uom.edit');
         Route::put('/product-uom/{id}',         [ProductUomController::class, 'update'])->name('product-uom.update');
         Route::delete('/product-uom/{id}',      [ProductUomController::class, 'destroy'])->name('product-uom.destroy');
-
         // Customers
         Route::get('/customers/search',         [CustomerController::class, 'searchAjax'])->name('customers.search.ajax');
         Route::get('/customers',                [CustomerController::class, 'index'])->name('customers.index');
-        Route::post('/customers',               [CustomerController::class, 'store'])->name('customers.store');
+        Route::post('/customers',               [CustomerController::class, 'store'])->name('customers.st   ore');
         Route::put('/customers/{customer}',     [CustomerController::class, 'update'])->name('customers.update');
         Route::delete('/customers/{customer}',  [CustomerController::class, 'destroy'])->name('customers.destroy');
-
         // Sales
         Route::get('/sales',                    [SaleController::class, 'index'])->name('sales.index');
         Route::post('/sales',                   [SaleController::class, 'store'])->name('sales.store');
@@ -117,14 +106,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/sales/{sale}/edit',        [SaleController::class, 'edit'])->name('sales.edit');
         Route::put('/sales/{sale}',             [SaleController::class, 'update'])->name('sales.update');
         Route::patch('/sales/{sale}/cancel',    [SaleController::class, 'cancel'])->name('sales.cancel');
-
         // Inventory & Stock
         Route::get('/stock-update',     [InventoryController::class, 'index'])->name('stock-update');
         Route::get('/stock-validation', [StockValidateController::class, 'index'])->name('stock-validation');
-
         // Cash Register / Shift
         Route::get('/shift', [CashController::class, 'index'])->name('shift');
-
         // Reports
         Route::get('/reports',          [ReportIndexController::class, 'index'])->name('reports.index');
         Route::get('/revenue-tracking', [RevenueTrackingController::class, 'index'])->name('revenue-tracking');
@@ -133,17 +119,17 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('cashier')->name('cashier.')->middleware('role:cashier')->group(function () {
-
+        // Customers
+        Route::get('/customers/search', [CustomerController::class, 'searchAjax'])->name('customers.search.ajax');
+        Route::post('/customers',       [CustomerController::class, 'store'])->name('customers.store');
         // POS
         Route::get('/pos',                                      [PosController::class, 'index'])->name('pos');
         Route::get('/pos/products',                             [ProductUomController::class, 'posProducts'])->name('pos.products');
         Route::get('/pos/products/{productCode}/uoms',          [ProductUomController::class, 'getByProduct'])->name('pos.products.uoms');
-
         // Shift
         Route::post('/open',                    [CashController::class, 'open'])->name('open');
         Route::post('/close',                   [CashController::class, 'close'])->name('close');
         Route::get('/current-shift-details',    [CashController::class, 'getCurrentShiftDetails'])->name('shift-details');
-
         // Sale Items (cart)
         Route::prefix('sale-items')->name('sale-items.')->group(function () {
             Route::post('/',            [SaleItemController::class, 'store'])->name('store');

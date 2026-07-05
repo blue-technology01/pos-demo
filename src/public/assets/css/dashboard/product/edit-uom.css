@@ -37,7 +37,6 @@
     letter-spacing: 0.01em;
 }
 
-/* ---------- Inputs ---------- */
 .form-group input[type="text"],
 .form-group input[type="number"] {
     width: 100%;
@@ -65,7 +64,6 @@
     font-weight: 400;
 }
 
-/* ---------- Readonly fields ---------- */
 .form-group input[readonly] {
     background: var(--color-background-secondary, #f9fafb);
     color: var(--color-text-secondary, #6b7280);
@@ -78,7 +76,6 @@
     box-shadow: none;
 }
 
-/* ---------- Two-column row ---------- */
 .row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -90,7 +87,6 @@
     margin-bottom: 0;
 }
 
-/* ---------- Checkbox ---------- */
 .form-group input[type="checkbox"] {
     width: 15px;
     height: 15px;
@@ -123,7 +119,6 @@
     background: var(--color-background-secondary, #f9fafb);
 }
 
-/* ---------- Button group ---------- */
 .btn-group {
     display: flex;
     align-items: center;
@@ -134,7 +129,6 @@
     justify-content: flex-end;
 }
 
-/* Save / Submit */
 .btn-save {
     display: inline-flex;
     align-items: center;
@@ -157,7 +151,6 @@
     opacity: 0.88;
 }
 
-/* Cancel */
 .btn-cancel {
     display: inline-flex;
     align-items: center;
@@ -182,7 +175,6 @@
     text-decoration: none;
 }
 
-/* ---------- Validation error state ---------- */
 .form-group input.is-invalid {
     border-color: #dc2626;
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
@@ -194,21 +186,17 @@
     margin-top: 2px;
 }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 640px) {
     .card {
         padding: 1.1rem;
     }
-
     .row {
         grid-template-columns: 1fr;
     }
-
     .btn-group {
         flex-direction: column-reverse;
         align-items: stretch;
     }
-
     .btn-save,
     .btn-cancel {
         width: 100%;

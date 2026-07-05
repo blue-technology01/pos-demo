@@ -81,9 +81,6 @@
     border-bottom: 0.5px solid var(--color-border-tertiary, #e5e7eb);
 }
 
-/* ============================================================
-   Form Groups
-   ============================================================ */
 .form-group {
     display: flex;
     flex-direction: column;
@@ -114,9 +111,6 @@
     gap: 12px;
 }
 
-/* ============================================================
-   Inputs
-   ============================================================ */
 .form-input,
 .form-select {
     width: 100%;
@@ -150,14 +144,12 @@
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
-/* Textarea */
 textarea.form-input {
     resize: vertical;
     min-height: 100px;
     line-height: 1.5;
 }
 
-/* Select */
 .form-select {
     appearance: none;
     -webkit-appearance: none;
@@ -168,16 +160,12 @@ textarea.form-input {
     cursor: pointer;
 }
 
-/* Validation error text */
 .text-danger {
     font-size: 11px;
     color: #dc2626;
     margin-top: 2px;
 }
 
-/* ============================================================
-   Image Upload
-   ============================================================ */
 .image-upload-wrap {
     position: relative;
     display: flex;
@@ -225,7 +213,6 @@ textarea.form-input {
     text-underline-offset: 2px;
 }
 
-/* Image preview */
 .image-preview {
     display: none;
     margin-top: 12px;
@@ -252,9 +239,6 @@ textarea.form-input {
     white-space: nowrap;
 }
 
-/* ============================================================
-   Form Actions
-   ============================================================ */
 .form-actions {
     display: flex;
     align-items: center;
@@ -306,9 +290,6 @@ textarea.form-input {
 
 .btn-submit:hover { opacity: 0.88; }
 
-/* ============================================================
-   Toast Notification
-   ============================================================ */
 .toast {
     position: fixed;
     top: 20px;
@@ -366,9 +347,6 @@ textarea.form-input {
     to   { opacity: 0; transform: translateX(16px); }
 }
 
-/* ============================================================
-   Responsive
-   ============================================================ */
 @media (max-width: 900px) {
     .form-grid {
         grid-template-columns: 1fr;
@@ -380,16 +358,13 @@ textarea.form-input {
         flex-direction: column;
         align-items: flex-start;
     }
-
     .form-row-2 {
         grid-template-columns: 1fr;
     }
-
     .form-actions {
         flex-direction: column-reverse;
         align-items: stretch;
     }
-
     .btn-cancel,
     .btn-submit {
         width: 100%;

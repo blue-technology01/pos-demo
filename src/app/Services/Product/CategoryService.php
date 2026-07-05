@@ -40,10 +40,10 @@ class CategoryService
 
     /**
      * Find a category by code or throw 404.
-     */
+    */
     public function findOrFail(string $code): Category
     {
-        return Category::findOrFail($code);
+        return Category::where('code', $code)->firstOrFail();
     }
 
     /**
@@ -65,17 +65,17 @@ class CategoryService
      */
     public function update(string $code, array $data): Category
     {
-        $category = Category::findOrFail($code);
+        $category = $this->findOrFail($code);
 
-        $image = isset($data['image']) && $data['image'] instanceof UploadedFile
+        $image = ($data['image'] ?? null) instanceof UploadedFile
             ? $this->replaceImage($category->image, $data['image'])
             : $category->image;
 
         $category->update([
-            'name'        => $data['name']        ?? $category->name,
+            'name'        => $data['name'] ?? $category->name,
             'description' => $data['description'] ?? $category->description,
             'image'       => $image,
-            'status'      => $data['status']       ?? $category->status,
+            'status'      => $data['status'] ?? $category->status,
         ]);
 
         return $category->fresh();
@@ -103,11 +103,7 @@ class CategoryService
 
         return $category->fresh();
     }
-
-    /* ─────────────────────────────────────────
-    |  Private helpers
-    ───────────────────────────────────────── */
-
+    // private helper
     private function applySearch($query, ?string $search): void
     {
         if (blank($search)) return;
@@ -161,10 +157,10 @@ class CategoryService
         return $new->store(self::IMAGE_DIR, self::IMAGE_DISK);
     }
 
-    private function deleteImage(?string $path): void
+   private function deleteImage(?string $path): void
     {
-        if ($path && Storage::disk(self::IMAGE_DISK)->exists($path)) {
-            Storage::disk(self::IMAGE_DISK)->delete($path);
-        }
+        if (!$path) return;
+
+        Storage::disk(self::IMAGE_DISK)->delete($path);
     }
 }

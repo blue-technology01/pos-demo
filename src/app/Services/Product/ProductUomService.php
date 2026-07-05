@@ -4,8 +4,8 @@ namespace App\Services\Product;
 
 use App\Models\ProductUom;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 
 class ProductUomService

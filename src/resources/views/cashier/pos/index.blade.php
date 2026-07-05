@@ -17,21 +17,20 @@
 <div class="pos-dashboard">
     @include('components.navbar-pos')
     <main class="pos-dashboard__main">
-
-        {{-- ══════════════════ CATALOG SECTION ══════════════════ --}}
+        {{-- category --}}
         <section class="pos-catalog">
 
             {{-- Search + Action Buttons --}}
             <div class="pos-catalog__search-wrap" style="padding:10px;">
                 <div class="pos-catalog__search">
                     <input type="text" id="product-search" class="pos-catalog__search-input"
-                           placeholder="finding product or barcode..." autocomplete="off">
+                           placeholder="Finding product or barcode..." autocomplete="off">
                     <button class="search-submit-btn">
                         <span class="material-symbols-outlined">search</span>
                     </button>
                 </div>
 
-                <button class="action-icon-btn action-icon-btn--scan" title="ស្កេនបាកូដ" id="start-btn">
+                <button class="action-icon-btn action-icon-btn--scan" title="scance barcode" id="start-btn">
                     <span class="material-symbols-outlined">document_scanner</span>
                 </button>
 
@@ -42,7 +41,7 @@
                 </button>
 
                 <button class="action-icon-btn action-icon-btn--customer" id="open-customer-btn"
-                        title="ជ្រើសរើសអតិថិជន" onclick="openCustomerFilterPopup()">
+                        title="choose customer" onclick="openCustomerFilterPopup()">
                     <span class="material-symbols-outlined">person_add</span>
                 </button>
             </div>
@@ -74,6 +73,10 @@
 
             <div class="pos-sidebar__cart-body">
                 <div class="pos-sidebar__cart-empty" id="cart-empty-state">
+                    <span class="material-symbols-outlined" aria-hidden="true"
+                        style="font-size: 100px; color: #9ca3af;">
+                        shopping_cart
+                    </span>
                     <p class="pos-sidebar__cart-empty-text">Don't have items</p>
                 </div>
                 <ul class="pos-sidebar__cart-list" id="cart-list"
@@ -188,7 +191,7 @@
     <div class="payment-modal-content">
         <div class="payment-receipt-side">
             <div class="receipt-header">
-                <img src="{{ asset('assets/images/logo.png') }}" alt="POS Logo" width="120" >
+                {{-- <img src="{{ asset('assets/images/logo.png') }}" alt="POS Logo" width="120" > --}}
                 {{-- <div class="shop-brand">ShopPoint POS</div> --}}
                 <h3 id="modal-customer-name">View</h3>
                 <p id="modal-invoice-no" class="font-mono">#INV-{{ date('Ymd') }}-0001</p>
@@ -328,18 +331,23 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
-<script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-    window.PREVIEW_RECEIPT   = {{ auth()->user()->preview_receipt ? 'true' : 'false' }};
-    window.isShiftOpen       = {{ $currentShift ? 'true' : 'false' }};
-    window.expectedShiftBalance = parseFloat("{{ $currentShift ? ($currentShift->opening_balance + $currentShift->total_sales) : 0 }}");
-    window.CUSTOMER_SEARCH_URL  = "{!! route('admin.customers.search.ajax') !!}";
-    window.CUSTOMER_STORE_URL   = "{!! route('admin.customers.store') !!}";
+{{--  All window.* globals defined first, no DOM access here --}}
+<script>
+    window.CUSTOMER_DISPLAY_URL     = "{{ route('cashier.customer.display') }}";
+    window.PREVIEW_RECEIPT          = {{ auth()->user()->preview_receipt ? 'true' : 'false' }};
+    window.isShiftOpen              = {{ $currentShift ? 'true' : 'false' }};
+    window.expectedShiftBalance     = parseFloat("{{ $currentShift ? ($currentShift->opening_balance + $currentShift->total_sales) : 0 }}");
+    window.CUSTOMER_SEARCH_URL      = "{!! route('cashier.customers.search.ajax') !!}";
+    window.CUSTOMER_STORE_URL       = "{!! route('cashier.customers.store') !!}";
+    window.CSRF_TOKEN               = "{{ csrf_token() }}";
+    window.selectedCustomerId       = null;
+    window.selectedCustomerName     = null;
 
     window.ROUTES = {
         posProducts: "{!! route('cashier.pos.products') !!}",
@@ -349,43 +357,44 @@
         clearCart:   "{!! route('cashier.sale-items.clear') !!}",
         confirmSale: "{!! route('cashier.sale-items.confirm') !!}",
     };
+
     window.POS_ASSETS = {
         storageBase: "{{ asset('storage') }}",
         placeholder: "{{ asset('assets/images/not-product.png') }}",
     };
-    window.CSRF_TOKEN = "{{ csrf_token() }}";
 
     window.currentRegisterId = {{
         \App\Models\CashRegister::where('user_id', auth()->id())
             ->where('status', 'open')
             ->value('id') ?? 'null'
     }};
-    window.selectedCustomerId = null;
-
-    const startBtn = document.getElementById('start-btn');
-        const video = document.getElementById('webcam');
-
-        startBtn.addEventListener('click', async () => {
-        try {
-            // 1. Request camera access
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-
-            // 2. Set the video source
-            video.srcObject = stream;
-
-            // 3. Make the video visible
-            video.style.display = 'block';
-            startBtn.style.display = 'none'; // Hide button once camera is active
-
-        } catch (err) {
-            console.error("Camera access denied or failed:", err);
-            alert("Could not access the camera. Please check permissions.");
-        }
-        });
 </script>
+
+{{--  Deferred JS files — load after globals are set --}}
 <script src="{{ asset('assets/js/components/togglescreen.js') }}" defer></script>
 <script src="{{ asset('assets/js/dashboard/pos/pos.js') }}" defer></script>
 <script src="{{ asset('assets/js/dashboard/customer/customer-pos.js') }}" defer></script>
 <script src="{{ asset('assets/js/dashboard/pos/cash-register-pos.js') }}" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+{{--  DOM-dependent code runs after everything is loaded --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const startBtn = document.getElementById('start-btn');
+        const video    = document.getElementById('webcam');
+
+        if (!startBtn || !video) return; {{-- guard if elements don't exist --}}
+
+        startBtn.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject    = stream;
+                video.style.display    = 'block';
+                startBtn.style.display = 'none';
+            } catch (err) {
+                console.error('Camera access denied or failed:', err);
+                alert('Could not access the camera. Please check permissions.');
+            }
+        });
+    });
+</script>
 @endpush

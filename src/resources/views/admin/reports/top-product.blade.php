@@ -71,7 +71,7 @@
             {{-- Reset --}}
             <a href="{{ route('admin.top-product') }}" class="btn-reset" onclick="showLoader()">
                 <i class="ti ti-refresh" aria-hidden="true"></i> Reset
-            </a>    
+            </a>
 
             {{-- Excel Export --}}
             <a href="#" class="btn-excel">
@@ -107,7 +107,7 @@
     <div id="list-view" class="tp-panel hidden">
         <div class="tp-panel__header">
             <div>
-                <p class="tp-panel__title">Product rankings</p> 
+                <p class="tp-panel__title">Product rankings</p>
                 <p class="tp-panel__sub">Ranked by total revenue generation</p>
             </div>
             <span class="tp-panel__meta">
@@ -227,7 +227,7 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    
+
 <script>
 window.topProductsData = @json($chartData);
 </script>

@@ -37,7 +37,6 @@
     margin-bottom: 1.25rem;
 }
 
-/* Shared input / select base */
 .tp-filter-bar input[type="text"],
 .tp-filter-bar input[type="date"],
 .tp-filter-bar .filter-category {
@@ -61,7 +60,6 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* Select arrow */
 .tp-filter-bar .filter-category {
     appearance: none;
     -webkit-appearance: none;
@@ -72,7 +70,6 @@
     cursor: pointer;
 }
 
-/* Search wrap — icon inside input */
 .tp-search-wrap {
     position: relative;
     display: flex;
@@ -91,7 +88,6 @@
     padding-left: 36px;
 }
 
-/* Buttons */
 .btn-filter,
 .btn-excel,
 .btn-reset {
@@ -126,8 +122,6 @@
     background: var(--color-background-secondary, #f3f4f6);
     color: var(--color-text-primary, #111);
 }
-
-/* View toggle */
 .tp-view-toggle {
     display: flex;
     border: 0.5px solid #2563eb;
@@ -391,7 +385,6 @@
     color: var(--color-text-secondary, #6b7280);
 }
 
-/* Per-page select form */
 .table-footer form {
     display: inline-flex;
     align-items: center;
@@ -421,7 +414,6 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* Pagination (numbers-only partial) */
 .table-footer .pagination,
 .table-footer nav .pagination {
     display: flex;
@@ -502,12 +494,10 @@
         margin-left: 0;
         width: 100%;
     }
-
     .tp-view-btn {
         flex: 1;
         justify-content: center;
     }
-
     .table-footer {
         flex-direction: column;
         align-items: flex-start;

@@ -18,7 +18,6 @@
     gap: 10px;
 }
 
-/* Filter form */
 .toolbar-left form {
     display: flex;
     align-items: center;
@@ -73,7 +72,6 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* Filter submit button */
 .toolbar-left form button[type="submit"] {
     font-family: 'Inter', sans-serif;
     font-size: 13px;
@@ -91,7 +89,6 @@
 
 .toolbar-left form button[type="submit"]:hover { opacity: 0.88; }
 
-/* Add Category button */
 .btn-add {
     display: inline-flex;
     align-items: center;
@@ -113,7 +110,6 @@
 .btn-add:hover { opacity: 0.88; }
 .btn-add i { font-size: 15px; }
 
-/* ---------- Table card ---------- */
 .table-card {
     background: var(--color-background-primary, #fff);
     border: none;
@@ -129,7 +125,6 @@
     -webkit-overflow-scrolling: touch;
 }
 
-/* ---------- Table ---------- */
 .table-card table {
     width: 100%;
     border-collapse: collapse;
@@ -187,7 +182,6 @@
     background: #f8faff;
 }
 
-/* ---------- Status badge ---------- */
 .badge {
     display: inline-flex;
     align-items: center;
@@ -201,7 +195,6 @@
 .badge-active   { background: #dcfce7; color: #166534; }
 .badge-inactive { background: #fee2e2; color: #991b1b; }
 
-/* ---------- Action buttons ---------- */
 .actions-cell {
     white-space: nowrap;
     text-align: right;
@@ -244,7 +237,6 @@
     opacity: 1;
 }
 
-/* ---------- Empty row ---------- */
 .empty-row td {
     text-align: center;
     padding: 2.5rem 1rem;
@@ -253,7 +245,6 @@
 }
 
 
-/* ===== TABLE FOOTER WRAPPER ===== */
 .table-footer {
     width: 100%;
     display: flex;
@@ -262,20 +253,17 @@
     padding: 1rem;
 }
 
-/* LEFT SIDE (info + select) */
 .table-footer-left {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* INFO TEXT */
 .table-info {
     font-size: 13px;
     color: #374151;
 }
 
-/* ===== PAGINATION WRAPPER ===== */
 .pagination {
     display: flex;
     align-items: center;
@@ -312,7 +300,6 @@
     transition: all 0.15s ease;
 }
 
-/* ACTIVE PAGE */
 .pagination .active span {
     background: #2563eb;
     color: #fff;
@@ -320,21 +307,18 @@
     font-weight: 600;
 }
 
-/* HOVER */
 .pagination a:hover {
     background: #eff6ff;
     border-color: #bfdbfe;
     color: #2563eb;
 }
 
-/* DISABLED */
 .pagination .disabled span,
 .pagination [aria-disabled="true"] span {
     opacity: 0.35;
     pointer-events: none;
 }
 
-/* ===== PER PAGE SELECT ===== */
 .table-footer select {
     font-family: Inter, sans-serif;
     font-size: 12px;
@@ -378,7 +362,6 @@
     border:none;
 }
 
-/* ---------- Modal overlay ---------- */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -396,7 +379,6 @@
     display: flex;
 }
 
-/* ---------- Modal box ---------- */
 .modal {
     background: var(--color-background-primary, #fff);
     border-radius: 20px;
@@ -412,7 +394,6 @@
     to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* ---------- Modal header ---------- */
 .modal-header {
     display: flex;
     align-items: center;
@@ -457,7 +438,6 @@
     border-color: #fecaca;
 }
 
-/* ---------- Modal body ---------- */
 .modal-body {
     padding: 1.25rem 1.5rem;
     display: flex;
@@ -465,7 +445,6 @@
     gap: 14px;
 }
 
-/* ---------- Edit chip (unit preview) ---------- */
 .edit-chip {
     display: flex;
     align-items: center;
@@ -488,7 +467,6 @@
     color: var(--color-text-tertiary, #9ca3af);
 }
 
-/* ---------- Form layout ---------- */
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -505,7 +483,6 @@
     gap: 5px;
 }
 
-/* 3 columns when there are 3 items */
 .form-row:has(.form-group:nth-child(3)) {
     grid-template-columns: 1fr 1fr 1fr;
 }
@@ -557,7 +534,6 @@ select.form-control {
     cursor: pointer;
 }
 
-/* ---------- Modal footer ---------- */
 .modal-footer {
     display: flex;
     align-items: center;
@@ -608,7 +584,6 @@ select.form-control {
 
 .btn-submit:hover { opacity: 0.88; }
 
-/* ---------- Toast notification ---------- */
 @keyframes slideIn {
     from { opacity: 0; transform: translateX(20px); }
     to   { opacity: 1; transform: translateX(0); }
@@ -619,35 +594,28 @@ select.form-control {
     to   { opacity: 0; transform: translateX(20px); }
 }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 768px) {
     .toolbar {
         flex-direction: column;
         align-items: stretch;
     }
-
     .toolbar-left,
     .toolbar-right {
         flex-wrap: wrap;
     }
-
     .search-box input[type="text"] {
         min-width: unset;
         width: 100%;
     }
-
     .form-row {
         grid-template-columns: 1fr;
     }
-
     .form-row:has(.form-group:nth-child(3)) {
         grid-template-columns: 1fr;
     }
-
     .actions-cell {
         text-align: left;
     }
-
     .table-footer {
         flex-direction: column;
         align-items: flex-start;

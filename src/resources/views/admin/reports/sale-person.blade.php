@@ -226,7 +226,8 @@
                     <div id="regionChart"></div>
                     <div class="sp-chart-center">
                         <span class="sp-chart-center__val">
-                            ${{ number_format(collect($chartData)->sum('revenue') / 1000, 1) }}k
+                            {{-- Removed the 'k' suffix to match actual dollar values --}}
+                            ${{ number_format(collect($chartData)->sum('revenue'), 2) }}
                         </span>
                         <span class="sp-chart-center__lbl">Total</span>
                     </div>
@@ -241,18 +242,17 @@
                         $color  = $colors[$i % count($colors)];
                     @endphp
                     <div class="sp-region-row">
-                        <div class="sp-region-left">
+                       <div class="sp-region-left">
                             <span class="sp-region-dot" style="background:{{ $color }}"></span>
                             <span class="sp-region-name">{{ $item['name'] }}</span>
                         </div>
-                        <span class="sp-region-val">${{ number_format($item['revenue'] / 1000, 1) }}k</span>
+                        <span class="sp-region-val">${{ number_format($item['revenue'], 2) }}</span>
                     </div>
                 @endforeach
             </div>
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
@@ -268,9 +268,8 @@
     const chartData = @json($chartData);
     const labels    = chartData.map(d => d.name);
     const series    = chartData.map(d => parseFloat(d.revenue));
-    const total     = series.reduce((a, b) => a + b, 0);
-    // chart
-    const chart = new ApexCharts(document.querySelector('#regionChart'), {
+
+    new ApexCharts(document.querySelector('#regionChart'), {
         chart: {
             type    : 'donut',
             width   : 220,
@@ -291,18 +290,14 @@
         },
         tooltip: {
             y: {
-                formatter: val => {
-                    const pct = total > 0 ? Math.round(val / total * 100) : 0;
-                    return '$' + (val / 1000).toFixed(1) + 'k (' + pct + '%)';
-                }
+                formatter: val => '$' + parseFloat(val).toFixed(2)
             }
         },
+
         states: {
             hover: { filter: { type: 'darken', value: 0.85 } },
         },
-    });
-
-    chart.render();
+    }).render();
 })();
 </script>
 @endpush

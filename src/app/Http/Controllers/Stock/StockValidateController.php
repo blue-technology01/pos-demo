@@ -32,6 +32,20 @@ class StockValidateController extends Controller
             ->paginate($request->per_page ?? 15)
             ->withQueryString();
 
-        return view('admin.stocks.stock-validation', compact('attempts'));
+        // Reason breakdown for the chart — reflects the whole filtered result set,
+        // not just the current page. Only the search filter is applied here
+        // (not the status filter), since every row in this table is already a
+        // blocked attempt — filtering by "reason" is the whole point of the chart.
+        $reasonCounts = BlockedSaleAttempt::query()
+            ->when($request->search, function ($q) use ($request) {
+                $q->whereHas('productUom.product', function ($q) use ($request) {
+                    $q->where('name', 'LIKE', "%{$request->search}%");
+                });
+            })
+            ->selectRaw('reason, COUNT(*) as total')
+            ->groupBy('reason')
+            ->pluck('total', 'reason');
+
+        return view('admin.stocks.stock-validation', compact('attempts', 'reasonCounts'));
     }
 }

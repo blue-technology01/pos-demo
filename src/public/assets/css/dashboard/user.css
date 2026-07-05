@@ -77,7 +77,6 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* Filter selects */
 .um-filter-select {
     font-family: 'Inter', sans-serif;
     font-size: 13px;
@@ -101,7 +100,6 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* Per page wrap */
 .um-per-page {
     display: flex;
     align-items: center;
@@ -114,7 +112,6 @@
     width: 72px;
 }
 
-/* Reset / clear button */
 .um-btn-reset {
     display: inline-flex;
     align-items: center;
@@ -143,8 +140,6 @@
     color: var(--color-text-primary, #111);
 }
 
-
-/* Add product button */
 .product-section__btn-add {
     display: inline-flex;
     align-items: center;
@@ -165,8 +160,6 @@
     flex-shrink: 0;
 }
 
-
-/* Primary button */
 .btn.btn-primary {
     display: inline-flex;
     align-items: center;
@@ -194,7 +187,6 @@
 
 .btn.btn-primary:hover { opacity: 0.88; }
 
-/* ---------- Stats row ---------- */
 .um-stats {
     display: flex;
     align-items: center;
@@ -220,7 +212,6 @@
     color: var(--color-text-primary, #111);
 }
 
-/* ---------- Table card ---------- */
 .um-card {
     background: var(--color-background-primary, #fff);
     border: none;
@@ -236,7 +227,6 @@
     -webkit-overflow-scrolling: touch;
 }
 
-/* ---------- Table ---------- */
 .um-table {
     width: 100%;
     border-collapse: collapse;
@@ -281,7 +271,6 @@
     background: #f8faff;
 }
 
-/* Row index */
 .row-index {
     font-size: 12px;
     color: var(--color-text-tertiary, #9ca3af);
@@ -289,14 +278,12 @@
     text-align: center;
 }
 
-/* ---------- User cell ---------- */
 .user-cell {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* Avatar image */
 .user-avatar {
     width: 36px;
     height: 36px;
@@ -306,7 +293,6 @@
     border: 1.5px solid var(--color-border-tertiary, #e5e7eb);
 }
 
-/* Avatar initials fallback */
 .user-avatar-initials {
     width: 36px;
     height: 36px;
@@ -334,7 +320,6 @@
     margin-top: 1px;
 }
 
-/* ---------- Role badge ---------- */
 .role-badge {
     display: inline-flex;
     align-items: center;
@@ -360,13 +345,11 @@
     color: var(--color-text-secondary, #6b7280);
 }
 
-/* Catch-all for any other role */
 .role-badge:not(.role-badge--admin):not(.role-badge--cashier):not(.role-badge--none) {
     background: #d1fae5;
     color: #065f46;
 }
 
-/* ---------- Action buttons ---------- */
 .btn-edit,
 .btn-delete {
     display: inline-flex;
@@ -398,7 +381,6 @@
 
 .btn-delete:hover { background: #fecaca; opacity: 1; }
 
-/* ---------- Empty state ---------- */
 .um-empty {
     text-align: center;
     padding: 2.5rem 1rem;
@@ -406,7 +388,6 @@
     font-size: 13px;
 }
 
-/* ---------- Pagination ---------- */
 .table-footer {
     display: flex;
     align-items: center;
@@ -423,7 +404,6 @@
     color: var(--color-text-secondary, #6b7280);
 }
 
-/* ===== TABLE FOOTER WRAPPER ===== */
 .table-footer {
     width: 100%;
     display: flex;
@@ -431,20 +411,17 @@
     align-items: center;
 }
 
-/* LEFT SIDE (info + select) */
 .table-footer-left {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* INFO TEXT */
 .table-info {
     font-size: 13px;
     color: #374151;
 }
 
-/* ===== PAGINATION WRAPPER ===== */
 .pagination {
     display: flex;
     align-items: center;
@@ -481,7 +458,6 @@
     transition: all 0.15s ease;
 }
 
-/* ACTIVE PAGE */
 .pagination .active span {
     background: #2563eb;
     color: #fff;
@@ -489,21 +465,17 @@
     font-weight: 600;
 }
 
-/* HOVER */
 .pagination a:hover {
     background: #eff6ff;
     border-color: #bfdbfe;
     color: #2563eb;
 }
 
-/* DISABLED */
 .pagination .disabled span,
 .pagination [aria-disabled="true"] span {
     opacity: 0.35;
     pointer-events: none;
 }
-
-/* ===== PER PAGE SELECT ===== */
 .table-footer select {
     font-family: Inter, sans-serif;
     font-size: 12px;
@@ -587,7 +559,6 @@
     to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Modal header */
 .um-modal-header {
     display: flex;
     align-items: center;
@@ -635,7 +606,6 @@
     border-color: #fecaca;
 }
 
-/* Modal body */
 .um-modal-body {
     padding: 1.25rem 1.5rem;
     display: flex;
@@ -643,7 +613,6 @@
     gap: 14px;
 }
 
-/* Avatar upload preview */
 .um-avatar-preview {
     display: flex;
     flex-direction: column;
@@ -681,7 +650,6 @@
     font-family: 'Inter', sans-serif;
 }
 
-/* Form groups */
 .um-form-group {
     display: flex;
     flex-direction: column;
@@ -739,7 +707,6 @@ select.um-form-control {
     cursor: pointer;
 }
 
-/* Modal footer */
 .um-modal-footer {
     display: flex;
     align-items: center;
@@ -797,7 +764,6 @@ select.um-form-control {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
 }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 768px) {
     .um-filter {
         flex-direction: column;
@@ -823,12 +789,6 @@ select.um-form-control {
         align-items: flex-start;
     }
 }
-
-/* ============================================================
-   Modal Overlay & Box — modals.blade.php
-   ============================================================ */
-
-/* ---------- Overlay ---------- */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -852,7 +812,6 @@ select.um-form-control {
     to   { opacity: 1; }
 }
 
-/* ---------- Modal box ---------- */
 .modal-box {
     background: var(--color-background-primary, #fff);
     border-radius: 20px;
@@ -869,7 +828,6 @@ select.um-form-control {
     max-width: 380px;
 }
 
-/* Scrollbar */
 .modal-box::-webkit-scrollbar { width: 4px; }
 .modal-box::-webkit-scrollbar-track { background: transparent; }
 .modal-box::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 99px; }
@@ -879,7 +837,6 @@ select.um-form-control {
     to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* ---------- Modal header ---------- */
 .modal-box__header {
     display: flex;
     align-items: center;
@@ -937,7 +894,6 @@ select.um-form-control {
     border-color: #fecaca;
 }
 
-/* ---------- Modal body ---------- */
 .modal-box__body {
     padding: 1.25rem 1.5rem;
     display: flex;
@@ -945,7 +901,6 @@ select.um-form-control {
     gap: 14px;
 }
 
-/* ---------- Avatar upload ---------- */
 .avatar-upload {
     display: flex;
     align-items: center;
@@ -1015,7 +970,6 @@ select.um-form-control {
     background: #dbeafe;
 }
 
-/* ---------- Form layout ---------- */
 .modal-form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1075,7 +1029,6 @@ select.modal-form-control {
     cursor: pointer;
 }
 
-/* ---------- Delete confirm ---------- */
 .delete-confirm-wrap {
     display: flex;
     flex-direction: column;
@@ -1114,7 +1067,6 @@ select.modal-form-control {
     color: var(--color-text-secondary, #6b7280);
 }
 
-/* ---------- Modal footer ---------- */
 .modal-box__footer {
     display: flex;
     align-items: center;
@@ -1202,24 +1154,20 @@ select.modal-form-control {
 
 .modal-btn-delete:hover { opacity: 0.88; }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 540px) {
     .modal-form-row {
         grid-template-columns: 1fr;
     }
-
     .modal-box__footer {
         flex-direction: column-reverse;
         align-items: stretch;
     }
-
     .modal-btn-cancel,
     .modal-btn-save,
     .modal-btn-delete {
         width: 100%;
         justify-content: center;
     }
-
     .avatar-upload {
         flex-direction: column;
         align-items: flex-start;

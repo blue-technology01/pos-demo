@@ -9,83 +9,54 @@ use Illuminate\Validation\ValidationException;
 
 class InventoryService
 {
-    /**
-     * Validate, check, and deduct stock for one sale item.
-     *
-     * DB::transaction() here — SaleService owns the outer transaction,
-     * so all stock changes roll back automatically if anything else in the sale fails.
-     */
-    public function deductStockWithCheck(string $productCode, string $uomCode, float $qty): void
+    public function deductStockWithCheck(string $productCode, string $uomCode, int|float $qty): void
     {
-        // quantity must be positive
         if ($qty <= 0) {
             throw new \InvalidArgumentException('Quantity must be greater than zero.');
         }
-
-        // lock the product row to prevent race conditions
         $product = Product::where('code', $productCode)
             ->lockForUpdate()
             ->firstOrFail();
-
-        // Resolve UOM multiplier — e.g. 1 carton = 24 bottles
         $uom = ProductUom::where('product_code', $productCode)
             ->where('uom_code', $uomCode)
             ->first();
-
         if (!$uom) {
             throw new \Exception("UOM '{$uomCode}' not found for product '{$productCode}'.");
         }
-
-        // Real base units to deduct from stock
         $requiredStock = $qty * $uom->quantity_per_unit;
-
-        // Check stock is sufficient before deducting
+        // normalize to prevent float precision issues
+        $requiredStock = (int) round($requiredStock);
         if ($product->stock < $requiredStock) {
             throw ValidationException::withMessages([
                 'stock' => "{$product->name} is out of stock.",
             ]);
         }
-
-        // Deduct stock
         $product->decrement('stock', $requiredStock);
-
         Log::info('Stock deducted', [
             'product_code' => $productCode,
             'uom_code'     => $uomCode,
             'qty'          => $qty,
             'deducted'     => $requiredStock,
-            'remaining' => $product->fresh()->stock,
-
+            'remaining'    => $product->stock, // already updated in memory after decrement
         ]);
     }
 
-    /**
-     * Restore stock when a sale is cancelled or updated.
-     *
-     * NOTE: Same as above — caller (SaleService) owns the transaction.
-     */
-    public function restoreStock(string $productCode, string $uomCode, float $qty): void
+    public function restoreStock(string $productCode, string $uomCode, int|float $qty): void
     {
         if ($qty <= 0) {
             return;
         }
-
-        $product = Product::where('code', $productCode)
-            ->lockForUpdate()
-            ->first();
-
-        // Product may have been deleted — skip silently
+        $product = Product::where('code', $productCode)->lockForUpdate()->first();
         if (!$product) {
             return;
         }
+        $uom = ProductUom::where('product_code', $productCode)->where('uom_code', $uomCode)->first();
 
-        // Resolve UOM multiplier — restore same base units that were originally deducted
-        $uom = ProductUom::where('product_code', $productCode)
-            ->where('uom_code', $uomCode)
-            ->first();
+        if (!$uom) {
+            throw new \Exception("UOM '{$uomCode}' not found for product '{$productCode}'.");
+        }
 
-        $qtyPerUnit    = $uom ? $uom->quantity_per_unit : 1.0;
-        $restoreAmount = $qty * $qtyPerUnit;
+        $restoreAmount = (int) round($qty * $uom->quantity_per_unit);
 
         $product->increment('stock', $restoreAmount);
 
@@ -94,7 +65,7 @@ class InventoryService
             'uom_code'     => $uomCode,
             'qty'          => $qty,
             'restored'     => $restoreAmount,
-            'remaining' => $product->fresh()->stock,
+            'remaining'    => $product->stock,
         ]);
     }
 }

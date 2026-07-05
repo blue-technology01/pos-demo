@@ -1,15 +1,9 @@
-/* ============================================================
-   Cash Register / Shift History — shift.css
-   ============================================================ */
-
-/* ---------- Page ---------- */
 .unit-section {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
-/* ---------- Header & Search ---------- */
 .header-actions {
     display: flex;
     align-items: center;
@@ -24,7 +18,6 @@
     flex-wrap: wrap;
 }
 
-/* Search box — icon + input */
 .search-box {
     display: flex;
     align-items: center;
@@ -62,7 +55,6 @@
     color: #9ca3af;
 }
 
-/* Hide the plain search icon & label outside search-box */
 .search-wrap > .material-symbols-outlined {
     display: none;
 }
@@ -71,7 +63,6 @@
     display: none;
 }
 
-/* Date inputs — standalone like filter-select */
 .filter-date {
     height: 36px;
     padding: 0 10px;
@@ -91,7 +82,6 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-/* Filter button — blue */
 .btn-filter {
     display: inline-flex;
     align-items: center;
@@ -113,7 +103,6 @@
     background: #1d4ed8;
 }
 
-/* Reset button — gray */
 .btn-reset {
     display: inline-flex;
     align-items: center;
@@ -137,7 +126,6 @@
     color: #111827;
 }
 
-/* ---------- Stat Grid ---------- */
 .stat-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -209,7 +197,6 @@
     color: #dc2626;
 }
 
-/* ---------- Table Card ---------- */
 .unit-card {
     border-radius: 12px;
     background: var(--color-background-primary, #fff);
@@ -225,7 +212,6 @@
     width: 100%;
 }
 
-/* ---------- Table ---------- */
 .table-custom {
     width: 100%;
     border-collapse: collapse;
@@ -264,14 +250,12 @@
     background: #f9fafb;
 }
 
-/* ---------- Invoice Link ---------- */
 .invoice-link {
     font-weight: 600;
     color: #2563eb;
     font-size: 13px;
 }
 
-/* ---------- Cashier Cell ---------- */
 .cashier-cell {
     display: flex;
     align-items: center;
@@ -292,7 +276,6 @@
     flex-shrink: 0;
 }
 
-/* ---------- Diff Badges ---------- */
 .diff-badge {
     display: inline-block;
     font-size: 12px;
@@ -317,7 +300,6 @@
     color: #6b7280;
 }
 
-/* ---------- Status Badge ---------- */
 .status-badge {
     display: inline-block;
     font-size: 11px;
@@ -337,13 +319,11 @@
     color: #6b7280;
 }
 
-/* ---------- Muted Text ---------- */
 .muted-text {
     color: #9ca3af !important;
     font-size: 12px;
 }
 
-/* ---------- Action Button (View) ---------- */
 .btn-view {
     display: inline-flex;
     align-items: center;
@@ -372,8 +352,6 @@
     transform: scale(0.97);
 }
 
-
-/* ===== TABLE FOOTER WRAPPER ===== */
 .table-footer {
     width: 100%;
     display: flex;
@@ -382,20 +360,17 @@
     padding: 1rem;
 }
 
-/* LEFT SIDE (info + select) */
 .table-footer-left {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* INFO TEXT */
 .table-info {
     font-size: 13px;
     color: #374151;
 }
 
-/* ===== PAGINATION WRAPPER ===== */
 .pagination {
     display: flex;
     align-items: center;
@@ -432,7 +407,6 @@
     transition: all 0.15s ease;
 }
 
-/* ACTIVE PAGE */
 .pagination .active span {
     background: #2563eb;
     color: #fff;
@@ -440,21 +414,18 @@
     font-weight: 600;
 }
 
-/* HOVER */
 .pagination a:hover {
     background: #eff6ff;
     border-color: #bfdbfe;
     color: #2563eb;
 }
 
-/* DISABLED */
 .pagination .disabled span,
 .pagination [aria-disabled="true"] span {
     opacity: 0.35;
     pointer-events: none;
 }
 
-/* ===== PER PAGE SELECT ===== */
 .table-footer select {
     font-family: Inter, sans-serif;
     font-size: 12px;
@@ -498,10 +469,6 @@
     border:none;
 }
 
-/* ============================================================
-   Detail Modal
-   ============================================================ */
-
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -524,7 +491,6 @@
     flex-direction: column;
 }
 
-/* ---------- Modal Header ---------- */
 .modal-header {
     display: flex;
     align-items: flex-start;
@@ -572,7 +538,6 @@
     font-size: 17px;
 }
 
-/* ---------- Modal Body ---------- */
 .modal-body {
     padding: 20px;
     display: flex;
@@ -581,7 +546,6 @@
     flex: 1;
 }
 
-/* ---------- Section Label ---------- */
 .detail-section-label {
     font-size: 11px;
     font-weight: 700;
@@ -591,7 +555,6 @@
     margin-bottom: 8px;
 }
 
-/* ---------- Detail Grid (Cashier info) ---------- */
 .detail-grid {
     background: #f9fafb;
     border: 1px solid #f3f4f6;
@@ -622,7 +585,6 @@
     text-align: right;
 }
 
-/* ---------- Summary Stat Cards ---------- */
 .detail-stat-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -657,7 +619,6 @@
     color: #16a34a;
 }
 
-/* ---------- Note ---------- */
 .detail-note {
     background: #fffbeb;
     border: 1px solid #fde68a;
@@ -668,7 +629,6 @@
     line-height: 1.5;
 }
 
-/* ---------- Modal Footer ---------- */
 .modal-footer {
     display: flex;
     justify-content: flex-end;
@@ -698,7 +658,6 @@
     color: #111827;
 }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 900px) {
     .stat-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -711,25 +670,20 @@
         align-items: stretch;
         gap: 8px;
     }
-
     .stat-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-
     .detail-stat-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-
     .btn-filter,
     .btn-reset {
         width: 100%;
         justify-content: center;
     }
-
     .modal-footer {
         flex-direction: column;
     }
-
     .btn-cancel {
         width: 100%;
         justify-content: center;

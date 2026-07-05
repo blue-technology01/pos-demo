@@ -17,16 +17,15 @@ class SaleItemService
         return session(self::SESSION_KEY, []);
     }
 
-    // add or merge items
     public function addItem(array $data): array
     {
         $items = $this->getItems();
-
+        // Check if the product already exists in the items array
         $existingKey = $this->findItemKey($items, $data['product_code']);
-
         if ($existingKey !== null) {
             // Merge quantity if product already exists
             $items[$existingKey]['quantity'] += $data['quantity'] ?? 1;
+            // Update other fields if provided
             $items[$existingKey]['amount']    = $this->calculateAmount($items[$existingKey]);
         } else {
             // Add new item
@@ -42,13 +41,11 @@ class SaleItemService
                 'discount_amount'      => $data['discount_amount'] ?? 0,
                 'amount'               => 0,
             ];
-
+            // Calculate the amount for the new item
             $item['amount'] = $this->calculateAmount($item);
             $items[]        = $item;
         }
-
         session([self::SESSION_KEY => $items]);
-
         return $items;
     }
 
@@ -56,7 +53,6 @@ class SaleItemService
     public function updateItem(string $rowId, array $data): array
     {
         $items = $this->getItems();
-
         foreach ($items as &$item) {
             if ($item['row_id'] === $rowId) {
                 $item['quantity']             = $data['quantity']            ?? $item['quantity'];
@@ -95,13 +91,15 @@ class SaleItemService
     public function getSummary(): array
     {
         $items = $this->getItems();
-
+        // calculate subtotal
         $subtotal        = collect($items)->sum(fn($i) => $i['quantity'] * $i['unit_price']);
+        // calculate total discount based on discount percentage and amount
         $totalDiscount   = collect($items)->sum(fn($i) => $i['discount_amount']);
+        // calculate total amount after discount
         $total           = collect($items)->sum(fn($i) => $i['amount']);
 
         return [
-            'subtotal'       => round($subtotal, 2),
+            'subtotal'       => round($subtotal, 2), //round use for 2 decimal places
             'total_discount' => round($totalDiscount, 2),
             'total'          => round($total, 2),
             'item_count'     => count($items),
@@ -131,6 +129,7 @@ class SaleItemService
     private function findItemKey(array $items, string $productCode): int|null
     {
         foreach ($items as $key => $item) {
+            // Check if the product code matches
             if ($item['product_code'] === $productCode) {
                 return $key;
             }
@@ -141,8 +140,7 @@ class SaleItemService
     private function calculateAmount(array $item): float
     {
         $subtotal = $item['quantity'] * $item['unit_price'];
-
-        // Discount by percentage takes priority if set
+        // check if discount percentage > 0
         if ($item['discount_percentage'] > 0) {
             $discountAmount = $subtotal * ($item['discount_percentage'] / 100);
         } else {

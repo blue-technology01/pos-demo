@@ -43,7 +43,7 @@
 
             <a href="{{ url()->current() }}" class="um-btn-reset">Clear</a>
         </span>
-        
+
         <button type="button" class="btn btn-primary" id="btnCreateUser">
             <span class="material-symbols-outlined">person_add</span>
             New User

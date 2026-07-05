@@ -37,7 +37,6 @@ class SaleController extends Controller
     public function show(int $id)
     {
         $sale = Sale::with('items')->findOrFail($id);
-
         return view('admin.sales.sale-history.show', compact('sale'));
     }
 
@@ -47,22 +46,27 @@ class SaleController extends Controller
     public function edit(int $id)
     {
         $sale = Sale::with('items')->findOrFail($id);
-
         return view('admin.sales.sale-history.edit', compact('sale'));
     }
 
     /**
      * Store a new sale from POS.
-     */
+    */
+
     public function store(SaleStoreRequest $request)
     {
+        \Log::info('Sale request data', [
+            'customer_id' => $request->validated()['customer_id'] ?? 'NOT FOUND',
+            'total_amount' => $request->validated()['total_amount'] ?? 'NOT FOUND',
+        ]);
+
         try {
             $sale = $this->saleService->createSale($request->validated());
             return response()->json([
                 'success'    => true,
                 'message'    => "Sale #{$sale->invoice_no} created successfully!",
                 'invoice_no' => $sale->invoice_no,
-                'sale_id'    => $sale->id
+                'sale_id'    => $sale->id,
             ], 201);
 
         } catch (\Exception $e) {
@@ -72,7 +76,6 @@ class SaleController extends Controller
             ], 422);
         }
     }
-
     /**
      * Update an existing sale.
      */

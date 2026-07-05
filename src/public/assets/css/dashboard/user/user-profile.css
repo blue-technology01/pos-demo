@@ -1,8 +1,3 @@
-/* ============================================================
-   User Profile — user-profile.css
-   ============================================================ */
-
-/* ---------- Page wrapper ---------- */
 .profile-wrapper {
     display: flex;
     justify-content: center;
@@ -10,7 +5,6 @@
     padding: 40px 16px;
 }
 
-/* ---------- Card ---------- */
 .profile-card {
     width: 100%;
     max-width: 400px;
@@ -21,7 +15,6 @@
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
 }
 
-/* ---------- Banner ---------- */
 .profile-header {
     height: 110px;
     background: darkcyan;
@@ -37,16 +30,14 @@
     background-size: 16px 16px;
 }
 
-/* ---------- Body (centered column) ---------- */
 .profile-body {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 0 28px 28px;
-    margin-top: -44px; /* pull body up so avatar overlaps banner */
+    margin-top: -44px;
 }
 
-/* ---------- Avatar ---------- */
 .profile-avatar {
     width: 88px;
     height: 88px;
@@ -60,7 +51,6 @@
     z-index: 1;
 }
 
-/* ---------- Role badge ---------- */
 .profile-role-badge {
     display: inline-block;
     margin-top: 12px;
@@ -70,7 +60,6 @@
     border-radius: 20px;
     letter-spacing: 0.3px;
     text-transform: capitalize;
-    /* default */
     background: #f3f4f6;
     color: #6b7280;
     border: 1px solid #e5e7eb;
@@ -94,7 +83,6 @@
     border-color: #e5e7eb;
 }
 
-/* ---------- Name & email ---------- */
 .profile-name {
     font-size: 18px;
     font-weight: 600;
@@ -111,7 +99,6 @@
     word-break: break-all;
 }
 
-/* ---------- Divider ---------- */
 .profile-divider {
     width: 100%;
     border: none;
@@ -119,7 +106,6 @@
     margin: 0 0 18px;
 }
 
-/* ---------- Info list ---------- */
 .profile-info {
     width: 100%;
     display: flex;
@@ -169,20 +155,16 @@
     text-overflow: ellipsis;
 }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 480px) {
     .profile-wrapper {
         padding: 20px 12px;
     }
-
     .profile-card {
         border-radius: 16px;
     }
-
     .profile-body {
         padding: 0 18px 22px;
     }
-
     .profile-name {
         font-size: 16px;
     }

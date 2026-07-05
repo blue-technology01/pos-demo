@@ -315,7 +315,6 @@
         padding: 6px;
     }
 
-    /* ✅ Fixed: use nav-pill-wrap.open for user dropdown too */
     .nav-pill-wrap.open .navbar-dropdown {
         display: block;
     }
@@ -519,9 +518,6 @@
 <script>
 (function () {
 
-    // ─────────────────────────────────────────
-    // Helper: toggle dropdown, close others
-    // ─────────────────────────────────────────
     const dropdowns = [];
 
     function registerDropdown(wrapId, btnId) {
@@ -546,14 +542,10 @@
         dropdowns.forEach(d => d.classList.remove('open'));
     });
 
-    // ✅ Register all dropdowns
     registerDropdown('notifWrap', 'notifBtn');
     registerDropdown('langWrap',  'langBtn');
     registerDropdown('userWrap',  'userBtn');
 
-    // ─────────────────────────────────────────
-    // Notifications
-    // ─────────────────────────────────────────
     const list  = document.getElementById('notifList');
     const badge = document.getElementById('notifBadge');
     const FETCH_URL = "{{ route('notifications.fetch') }}";

@@ -1,5 +1,4 @@
 
-/* ---------- Page shell ---------- */
 .sp-page {
     padding: 1.75rem 0;
     font-family: inherit;
@@ -9,7 +8,6 @@
 .sp-page * {
     font-family: 'Inter', sans-serif;
 }
-/* ---------- Page header ---------- */
 .sp-page__header {
     display: flex;
     align-items: flex-start;
@@ -45,7 +43,6 @@
     flex-wrap: wrap;
 }
 
-/* ---------- Toggle group ---------- */
 .sp-toggle-group {
     display: flex;
     border: 0.5px solid #2563eb;
@@ -74,7 +71,6 @@
     background: #eff6ff;
 }
 
-/* ---------- Export button ---------- */
 .sp-export-btn {
     display: flex;
     align-items: center;
@@ -93,7 +89,6 @@
     background: #eff6ff;
 }
 
-/* ---------- Filter bar ---------- */
 .sp-filter-bar {
     display: flex;
     align-items: center;
@@ -160,7 +155,6 @@
     background: var(--color-background-secondary, #f9fafb);
 }
 
-/* ---------- KPI cards row ---------- */
 .sp-kpi-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -203,7 +197,6 @@
     color: var(--color-text-tertiary, #9ca3af);
 }
 
-/* KPI badges */
 .sp-kpi-badge {
     display: inline-flex;
     align-items: center;
@@ -252,7 +245,6 @@
     width: 68%;
 }
 
-/* KPI top-person cell */
 .sp-kpi-person {
     display: flex;
     align-items: center;
@@ -273,7 +265,6 @@
     margin: 0;
 }
 
-/* ---------- Avatars ---------- */
 .sp-avatar {
     width: 34px;
     height: 34px;
@@ -292,7 +283,6 @@
 .sp-avatar--gray   { background: #f1f5f9; color: #475569; }
 .sp-avatar--purple { background: #ede9fe; color: #6d28d9; }
 
-/* ---------- Bottom two-column layout ---------- */
 .sp-bottom-row {
     display: grid;
     grid-template-columns: 1fr 300px;
@@ -300,7 +290,6 @@
     align-items: start;
 }
 
-/* ---------- Panels ---------- */
 .sp-panel {
     background: var(--color-background-primary, #fff);
     border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
@@ -310,10 +299,6 @@
         0 4px 16px rgba(15, 23, 42, 0.06);
     border-radius: 16px;
     padding: 1.1rem 1.25rem;
-}
-
-.sp-panel--side {
-    /* right column panel — same styling */
 }
 
 .sp-panel__header {
@@ -349,7 +334,6 @@
     text-decoration: underline;
 }
 
-/* ---------- Table ---------- */
 .table-responsive {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -387,7 +371,6 @@
     background: var(--color-background-secondary, #f9fafb);
 }
 
-/* Rank pill */
 .sp-rank {
     font-size: 11px;
     font-weight: 500;
@@ -398,7 +381,6 @@
     white-space: nowrap;
 }
 
-/* Staff cell */
 .sp-staff-cell {
     display: flex;
     align-items: center;
@@ -410,14 +392,11 @@
     color: var(--color-text-primary, #111);
 }
 
-/* Trend icons */
 .sp-trend { font-size: 16px; }
 .sp-trend--up   { color: #16a34a; }
 .sp-trend--down { color: #dc2626; }
 
-/* ---------- Pagination ---------- */
 
-/* ===== TABLE FOOTER WRAPPER ===== */
 .table-footer {
     width: 100%;
     display: flex;
@@ -426,20 +405,17 @@
     padding: 1rem;
 }
 
-/* LEFT SIDE (info + select) */
 .table-footer-left {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* INFO TEXT */
 .table-info {
     font-size: 13px;
     color: #374151;
 }
 
-/* ===== PAGINATION WRAPPER ===== */
 .pagination {
     display: flex;
     align-items: center;
@@ -476,7 +452,6 @@
     transition: all 0.15s ease;
 }
 
-/* ACTIVE PAGE */
 .pagination .active span {
     background: #2563eb;
     color: #fff;
@@ -484,21 +459,18 @@
     font-weight: 600;
 }
 
-/* HOVER */
 .pagination a:hover {
     background: #eff6ff;
     border-color: #bfdbfe;
     color: #2563eb;
 }
 
-/* DISABLED */
 .pagination .disabled span,
 .pagination [aria-disabled="true"] span {
     opacity: 0.35;
     pointer-events: none;
 }
 
-/* ===== PER PAGE SELECT ===== */
 .table-footer select {
     font-family: Inter, sans-serif;
     font-size: 12px;
@@ -541,18 +513,23 @@
 .pagination-numbers .dots{
     border:none;
 }
-
-/* ---------- Donut chart ---------- */
 .sp-chart-wrap {
     display: flex;
     justify-content: center;
+    align-items: center;
     margin: 0.75rem 0;
 }
 
 .sp-chart-container {
     position: relative;
-    width: 180px;
-    height: 180px;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+#regionChart {
+    width: 100%;
+    height: 100%;
 }
 
 .sp-chart-container canvas {
@@ -561,15 +538,22 @@
 
 .sp-chart-center {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 55%;
+    left: 55%;
     transform: translate(-50%, -50%);
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     pointer-events: none;
+    z-index: 10;
 }
 
 .sp-chart-center__val {
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* display: block; */
     font-size: 18px;
     font-weight: 500;
     color: var(--color-text-primary, #111);
@@ -581,7 +565,6 @@
     color: var(--color-text-secondary, #6b7280);
 }
 
-/* ---------- Region / legend list ---------- */
 .sp-region-list {
     margin-top: 0.5rem;
 }
@@ -624,7 +607,6 @@
     color: var(--color-text-primary, #111);
 }
 
-/* ---------- Insight box (used in JS template) ---------- */
 .sp-insight-box {
     margin-top: 1rem;
     padding: 10px 14px;
@@ -640,12 +622,10 @@
     line-height: 1.5;
 }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 900px) {
     .sp-bottom-row {
         grid-template-columns: 1fr;
     }
-
     .sp-panel--side {
         order: -1;
     }
@@ -655,19 +635,15 @@
     .sp-kpi-row {
         grid-template-columns: 1fr;
     }
-
     .sp-page__header {
         flex-direction: column;
     }
-
     .sp-page__actions {
         width: 100%;
     }
-
     .sp-toggle-group {
         width: 100%;
     }
-
     .sp-toggle-btn {
         flex: 1;
         text-align: center;

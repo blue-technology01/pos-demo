@@ -19,15 +19,22 @@
 </head>
 <body>
     <x-loading />
+
     <div class="panel-image">
         <div class="panel-logo">
             <img src="{{ asset('assets/images/logo.png') }}" alt="POS Logo" width="120" height="40">
         </div>
-        <div class="slides">
-            <div class="slide active" style="background-image: url('{{ asset('assets/images/slider1.png') }}')"></div>
-            <div class="slide" style="background-image: url('{{ asset('assets/images/slider3.jpg') }}')"></div>
-            <div class="slide" style="background-image: url('{{ asset('assets/images/slider3.webp') }}')"></div>
+
+        <div class="slider-panel" id="auth-slider-panel">
+            <div class="slider-track" id="auth-slider-track">
+                <div class="slide" style="background-image: url('{{ asset('assets/images/slider1.png') }}')"></div>
+                <div class="slide" style="background-image: url('{{ asset('assets/images/slider3.jpg') }}')"></div>
+                <div class="slide" style="background-image: url('{{ asset('assets/images/slider3.webp') }}')"></div>
+                {{-- Clone of slide 1, used only so the scroll can loop seamlessly back to the start --}}
+                <div class="slide" aria-hidden="true" style="background-image: url('{{ asset('assets/images/slider1.png') }}')"></div>
+            </div>
         </div>
+
         <div class="panel-copy">
             <h2 id="slide-title">Fast Point of Sale</h2>
             <p id="slide-sub">Quick checkout, table management, and real-time orders.</p>
@@ -41,37 +48,81 @@
 
     @yield('content')
 
-    <script src="{{ asset('assets/js/app.js') }}" defer></script>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-        const slides = document.querySelectorAll('.slide');
-        if (!slides.length) return;
-
-        const contents = [
-            { title: 'Fast Point of Sale',       sub: 'Quick checkout, table management, and real-time orders.' },
-            { title: 'Smart Order Management',   sub: 'Track every table and order in real time.' },
-            { title: 'Multiple Payment Options', sub: 'Accept cash, card, QR, and more seamlessly.' },
-        ];
-
-        let current = 0;
-
-        function goTo(index) {
-            slides[current].classList.remove('active');
-            current = (index + slides.length) % slides.length;
-            slides[current].classList.add('active');
-
-            const titleEl = document.getElementById('slide-title');
-            const subEl   = document.getElementById('slide-sub');
-            if (titleEl) titleEl.textContent = contents[current].title;
-            if (subEl)   subEl.textContent   = contents[current].sub;
-        }
-
-        setInterval(() => goTo(current + 1), 8000);
-    });
-    </script>
+    {{-- <script src="{{ asset('assets/js/app.js') }}" defer></script> --}}
 
     @stack('scripts')
+
+    <script>
+        // ── Auth page slider (smooth loop, same pattern as customer display) ──
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const INTERVAL = 4000; // declared locally — no dependency on app.js
+
+            const track = document.getElementById('auth-slider-track');
+            const panel = document.querySelector('.panel-image');
+
+            if (!track || !panel) return;
+
+            // Only count REAL slides (exclude the clone used for the loop)
+            const realSlideCount = track.children.length - 1;
+
+            const contents = [
+                { title: 'Fast Point of Sale',       sub: 'Quick checkout, table management, and real-time orders.' },
+                { title: 'Smart Order Management',   sub: 'Track every table and order in real time.' },
+                { title: 'Multiple Payment Options', sub: 'Accept cash, card, QR, and more seamlessly.' },
+            ];
+
+            let index = 0;
+            let timer;
+
+            // Inject progress bar
+            const bar = document.createElement('div');
+            bar.className = 'slide-progress';
+            panel.appendChild(bar);
+
+            function goToSlide(nextIndex) {
+                index = nextIndex;
+                track.style.transform = `translateX(-${index * 100}%)`;
+
+                const content = contents[index % realSlideCount];
+                const titleEl = document.getElementById('slide-title');
+                const subEl   = document.getElementById('slide-sub');
+                if (titleEl) titleEl.textContent = content.title;
+                if (subEl)   subEl.textContent   = content.sub;
+
+                // Once we've scrolled onto the cloned slide, snap back to slide 0
+                // invisibly once the animation finishes.
+                if (index === realSlideCount) {
+                    track.addEventListener('transitionend', function reset() {
+                        track.removeEventListener('transitionend', reset);
+                        track.style.transition = 'none';
+                        index = 0;
+                        track.style.transform = 'translateX(0%)';
+                        void track.offsetHeight; // force reflow
+                        track.style.transition = '';
+                    });
+                }
+            }
+
+            function startProgress() {
+                bar.style.transition = 'none';
+                bar.style.width = '0%';
+                requestAnimationFrame(() => requestAnimationFrame(() => {
+                    bar.style.transition = `width ${INTERVAL}ms linear`;
+                    bar.style.width = '100%';
+                }));
+            }
+
+            function startAuto() {
+                clearInterval(timer);
+                startProgress();
+                timer = setInterval(() => {
+                    goToSlide(index + 1);
+                    startProgress();
+                }, INTERVAL);
+            }
+            startAuto();
+        });
+    </script>
 </body>
 </html>

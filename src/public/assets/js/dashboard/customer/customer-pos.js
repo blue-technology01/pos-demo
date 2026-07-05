@@ -1,23 +1,21 @@
-// ============================================================
-// CUSTOMER POS — Search, Select, Create
-// ============================================================
-
-// ✅ local cache — loaded once when modal opens
-let _allCustomers = [];
+let _allCustomers   = [];
 let _customersLoaded = false;
-let searchTimeout = null;
+let searchTimeout   = null;
 
-// ─── Filter Modal ────────────────────────────────────────────
+function _esc(str) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(str ?? ''));
+    return d.innerHTML;
+}
 
 function openCustomerFilterPopup() {
     resetSearchModal();
     document.getElementById("customerFilterModal").style.display = "flex";
     document.getElementById("popupSearchInput").focus();
-
     if (!_customersLoaded) {
         _fetchAllCustomers();
     } else {
-        _renderLocalResults(""); // already cached — show instantly
+        _renderLocalResults("");
     }
 }
 
@@ -32,8 +30,6 @@ function resetSearchModal() {
     clearTimeout(searchTimeout);
 }
 
-// ─── Load full customer list once ────────────────────────────
-
 async function _fetchAllCustomers() {
     const resultContainer = document.getElementById("popupCustomerResult");
     resultContainer.innerHTML = renderLoading();
@@ -43,11 +39,9 @@ async function _fetchAllCustomers() {
         if (!response.ok) throw new Error("Network error");
         const data = await response.json();
 
-        // support both flat array and paginated { data: [...] }
-        _allCustomers   = Array.isArray(data) ? data : (data.data ?? []);
+        _allCustomers    = Array.isArray(data) ? data : (data.data ?? []);
         _customersLoaded = true;
 
-        // render with whatever is currently in the search box
         const keyword = document.getElementById("popupSearchInput").value.trim();
         _renderLocalResults(keyword);
     } catch (err) {
@@ -56,27 +50,18 @@ async function _fetchAllCustomers() {
     }
 }
 
-// ─── Real-time Search ────────────────────────────────────────
-
 function filterCustomersRealTime() {
     clearTimeout(searchTimeout);
     const keyword = document.getElementById("popupSearchInput").value.trim();
 
-    // ✅ instant local filter — no debounce needed, no server call
     if (_customersLoaded) {
         _renderLocalResults(keyword);
-
-        // ✅ silently refresh from server in background for accuracy
-        clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => _serverSearchCustomers(keyword), 400);
         return;
     }
 
-    // not loaded yet — debounce server fetch
     searchTimeout = setTimeout(() => fetchCustomersFromBackend(keyword), 300);
 }
-
-// ─── Local filter (instant) ───────────────────────────────────
 
 function _renderLocalResults(keyword) {
     const resultContainer = document.getElementById("popupCustomerResult");
@@ -95,10 +80,18 @@ function _renderLocalResults(keyword) {
         resultContainer.innerHTML = renderEmpty();
     } else {
         resultContainer.innerHTML = renderCustomerList(filtered);
+
+        //  Attach events safely — no inline onclick with raw data
+        resultContainer.querySelectorAll("[data-customer-id]").forEach(el => {
+            el.addEventListener("click", () => {
+                selectCustomerForPOS(
+                    el.dataset.customerId,
+                    el.dataset.customerName
+                );
+            });
+        });
     }
 }
-
-// ─── Silent background refresh ────────────────────────────────
 
 async function _serverSearchCustomers(keyword) {
     try {
@@ -107,14 +100,11 @@ async function _serverSearchCustomers(keyword) {
         );
         if (!response.ok) return;
         const data = await response.json();
-
         const results = Array.isArray(data) ? data : (data.data ?? []);
 
-        // ✅ discard if user has already changed the input
         const currentKeyword = document.getElementById("popupSearchInput").value.trim();
         if (currentKeyword !== keyword) return;
 
-        // ✅ merge new results back into cache so future local searches are fresh
         results.forEach(incoming => {
             const idx = _allCustomers.findIndex(c => c.id === incoming.id);
             if (idx >= 0) _allCustomers[idx] = incoming;
@@ -126,17 +116,14 @@ async function _serverSearchCustomers(keyword) {
         console.error("Background customer search error:", err);
     }
 }
-
-// ─── Fetch from Backend (fallback only) ──────────────────────
-
 function fetchCustomersFromBackend(keyword) {
     const resultContainer = document.getElementById("popupCustomerResult");
     resultContainer.innerHTML = renderLoading();
 
     fetch(`${window.CUSTOMER_SEARCH_URL}?keyword=${encodeURIComponent(keyword)}`)
-        .then(response => {
-            if (!response.ok) throw new Error("Network response was not ok");
-            return response.json();
+        .then(r => {
+            if (!r.ok) throw new Error("Network error");
+            return r.json();
         })
         .then(customers => {
             const list = Array.isArray(customers) ? customers : (customers.data ?? []);
@@ -153,103 +140,124 @@ function fetchCustomersFromBackend(keyword) {
         });
 }
 
-// ─── Render Helpers ──────────────────────────────────────────
-
 function renderLoading() {
     return `
-        <div style="padding:30px;text-align:center;color:#64748b;font-size:14px;">
-            <span style="font-size:22px;">⏳</span>
-            <p style="margin:8px 0 0;">Loading...</p>
-        </div>`;
+        <div class="loading-wrapper">
+            <div class="loading-icon">
+                <span class="material-symbols-outlined loading-spin">
+                    progress_activity
+                </span>
+            </div>
+            <p class="loading-text">Loading customers...</p>
+        </div>
+    `;
 }
 
 function renderEmpty() {
     return `
-        <div style="padding:30px;text-align:center;color:#94a3b8;font-size:14px;">
-            <span style="font-size:32px;">🔍</span>
-            <p style="margin:8px 0 0;">Type a name or phone number to search</p>
-        </div>`;
+        <div class="empty-wrapper">
+            <div class="empty-icon">
+                <span class="material-symbols-outlined">
+                    search
+                </span>
+            </div>
+            <p class="empty-text">
+                Type a name or phone number to search
+            </p>
+            <p class="empty-sub">
+                Start typing to find customers quickly
+            </p>
+        </div>
+    `;
 }
 
 function renderNotFound(keyword) {
-    return `
-        <div style="padding:30px 20px;text-align:center;">
-            <span style="font-size:32px;">😕</span>
-            <p style="color:#64748b;font-size:14px;margin:10px 0 16px;">
-                No customer found for <strong>"${keyword}"</strong>
+    const html = `
+        <div class="notfound-wrapper">
+            <div class="notfound-icon">
+                <span class="material-symbols-outlined">sentiment_dissatisfied</span>
+            </div>
+            <p class="notfound-title">
+                No customer found!
             </p>
             <button
                 type="button"
-                onclick="triggerAddNewCustomer('${keyword}')"
-                style="
-                    display:inline-flex;align-items:center;gap:6px;
-                    background:#16a34a;color:#fff;
-                    padding:10px 20px;border:none;border-radius:6px;
-                    font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;
-                ">
-                <span class="material-symbols-outlined" style="font-size:18px;">person_add</span>
-                Create "${keyword}" as new customer
-            </button>
-        </div>`;
-}
+                id="btn-add-new-customer"
+                class="notfound-btn"
+                data-keyword="${_esc(keyword)}">
 
-function renderError() {
-    return `
-        <div style="padding:30px;text-align:center;color:#ef4444;font-size:14px;">
-            <span style="font-size:32px;">⚠️</span>
-            <p style="margin:8px 0 0;">Failed to connect to server. Please try again.</p>
-        </div>`;
+                <span class="material-symbols-outlined">person_add</span>
+                Create new customer
+            </button>
+
+        </div>
+    `;
+    setTimeout(() => {
+        const btn = document.getElementById("btn-add-new-customer");
+        if (btn) {
+            btn.addEventListener("click", () =>
+                triggerAddNewCustomer(btn.dataset.keyword)
+            );
+        }
+    }, 0);
+    return html;
 }
 
 function renderCustomerList(customers) {
     return customers.map(customer => `
         <div
-            onclick="selectCustomerForPOS('${customer.id}', '${customer.name}')"
-            style="
-                display:flex;justify-content:space-between;align-items:center;
-                padding:12px 16px;border-bottom:1px solid #e2e8f0;
-                cursor:pointer;transition:background 0.15s;
-            "
-            onmouseover="this.style.background='#f8fafc'"
-            onmouseout="this.style.background=''"
+            class="customer-item"
+            data-customer-id="${_esc(String(customer.id))}"
+            data-customer-name="${_esc(customer.name)}"
         >
-            <div style="display:flex;align-items:center;gap:10px;">
-                <div style="
-                    width:36px;height:36px;border-radius:50%;
-                    background:#e0f2fe;color:#0284c7;
-                    display:flex;align-items:center;justify-content:center;
-                    font-weight:700;font-size:15px;flex-shrink:0;
-                ">
-                    ${customer.name.charAt(0).toUpperCase()}
+            <div class="customer-left">
+                <div class="customer-avatar">
+                    ${_esc(customer.name.charAt(0).toUpperCase())}
                 </div>
                 <div>
-                    <p style="margin:0;font-size:14px;font-weight:600;color:#0f172a;">${customer.name}</p>
-                    <p style="margin:2px 0 0;font-size:12px;color:#64748b;">
-                        📱 ${customer.phone || 'No phone'}
+                    <p class="customer-name">
+                        ${_esc(customer.name)}
+                    </p>
+                    <p class="customer-phone">
+                        <span class="material-symbols-outlined" style="font-size:14px;">
+                            phone_iphone
+                        </span>
+                        ${_esc(customer.phone || 'No phone')}
                     </p>
                 </div>
             </div>
-            <span style="font-size:12px;font-weight:600;color:#16a34a;white-space:nowrap;">
-                Select ✓
+            <span class="customer-right">
+                Select
+                <span class="material-symbols-outlined" style="font-size:16px;">
+                    arrow_forward
+                </span>
             </span>
         </div>
     `).join("");
 }
 
-// ─── Select Customer ─────────────────────────────────────────
-
 function selectCustomerForPOS(id, name) {
     window.selectedCustomerId = id;
-
     const nameDisplay = document.getElementById("selected-customer-name");
     const idDisplay   = document.getElementById("selected-customer-id");
     if (nameDisplay) nameDisplay.innerText = name;
     if (idDisplay)   idDisplay.innerText   = `#C-${String(id).padStart(6, "0")}`;
-
+    //  show clear button after customer selected
+    const clearBtn = document.getElementById("clear-customer-btn");
+    if (clearBtn) clearBtn.style.display = "inline-flex";
     closeFilterModal();
 }
 
-// ─── Create New Customer ─────────────────────────────────────
+//  New — clear selected customer
+function clearSelectedCustomer() {
+    window.selectedCustomerId = null;
+    const nameDisplay = document.getElementById("selected-customer-name");
+    const idDisplay   = document.getElementById("selected-customer-id");
+    if (nameDisplay) nameDisplay.innerText = "No customer selected";
+    if (idDisplay)   idDisplay.innerText   = "";
+    const clearBtn = document.getElementById("clear-customer-btn");
+    if (clearBtn) clearBtn.style.display = "none";
+}
 
 function triggerAddNewCustomer(passedName) {
     closeFilterModal();
@@ -261,11 +269,12 @@ function openCreateCustomerForm(prefillValue = "") {
     const overlay = document.getElementById("create-customer-overlay");
     if (!overlay) return;
     overlay.style.display = "flex";
-
     const isPhone = /^[0-9\s\+\-]+$/.test(prefillValue);
     const inputId = isPhone ? "nc-phone" : "nc-name";
     const el = document.getElementById(inputId);
     if (el) el.value = prefillValue;
+    //  focus the prefilled input
+    if (el) el.focus();
 }
 
 function closeCreateCustomerForm() {
@@ -279,9 +288,9 @@ function resetCreateForm() {
         const el = document.getElementById(id);
         if (el) el.value = "";
     });
+
     const errorBox = document.getElementById("nc-error");
     if (errorBox) { errorBox.style.display = "none"; errorBox.innerText = ""; }
-
     const submitBtn = document.getElementById("nc-submit-btn");
     if (submitBtn) {
         submitBtn.disabled = false;
@@ -290,17 +299,14 @@ function resetCreateForm() {
 }
 
 function submitNewCustomer() {
-    const name      = document.getElementById("nc-name").value.trim();
-    const phone     = document.getElementById("nc-phone").value.trim();
-    const errorBox  = document.getElementById("nc-error");
+    const name     = document.getElementById("nc-name").value.trim();
+    const phone    = document.getElementById("nc-phone").value.trim();
+    const errorBox = document.getElementById("nc-error");
     const submitBtn = document.getElementById("nc-submit-btn");
-
     if (!name) { showCreateError("Full name is required."); return; }
-
     submitBtn.disabled = true;
     submitBtn.innerHTML = `<span class="material-symbols-outlined">hourglass_top</span> Creating...`;
     errorBox.style.display = "none";
-
     fetch(window.CUSTOMER_STORE_URL, {
         method: "POST",
         headers: {
@@ -313,7 +319,6 @@ function submitNewCustomer() {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            // ✅ add new customer to local cache so it appears instantly next time
             _allCustomers.unshift(data.customer);
             selectCustomerForPOS(data.customer.id, data.customer.name);
             closeCreateCustomerForm();

@@ -1,6 +1,6 @@
 .customer-list-container {
     padding: 1.75rem 0;
-    font-family: 'Inter', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 13px;
     color: var(--color-text-primary, #111);
 }
@@ -15,7 +15,7 @@
 }
 
 .customer-list-container .alert {
-    font-family: 'Inter', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 13px;
     border-radius: 12px;
     border: none;
@@ -23,7 +23,6 @@
     margin-bottom: 1.25rem;
 }
 
-/* ---------- Actions bar ---------- */
 .customer-list-actions {
     display: flex;
     align-items: center;
@@ -42,7 +41,7 @@
 }
 
 .customer-search-input {
-    font-family: 'Inter', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 13px;
     font-weight: 400;
     padding: 8px 16px;
@@ -57,20 +56,18 @@
 
 .customer-search-input:focus {
     border-color: #2563eb;
-    /* box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); */
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 .customer-search-input::placeholder {
     color: var(--color-text-tertiary, #9ca3af);
 }
 
-/* ---------- Shared button base ---------- */
 .btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-
     font-size: 13px;
     font-weight: 500;
     padding: 8px 20px;
@@ -85,7 +82,6 @@
 
 .btn:hover { opacity: 0.88; }
 
-/* Variants */
 .btn-primary {
     background: #2563eb;
     color: #fff;
@@ -118,20 +114,18 @@
     opacity: 1;
 }
 
-/* Add customer button */
 .btn-add-customer {
     background: #2563eb;
     color: #fff;
     padding: 8px 20px;
 }
 
-/* Search / clear buttons */
 .btn-search {
     background: #2563eb;
     color: #fff;
 }
 
-.btn-clear {    
+.btn-clear {
     background: transparent;
     color: var(--color-text-secondary, #6b7280);
     border: 0.5px solid var(--color-border-secondary, #d1d5db);
@@ -142,21 +136,15 @@
     opacity: 1;
 }
 
-/* ---------- Table card ---------- */
 .customer-list-card {
-
     background: var(--color-background-primary, #fff);
-    border: none;
-    box-shadow:
-        0 1px 2px rgba(15, 23, 42, 0.04),
-        0 4px 16px rgba(15, 23, 42, 0.06);
+    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
     border-radius: 16px;
     padding: 0;
     overflow: hidden;
     margin-bottom: 1rem;
 }
 
-/* ---------- Table ---------- */
 .customer-table {
     width: 100%;
     border-collapse: collapse;
@@ -202,19 +190,16 @@
     background: #f8faff;
 }
 
-/* Customer name cell */
 .customer-name-td {
     font-weight: 500;
     color: var(--color-text-primary, #111);
 }
 
-/* Actions cell */
 .customer-actions-td {
     text-align: right;
     white-space: nowrap;
 }
 
-/* Empty state */
 .table-empty-td {
     text-align: center;
     padding: 2.5rem 1rem !important;
@@ -222,7 +207,6 @@
     font-size: 13px;
 }
 
-/* ---------- Status badge ---------- */
 .status-badge {
     display: inline-flex;
     align-items: center;
@@ -243,7 +227,6 @@
     color: #991b1b;
 }
 
-/* ---------- Row action buttons ---------- */
 .btn-action-edit,
 .btn-action-delete {
     display: inline-flex;
@@ -281,42 +264,28 @@
     opacity: 1;
 }
 
+.pagination-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
 
-/* LEFT SIDE (info + select) */
-.table-footer-left {
+.pagination-container nav {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 4px;
 }
 
-/* INFO TEXT */
-.table-info {
-    font-size: 13px;
-    padding: 1rem;
-    color: #374151;
-}
-
-/* ===== PAGINATION WRAPPER ===== */
-.pagination {
-    display: flex;
-    align-items: center;
-}
-
-.pagination nav ul {
+.pagination-container .pagination {
     display: flex;
     align-items: center;
     gap: 4px;
     list-style: none;
-    padding: 0;
     margin: 0;
+    padding: 0;
 }
 
-.pagination nav li {
-    display: flex;
-}
-
-.pagination span,
-.pagination a {
+.pagination-container .page-item .page-link {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -324,81 +293,35 @@
     height: 30px;
     padding: 0 8px;
     border-radius: 50px;
-    border: 0.5px solid #e5e7eb;
-    background: #fff;
-    color: #111;
+    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    background: var(--color-background-primary, #fff);
+    color: var(--color-text-primary, #111);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 12px;
     font-weight: 500;
     text-decoration: none;
-    transition: all 0.15s ease;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-/* ACTIVE PAGE */
-.pagination .active span {
+.pagination-container .page-item.active .page-link {
     background: #2563eb;
     color: #fff;
     border-color: #2563eb;
     font-weight: 600;
 }
 
-/* HOVER */
-.pagination a:hover {
+.pagination-container .page-item.disabled .page-link {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+}
+
+.pagination-container .page-item:not(.active):not(.disabled) .page-link:hover {
     background: #eff6ff;
     border-color: #bfdbfe;
     color: #2563eb;
 }
 
-/* DISABLED */
-.pagination .disabled span,
-.pagination [aria-disabled="true"] span {
-    opacity: 0.35;
-    pointer-events: none;
-}
-
-/* ===== PER PAGE SELECT ===== */
-.table-footer select {
-    font-family: Inter, sans-serif;
-    font-size: 12px;
-    padding: 5px 28px 5px 12px;
-    border-radius: 50px;
-    border: 0.5px solid #d1d5db;
-    background: #fff;
-    color: #6b7280;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-}
-.pagination-numbers{
-    display:flex;
-    gap:8px;
-    justify-content:center;
-    align-items:center;
-}
-
-.pagination-numbers a,
-.pagination-numbers span{
-    width:36px;
-    height:36px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border:1px solid #ddd;
-    border-radius:8px;
-    text-decoration:none;
-}
-
-.pagination-numbers .active{
-    background:#111827;
-    color:#fff;
-}
-
-.pagination-numbers .dots{
-    border:none;
-}
-/* ---------- Modal overlay ---------- */
 .modal {
     display: none;
     position: fixed;
@@ -412,7 +335,6 @@
     padding: 1rem;
 }
 
-/* ---------- Modal box ---------- */
 .modal-content {
     background: var(--color-background-primary, #fff);
     border-radius: 20px;
@@ -428,7 +350,6 @@
     to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Modal title */
 .modal-title {
     font-size: 17px;
     font-weight: 600;
@@ -437,7 +358,6 @@
     margin: 0 0 1.5rem;
 }
 
-/* ---------- Form groups ---------- */
 .form-group {
     margin-bottom: 1rem;
 }
@@ -494,7 +414,6 @@
     cursor: pointer;
 }
 
-/* ---------- Modal footer ---------- */
 .modal-footer-actions {
     display: flex;
     align-items: center;
@@ -540,7 +459,6 @@
 
 .btn-modal-save:hover { opacity: 0.88; }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 640px) {
     .customer-list-actions {
         flex-direction: column;
@@ -571,5 +489,124 @@
 
     .customer-actions-td {
         text-align: left;
+    }
+}
+.customer-list-card {
+    padding-bottom: 0;
+}
+
+.table-footer {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 16px;
+    border-top: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+}
+
+.table-footer-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.table-info {
+    font-size: 12px;
+    color: var(--color-text-secondary, #6b7280);
+    text-transform: capitalize;
+}
+
+.table-footer form {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.table-footer form select {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 12px;
+    padding: 4px 28px 4px 10px;
+    border-radius: 50px;
+    border: 0.5px solid var(--color-border-secondary, #d1d5db);
+    background: var(--color-background-primary, #fff);
+    color: var(--color-text-primary, #111);
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.table-footer form select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.table-footer .pagination,
+.table-footer nav .pagination {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.table-footer .page-item .page-link,
+.table-footer nav .page-item .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 8px;
+    border-radius: 50px;
+    border: 0.5px solid var(--color-border-tertiary, #e5e7eb);
+    background: var(--color-background-primary, #fff);
+    color: var(--color-text-primary, #111);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.table-footer .page-item.active .page-link,
+.table-footer nav .page-item.active .page-link {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+    font-weight: 600;
+}
+
+.table-footer .page-item.disabled .page-link,
+.table-footer nav .page-item.disabled .page-link {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+}
+
+.table-footer .page-item:not(.active):not(.disabled) .page-link:hover,
+.table-footer nav .page-item:not(.active):not(.disabled) .page-link:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #2563eb;
+}
+
+@media (max-width: 640px) {
+    .table-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .table-footer-left {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
     }
 }

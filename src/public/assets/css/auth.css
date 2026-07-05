@@ -1,5 +1,9 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+*, *::before,
+ *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 :root {
   --sky:    #2E6DA4;
   --sky-dk: #245a8a;
@@ -9,13 +13,12 @@
   --muted:  #6b7280;
   --border: #d1d5db;
   --bg:     #ffffff;
-  --slide-dur: .7s;
+  --slide-dur: .9s;
 }
 
-html, body { 
-    height: 100%; 
-    overflow: hidden; 
-    
+html, body {
+    height: 100%;
+    overflow: hidden;
 }
 
 body {
@@ -25,31 +28,44 @@ body {
   width: 100vw;
 }
 
-/* ── LEFT PANEL ── */
 .panel-image {
   position: relative;
   flex: 1 1 55%;
   overflow: hidden;
 }
 
-/* ── SLIDER ── */
-.slides {
+.slider-viewport {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+.slider-panel {
   position: absolute;
   inset: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+.slider-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 .slide {
-    position: absolute;
-    inset: 0;
-    background-size: cover;
-    background-position: center;
-    opacity: 0;
-    transition: opacity 2s ease;  /* 2 second slow fade */
+  position: relative;
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-.slide.active { opacity: 1; }
 
-/* Dark overlay */
 .panel-image::after {
   content: '';
   position: absolute;
@@ -62,7 +78,7 @@ body {
   );
   pointer-events: none;
 }
-/* Logo */
+
 .panel-logo {
   position: absolute;
   top: 2rem;
@@ -76,7 +92,6 @@ body {
   object-fit: contain;
 }
 
-/* Bottom copy */
 .panel-copy {
   position: absolute;
   bottom: 2.5rem;
@@ -126,7 +141,6 @@ body {
   background: var(--sky);
 }
 
-/* ── RIGHT PANEL ── */
 .panel-form {
   flex: 0 0 42%;
   max-width: 560px;
@@ -137,7 +151,6 @@ body {
   overflow-y: auto;
 }
 
-/* Lang switcher */
 .lang-row {
   display: flex;
   justify-content: flex-end;
@@ -176,7 +189,6 @@ body {
   font-size: .7rem;
 }
 
-/* Form card area */
 .form-center {
   flex: 1;
   display: flex;
@@ -200,7 +212,6 @@ body {
   color: var(--muted);
 }
 
-/* Phone row */
 .phone-row {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -260,7 +271,6 @@ select {
   font-size: .75rem;
 }
 
-/* Input with icon */
 .input-icon { position: relative; }
 
 .input-icon svg {
@@ -274,7 +284,6 @@ select {
 
 .input-icon input { padding-left: 2.2rem; }
 
-/* Password field */
 .pw-wrap {
   position: relative;
   margin-bottom: 1.8rem;
@@ -295,7 +304,6 @@ select {
   align-items: center;
 }
 
-/* Login button */
 .btn-login {
   width: 100%;
   padding: 1rem;
@@ -334,7 +342,6 @@ select {
 
 .forgot:hover { opacity: .75; }
 
-/* ── OTP ── */
 .otp-resend {
   text-decoration: underline;
   color: var(--sky);
@@ -401,7 +408,6 @@ select {
   border-color: #e24b4a;
 }
 
-/* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .panel-image { display: none; }
   .panel-form {

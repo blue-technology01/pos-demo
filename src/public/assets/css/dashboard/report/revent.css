@@ -1,9 +1,3 @@
-/* ============================================================
-   Revenue Tracking Report — revent.css
-   Primary: #2563eb  |  Border-radius pills: 50px
-   ============================================================ */
-
-/* ---------- Page shell ---------- */
 .rv-page {
     padding: 1.75rem 0;
     font-family: 'Inter', sans-serif;
@@ -11,7 +5,6 @@
     color: var(--color-text-primary, #111);
 }
 
-/* ---------- Page header ---------- */
 .rv-page__header {
     margin-bottom: 1.5rem;
 }
@@ -33,7 +26,6 @@
     line-height: 1.5;
 }
 
-/* ---------- Filter bar ---------- */
 .rv-filter-bar {
     display: flex;
     align-items: center;
@@ -67,7 +59,6 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
-/* ---------- Buttons ---------- */
 .btn-filter {
     display: inline-flex;
     align-items: center;
@@ -117,7 +108,6 @@
     color: var(--color-text-primary, #111);
 }
 
-/* ---------- KPI cards row ---------- */
 .rv-kpi-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -125,7 +115,6 @@
     margin-bottom: 1.5rem;
 }
 
-/* ---------- KPI card ---------- */
 .rv-kpi-card {
     background: var(--color-background-primary, #fff);
     border: none;
@@ -136,10 +125,8 @@
     padding: 1.25rem 1.4rem;
     position: relative;
     overflow: hidden;
-    /* transition: border-color 0.2s, box-shadow 0.2s; */
 }
 
-/* Accent bar on left edge */
 .rv-kpi-card::before {
     content: '';
     position: absolute;
@@ -153,8 +140,6 @@
 .rv-kpi-card--blue::before   { background: #2563eb; }
 .rv-kpi-card--green::before  { background: #059669; }
 .rv-kpi-card--purple::before { background: #7c3aed; }
-
-/* Top row: icon + badge */
 .rv-kpi-card__top {
     display: flex;
     align-items: flex-start;
@@ -162,7 +147,6 @@
     margin-bottom: 14px;
 }
 
-/* Icon circle */
 .rv-kpi-card__icon {
     width: 40px;
     height: 40px;
@@ -178,7 +162,6 @@
 .rv-kpi-card__icon--green  { background: #d1fae5; color: #065f46; }
 .rv-kpi-card__icon--purple { background: #ede9fe; color: #5b21b6; }
 
-/* Badge */
 .rv-kpi-card__badge {
     display: inline-flex;
     align-items: center;
@@ -193,7 +176,6 @@
 .rv-kpi-card__badge--down { background: #fee2e2; color: #991b1b; }
 .rv-kpi-card__badge--neutral { background: var(--color-background-secondary, #f3f4f6); color: var(--color-text-secondary, #6b7280); }
 
-/* Label */
 .rv-kpi-card__label {
     font-size: 11px;
     font-weight: 500;
@@ -203,7 +185,6 @@
     margin: 0 0 6px;
 }
 
-/* Value */
 .rv-kpi-card__value {
     font-size: 28px;
     font-weight: 600;
@@ -217,7 +198,6 @@
 .rv-kpi-card__value--green  { color: #059669; }
 .rv-kpi-card__value--purple { color: #7c3aed; }
 
-/* Sub text below value */
 .rv-kpi-card__sub {
     font-size: 11px;
     font-weight: 400;
@@ -225,7 +205,6 @@
     margin: 0;
 }
 
-/* Bottom progress bar */
 .rv-kpi-card__bar {
     height: 3px;
     background: var(--color-background-secondary, #e5e7eb);
@@ -244,7 +223,6 @@
 .rv-kpi-card__bar-fill--green  { background: #059669; }
 .rv-kpi-card__bar-fill--purple { background: #7c3aed; }
 
-/* ---------- Panel ---------- */
 .rv-panel {
     background: var(--color-background-primary, #fff);
     border: none;
@@ -280,7 +258,6 @@
     margin: 3px 0 0;
 }
 
-/* ---------- Table ---------- */
 .table-responsive {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -331,7 +308,6 @@
     background: #f8faff;
 }
 
-/* ---------- Date cell ---------- */
 .rv-date-cell {
     display: flex;
     align-items: center;
@@ -368,13 +344,11 @@
     color: var(--color-text-tertiary, #9ca3af);
 }
 
-/* ---------- Revenue value ---------- */
 .rv-value {
     color: #2563eb;
     font-weight: 600;
 }
 
-/* ---------- Trend badges ---------- */
 .rv-trend {
     display: inline-flex;
     align-items: center;
@@ -389,7 +363,6 @@
 .rv-trend--up   { background: #dcfce7; color: #166534; }
 .rv-trend--down { background: #fee2e2; color: #991b1b; }
 
-/* ---------- Empty / loading / error ---------- */
 .rv-state-cell {
     text-align: center;
     padding: 2.5rem 1rem;
@@ -400,7 +373,6 @@
 .rv-state-cell--error { color: #dc2626; }
 
 
-/* ===== TABLE FOOTER WRAPPER ===== */
 .table-footer {
     width: 100%;
     display: flex;
@@ -409,20 +381,17 @@
     padding: 1rem;
 }
 
-/* LEFT SIDE (info + select) */
 .table-footer-left {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* INFO TEXT */
 .table-info {
     font-size: 13px;
     color: #374151;
 }
 
-/* ===== PAGINATION WRAPPER ===== */
 .pagination {
     display: flex;
     align-items: center;
@@ -467,21 +436,18 @@
     font-weight: 600;
 }
 
-/* HOVER */
 .pagination a:hover {
     background: #eff6ff;
     border-color: #bfdbfe;
     color: #2563eb;
 }
 
-/* DISABLED */
 .pagination .disabled span,
 .pagination [aria-disabled="true"] span {
     opacity: 0.35;
     pointer-events: none;
 }
 
-/* ===== PER PAGE SELECT ===== */
 .table-footer select {
     font-family: Inter, sans-serif;
     font-size: 12px;
@@ -525,7 +491,6 @@
     border:none;
 }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 768px) {
     .rv-kpi-row {
         grid-template-columns: 1fr 1fr;
@@ -537,21 +502,19 @@
 }
 
 @media (max-width: 480px) {
-    .rv-page__title { font-size: 18px; }
-
+    .rv-page__title {
+        font-size: 18px;
+    }
     .rv-kpi-row {
         grid-template-columns: 1fr;
     }
-
     .rv-kpi-row .rv-kpi-card:last-child {
         grid-column: auto;
     }
-
     .rv-filter-bar {
         flex-direction: column;
         align-items: stretch;
     }
-
     .rv-filter-bar input[type="text"],
     .rv-filter-bar input[type="date"],
     .btn-filter,

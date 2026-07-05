@@ -31,7 +31,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * AJAX: return all dashboard data for the given period.
+     * ajax: return all dashboard data for the given period.
      */
     public function data(Request $request): JsonResponse
     {
@@ -46,14 +46,14 @@ class DashboardController extends Controller
 
     private function getDashboardData(string $period): array
     {
-        return Cache::remember(
-            "dashboard:{$period}",
-            self::CACHE_TTL,
-            fn () => [
+        $key = "dashboard:{$period}:" . now()->format('Y-m-d-H-i'); // minute-based cache
+
+        return Cache::remember($key, 60, function () use ($period) {
+            return [
                 'stats' => $this->dashboardService->getStats($period),
                 'chart' => $this->dashboardService->getColumnChart($period),
                 'donut' => $this->dashboardService->getDonutChart($period),
-            ]
-        );
+            ];
+        });
     }
 }

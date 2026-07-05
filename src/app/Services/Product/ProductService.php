@@ -37,24 +37,22 @@ class ProductService
         if ($search = $request->search) {
             $query->where(function ($q) use ($search) {
                 $q->where('code', $search)
-                ->orWhere('barcode', $search)
-                ->orWhere('name', 'like', "%{$search}%");
+                    ->orWhere('barcode', $search)
+                    ->orWhere('name', 'like', $search . '%');
             });
         }
 
         // date range
         if ($request->start_date && $request->end_date) {
             $query->whereBetween('created_at', [
-                $request->start_date . ' 00:00:00',
-                $request->end_date . ' 23:59:59'
+                Carbon::parse($request->start_date)->startOfDay(),
+                Carbon::parse($request->end_date)->endOfDay(),
             ]);
         } elseif ($request->start_date) {
-            $query->where('created_at', '>=', $request->start_date . ' 00:00:00');
+            $query->where('created_at', '>=', Carbon::parse($request->start_date)->startOfDay());
         } elseif ($request->end_date) {
-            $query->where('created_at', '<=', $request->end_date . ' 23:59:59');
+            $query->where('created_at', '<=', Carbon::parse($request->end_date)->endOfDay());
         }
-
-
         // category
         if ($categoryCode = $request->category_code) {
             $query->where('category_code', $categoryCode);
@@ -84,33 +82,25 @@ class ProductService
                 return [
                     'code' => $product->code,
                     'name' => $product->name,
-                    // 'price' => (float) $product->price,
-                    // 'cost_price' => (float) $product->cost_price,
                     'stock' => (float) $product->stock,
                     'barcode' => $product->barcode,
                     'category_code' => $product->category_code,
                     'image' => $product->image,
 
-                    // FAST POS DISPLAY (ONLY ONE UOM)
                     'uom' => [
                         'uom_code'          => $retailUom->uom_code ?? null,
                         'uom_name'          => $retailUom->uom->name ?? null,
                         'quantity_per_unit' => (float) ($retailUom->quantity_per_unit ?? 1),
-                        // 'selling_price'     => (float) ($retailUom->selling_price ?? 0),
-                        // 'cost_price'        => (float) ($retailUom->cost_price ?? 0),
                         'barcode'           => $retailUom->barcode ?? null,
                         'is_default'        => (bool) ($retailUom->is_default ?? false),
                         'uom_role'          => $retailUom->uom_role ?? 'retail',
                     ],
-
-                    // FULL MATRIX (only for product detail page)
+        
                     'uom_matrix' => $product->uoms->map(function ($uom) {
                         return [
                             'uom_code'          => $uom->uom_code,
                             'uom_name'          => $uom->uom->name ?? $uom->uom_code,
                             'quantity_per_unit' => (float) $uom->quantity_per_unit,
-                            // 'cost_price'        => (float) $uom->cost_price,
-                            // 'selling_price'     => (float) $uom->selling_price,
                             'is_default'        => (bool) $uom->is_default,
                             'uom_role'          => $uom->uom_role ?? 'retail',
                             'barcode'           => $uom->barcode,
@@ -122,10 +112,12 @@ class ProductService
 
     /**
      * Find a product by code or throw 404.
-     */
+    */
     public function findOrFail(string $code): Product
     {
-        return Product::with(['uoms.uom'])->findOrFail($code);
+        return Product::with(['uoms.uom'])
+            ->where('code', $code)
+            ->firstOrFail();
     }
 
     /**
@@ -142,8 +134,6 @@ class ProductService
             'code'          => $data['code'],
             'name'          => $data['name'],
             'category_code' => $data['category_code'] ?? null,
-            // 'cost_price'    => $data['cost_price'] ?? 0,
-            // 'price'         => $data['price'] ?? 0,
             'stock'         => $data['stock'] ?? 0,
             'min_stock'     => $data['min_stock'] ?? 0,
             'barcode'       => $data['barcode'] ?? null,
@@ -161,20 +151,27 @@ class ProductService
     {
         $product = $this->findOrFail($code);
 
-        // Handle image update
-        if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
-
-            // delete old image
-            if ($product->image && Storage::disk('public')->exists($product->image)) {
+        if (($data['image'] ?? null) instanceof UploadedFile) {
+            if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
 
             $data['image'] = $data['image']->store('products', 'public');
         }
 
-        $product->update($data);
+        $product->update([
+            'name'          => $data['name'] ?? $product->name,
+            'category_code' => $data['category_code'] ?? $product->category_code,
+            'stock'         => $data['stock'] ?? $product->stock,
+            'min_stock'     => $data['min_stock'] ?? $product->min_stock,
+            'barcode'       => $data['barcode'] ?? $product->barcode,
+            'description'   => $data['description'] ?? $product->description,
+            'expiry_date'   => $data['expiry_date'] ?? $product->expiry_date,
+            'status'        => $data['status'] ?? $product->status,
+            'image'         => $data['image'] ?? $product->image,
+        ]);
 
-        return $product->fresh();
+        return $product->refresh();
     }
 
     public function getCategories()
@@ -192,7 +189,6 @@ class ProductService
         $product->update([
             'status' => 'inactive'
         ]);
-
         return $product->fresh();
     }
 }
