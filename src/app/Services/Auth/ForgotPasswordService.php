@@ -3,16 +3,18 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\RateLimiter;
 
 class ForgotPasswordService
 {
+
+    // constants
     private const OTP_LENGTH    = 6;
-    private const OTP_TTL       = 300; // 5mn >  valid
+    private const OTP_TTL       = 300; // time to live
     private const MAX_ATTEMPTS  = 3; // try attampt 3> block
     private const DECAY_SECONDS = 300;   // 5mn block time after max attempts
 
@@ -75,7 +77,7 @@ class ForgotPasswordService
         ];
     }
 
-    // verify OTP
+    // verify otp
     public function verifyOtp(string $phone, string $otp): array
     {
         if (empty($phone)) {
@@ -95,6 +97,7 @@ class ForgotPasswordService
                 'message' => 'Too many attempts. Try again later.'
             ];
         }
+
         // Check OTP validity
         if (!$cachedHash || !Hash::check($otp, $cachedHash)) {
             RateLimiter::hit($key, self::DECAY_SECONDS);

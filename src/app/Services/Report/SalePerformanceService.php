@@ -2,23 +2,15 @@
 
 namespace App\Services\Report;
 
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SalePerformanceService
 {
-    /**
-     * Paginated staff performance rows.
-     * Uses DB-level pagination for scalability.
-     */
-    public function getStaffPerformance(
-        string $startDate,
-        string $endDate,
-        string $search = '',
-        int $perPage = 15,
-        int $page = 1
-    ): array {
+
+    // get staff performance rows
+    public function getStaffPerformance(string $startDate,  string $endDate,  string $search = '',  int $perPage = 15, int $page = 1 ): array {
 
         $perPage = max(1, $perPage);
 
@@ -35,12 +27,11 @@ class SalePerformanceService
                 fn ($q) => $q->where('users.name', 'like', "%{$search}%")
             );
 
-        $total = (clone $baseQuery)
-            ->groupBy('users.id', 'users.name', 'users.avatar')
-            ->select('users.id')
-            ->get()
+        $total = DB::table(DB::raw("({$baseQuery->select('users.id')->groupBy('users.id')->toSql()}) as sub"))
+            ->mergeBindings($baseQuery)
             ->count();
 
+        // finding the top performance
         $maxRevenue = (clone $baseQuery)
             ->groupBy('users.id')
             ->selectRaw('SUM(sales.total_amount) as total_revenue')
@@ -64,7 +55,7 @@ class SalePerformanceService
             ->offset($offset)
             ->limit($perPage)
             ->get()
-            ->map(function ($row) use ($maxRevenue) {
+            ->map(function ($row) use ($maxRevenue) {  // map for transfer data to type that correct
 
                 $row->total_orders = (int) $row->total_orders;
                 $row->total_revenue = (float) $row->total_revenue;
@@ -94,9 +85,7 @@ class SalePerformanceService
         ];
     }
 
-    /**
-     * KPI summary — total revenue, orders, avg for header cards.
-     */
+    // kpi summary, total revenue, orders, avg for header cards
     public function getSummary(string $startDate, string $endDate): array
     {
         $result = DB::table('sales')
@@ -120,9 +109,7 @@ class SalePerformanceService
         ];
     }
 
-    /**
-     * Top performer — single best staff member this period.
-     */
+    // get top performance of single bast staff member this period
     public function getTopPerformer(string $startDate, string $endDate): ?object
     {
         return DB::table('sales')
@@ -142,9 +129,7 @@ class SalePerformanceService
             ->first();
     }
 
-    /**
-     * Chart data — top 6 staff for donut chart.
-     */
+    // chart data finding top 6 staff donut chart
     public function getChartData(string $startDate, string $endDate): Collection
     {
         return DB::table('sales')
@@ -157,7 +142,7 @@ class SalePerformanceService
                 DB::raw('SUM(sales.total_amount) as total_revenue'),
             )
             ->orderByDesc('total_revenue')
-            ->limit(6)
+            ->limit(6) // limite only 6 user
             ->get()
             ->map(fn($row) => [
                 'name'    => $row->staff_name,
@@ -165,9 +150,7 @@ class SalePerformanceService
             ]);
     }
 
-    /**
-     * Payment method breakdown per staff.
-     */
+    // payment method breakdown per staff
     public function getPaymentBreakdown(string $startDate, string $endDate): Collection
     {
         return DB::table('sales')
@@ -186,9 +169,7 @@ class SalePerformanceService
             ->get();
     }
 
-    /**
-     * Voided / refunded sales — audit per staff.
-     */
+    // voided or refunded sale audit per staff
     public function getVoidedSales(string $startDate, string $endDate): Collection
     {
         return DB::table('sales')

@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\View\View;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
-use App\Services\Auth\ForgotPasswordService;
 use App\Http\Requests\Auth\OtpVerifyRequest;
-use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Services\Auth\ForgotPasswordService;
 use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
 
 class ForgotPasswordController extends Controller
 {
@@ -117,6 +117,7 @@ class ForgotPasswordController extends Controller
                 ->route('auth.forgot-password')
                 ->with('error', 'Session expired. Please try again.');
         }
+
         return view('auth.reset-password');
     }
 

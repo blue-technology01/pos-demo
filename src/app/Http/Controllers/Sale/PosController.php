@@ -5,14 +5,10 @@ namespace App\Http\Controllers\Sale;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Services\Product\ProductUomService;
 
 class PosController extends Controller
 {
-    public function __construct(
-        private readonly ProductUomService $productUomService
-    ) {}
-
+    // show category product on POS
     public function index(Request $request)
     {
         $categories = Category::where('status', 'active')

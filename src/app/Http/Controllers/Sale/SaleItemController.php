@@ -11,11 +11,15 @@ use App\Http\Requests\Sale\SaleItemUpdateRequest;
 
 class SaleItemController extends Controller
 {
+    // inject service
     public function __construct(
+
         protected SaleItemService $saleItemService,
         protected SaleService $saleService,
+
     ) {}
 
+    // add product to sale chart
     public function store(SaleItemStoreRequest $request)
     {
         $data = $request->validated();
@@ -31,6 +35,7 @@ class SaleItemController extends Controller
         ]);
     }
 
+    // for edit sale items
     public function update(SaleItemUpdateRequest $request, string $rowId)
     {
         $data = $request->validated();
@@ -46,6 +51,7 @@ class SaleItemController extends Controller
         ]);
     }
 
+    // remove from product on POS
     public function destroy(string $rowId)
     {
         $items   = $this->saleItemService->removeItem($rowId);
@@ -65,6 +71,7 @@ class SaleItemController extends Controller
         return response()->json(['success' => true]);
     }
 
+    // confirm of sale ->create sale -> return invoice
     public function confirm(Request $request)
     {
         $request->validate([

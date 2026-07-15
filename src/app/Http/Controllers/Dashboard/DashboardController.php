@@ -17,9 +17,7 @@ class DashboardController extends Controller
         private readonly DashboardService $dashboardService
     ) {}
 
-    /**
-     * Blade dashboard page.
-     */
+    /* show dashboard page */
     public function index(): \Illuminate\View\View
     {
         $period = 'today';
@@ -30,9 +28,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    /**
-     * ajax: return all dashboard data for the given period.
-     */
+    /* return all dashbiard data for the given period */
     public function data(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -44,6 +40,7 @@ class DashboardController extends Controller
         return response()->json($this->getDashboardData($period));
     }
 
+    /* get dashboard data */
     private function getDashboardData(string $period): array
     {
         $key = "dashboard:{$period}:" . now()->format('Y-m-d-H-i'); // minute-based cache

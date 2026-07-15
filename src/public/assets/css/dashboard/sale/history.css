@@ -111,7 +111,7 @@
     font-family: 'Inter', sans-serif;
     font-size: 13px;
     font-weight: 400;
-    padding: 8px 18px;
+    padding: 5px 18px;
     border-radius: 50px;
     border: 0.5px solid var(--color-border-secondary, #d1d5db);
     background: transparent;

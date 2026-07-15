@@ -35,21 +35,16 @@
             <button type="submit" class="btn-filter" onclick="showLoader()">
                 <span class="material-symbols-outlined">filter_alt</span> Filter
             </button>
-
             <a href="{{ route('admin.sales.index') }}" class="btn-reset" onclick="showLoader()">
                 <span class="material-symbols-outlined">refresh</span>
                 Reset
             </a>
-
         </form>
 
         {{-- Export --}}
         <div class="export-actions">
             <button class="btn-export btn-excel">
                 <span class="material-symbols-outlined">table_view</span> Excel
-            </button>
-            <button class="btn-export btn-pdf">
-                <span class="material-symbols-outlined">picture_as_pdf</span> PDF
             </button>
         </div>
     </div>
@@ -100,15 +95,27 @@
                                         <span class="material-symbols-outlined">visibility</span>
                                     </button>
 
-                                    {{-- Void / Cancel --}}
+                                    {{-- Print invoice --}}
+                                    <a
+                                        href="{{ route('admin.sales.invoice.print', $sale->id) }}"
+                                        target="_blank"
+                                        class="btn-action btn-print"
+                                        title="Print invoice"
+                                        onclick="event.stopPropagation()"
+                                    >
+                                        <span class="material-symbols-outlined">print</span>
+                                    </a>
+
+                                    {{-- Cancel --}}
                                     @if($sale->status !== 'voided')
                                         <form
                                             action="{{ route('admin.sales.cancel', $sale->id) }}"
                                             method="POST"
-                                            onsubmit="return confirm('Are you sure you want to void this invoice?')"
+                                            onsubmit="event.stopPropagation();"
                                         >
                                             @csrf
-                                            <button type="submit" class="btn-cancel" title="Void sale">
+                                            @method('PATCH')    
+                                            <button type="submit" class="btn-cancel" title="Void sale" onclick="event.stopPropagation()">
                                                 <span class="material-symbols-outlined">block</span>
                                             </button>
                                         </form>

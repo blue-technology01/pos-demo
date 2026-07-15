@@ -8,8 +8,11 @@ use App\Http\Requests\Report\RevenueTrackingRequest;
 
 class RevenueTrackingController extends Controller
 {
+    // dependency injection
     public function __construct(
+
         private readonly RevenueTrackingService $revenueTrackingService
+
     ) {}
 
     public function index(RevenueTrackingRequest $request)

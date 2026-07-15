@@ -4,26 +4,23 @@ namespace App\Http\Controllers\Auth;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 
 class LoginController extends Controller
 {
-    // ─────────────────────────────────────────
-    // Show login page
-    // ─────────────────────────────────────────
+    // show page login
     public function index()
     {
         return view('auth.login');
     }
 
-    // ─────────────────────────────────────────
-    // Handle login
-    // ─────────────────────────────────────────
+
+    // handle login
     public function login(LoginRequest $request)
     {
         $key = $this->throttleKey($request);
@@ -55,9 +52,7 @@ class LoginController extends Controller
         return redirect()->to($this->redirectByRole());
     }
 
-    // ─────────────────────────────────────────
-    // Handle logout
-    // ─────────────────────────────────────────
+    // handle logout
     public function logout(Request $request)
     {
         $user = Auth::user(); //  Get user BEFORE logout
@@ -73,9 +68,7 @@ class LoginController extends Controller
         return redirect()->route('login');
     }
 
-    // ─────────────────────────────────────────
-    // Send Telegram notification
-    // ─────────────────────────────────────────
+    // send telegram notification
     private function sendTelegram($user, string $action): void
     {
         $token   = config('services.telegram.token');
@@ -129,9 +122,7 @@ class LoginController extends Controller
         }
     }
 
-    // ─────────────────────────────────────────
-    // Redirect based on user role after login
-    // ─────────────────────────────────────────
+    // redirect base role user role
     private function redirectByRole(): string
     {
         $user = Auth::user();
@@ -147,9 +138,7 @@ class LoginController extends Controller
         return route('forbidden');
     }
 
-    // ─────────────────────────────────────────
-    // Rate limiter key
-    // ─────────────────────────────────────────
+    // rate limite  key
     private function throttleKey(Request $request): string
     {
         return 'login-attempt:' . $request->ip() . ':' . strtolower((string) $request->input('email'));

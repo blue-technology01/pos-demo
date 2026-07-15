@@ -11,16 +11,14 @@
     <link rel="stylesheet" href="{{ asset('assets/css/components/sidebar.css') }}" data-turbo-track="reload">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
 
     @stack('styles')
 </head>
 <body class="dashboard-body">
-
     <x-spinner />
     <x-alert/>
-
     @include('components.navbar')
-
     <div class="dashboard-wrapper" id="dashboard-wrapper">
         @include('components.sidebar')
         <main class="main-content">
@@ -29,7 +27,6 @@
             </div>
         </main>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="{{ asset('assets/js/app.js') }}"></script>
     <script>
@@ -113,7 +110,7 @@
                 document.getElementById('langDropdown')
             );
 
-            /* ── Language switcher ── */
+            // language switcher
             const langBtn = document.getElementById('langBtn');
 
             document.querySelectorAll('.pill-dropdown-item[data-lang]').forEach(function (btn) {
@@ -135,7 +132,7 @@
                 });
             });
 
-            /* ── Fullscreen toggle ── */
+            // fullscreen toggle
             const fsBtn = document.getElementById('fsBtn');
 
             if (fsBtn) {
@@ -158,15 +155,12 @@
                 });
             }
 
-            /* ── Sidebar toggle ── */
+            // sidebar toggle
             const sidebarToggle = document.getElementById('sidebarToggle');
             if (sidebarToggle) {
                 sidebarToggle.addEventListener('click', () => document.body.classList.toggle('sidebar-collapsed'));
             }
-
         });
-
-        /* ── Lucide icons on Turbo navigation ── */
         document.addEventListener('turbo:load', function () {
             if (window.lucide) lucide.createIcons();
         });

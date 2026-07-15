@@ -8,8 +8,11 @@ use App\Services\Report\RevenueReportService;
 
 class ReportIndexController extends Controller
 {
+    // dependency injection
     public function __construct(
+
         private readonly RevenueReportService $revenueReportService
+
     ) {}
 
     public function index(Request $request)
@@ -21,7 +24,7 @@ class ReportIndexController extends Controller
 
         $startDate = $request->input('start_date') ?? now()->subDays(6)->format('Y-m-d');
         $endDate   = $request->input('end_date')   ?? now()->format('Y-m-d');
-        
+
         // return json for ajax requests
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([

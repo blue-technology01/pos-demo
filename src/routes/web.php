@@ -1,27 +1,30 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Sale\PosController;
 use App\Http\Controllers\Cash\CashController;
-use App\Http\Controllers\Customer\CustomerController;
-use App\Http\Controllers\Dashboard\DashboardController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\Printer\PrinterController;
-use App\Http\Controllers\Product\CategoryController;
-use App\Http\Controllers\Product\ProductController;
-use App\Http\Controllers\Product\ProductUomController;
+use App\Http\Controllers\Sale\SaleController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Product\UomController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Sale\SaleItemController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Printer\PrinterController;
+use App\Http\Controllers\Invoice\InvoiceController;
+use App\Http\Controllers\Product\CategoryController;
+use App\Http\Controllers\Customer\CustomerController;
+use App\Http\Controllers\Report\TopProductController;
 use App\Http\Controllers\Report\ReportIndexController;
+use App\Http\Controllers\Product\ProductUomController;
+use App\Http\Controllers\Warehouse\WarehouseController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Stock\StockValidateController;
+use App\Http\Controllers\Stock\StockMovementController;
+use App\Http\Controllers\Stock\StockAjustmentController;
 use App\Http\Controllers\Report\RevenueTrackingController;
 use App\Http\Controllers\Report\SalePerformanceController;
-use App\Http\Controllers\Report\TopProductController;
-use App\Http\Controllers\Sale\InventoryController;
-use App\Http\Controllers\Sale\PosController;
-use App\Http\Controllers\Sale\SaleController;
-use App\Http\Controllers\Sale\SaleItemController;
-use App\Http\Controllers\Stock\StockValidateController;
 
 Route::get('/', fn () => redirect()->route('login'));
 Route::get('/403', fn () => view('errors.403'))->name('forbidden');
@@ -29,9 +32,12 @@ Route::get('/404', fn () => view('errors.404'))->name('notFound');
 Route::get('/500', fn () => view('errors.500'))->name('serverError');
 
 Route::middleware('guest')->group(function () {
+
+    // login function
     Route::get('/login',                        [LoginController::class, 'index'])->name('login');
     Route::post('/login',                       [LoginController::class, 'login'])->name('auth.login.post');
 
+    // forgot password
     Route::get('/forgot-password',              [ForgotPasswordController::class, 'index'])->name('auth.forgot-password');
     Route::post('/forgot-password/send-otp',    [ForgotPasswordController::class, 'sendOtp'])->name('auth.forgot-password.send-otp');
     Route::get('/forgot-password/otp',          [ForgotPasswordController::class, 'otpForm'])->name('auth.otp.show');
@@ -41,14 +47,17 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset-password',              [ForgotPasswordController::class, 'resetPassword'])->name('auth.reset-password.post');
 });
 
+// customer display UI
 Route::get('/cashier/customer-display', function () {
             return view('cashier.customer-display');
 })->name('cashier.customer.display');
 
 Route::middleware('auth')->group(function () {
 
+    // logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('auth.logout');
 
+    // for show notification
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/fetch',                    [NotificationController::class, 'fetch'])->name('fetch');
         Route::patch('/{notification}/read',    [NotificationController::class, 'markAsRead'])->name('read');
@@ -57,80 +66,122 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
+
         // Dashboard
         Route::get('/dashboard',        [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/data',   [DashboardController::class, 'data'])->name('dashboard.data');
-        // Profile
+
+        // user profile
         Route::get('/profile',          [RegisterController::class, 'userProfile'])->name('profile');
         Route::get('/preview-settings', [RegisterController::class, 'previewSetting'])->name('preview-settings');
         Route::post('/preview/update',  [PrinterController::class, 'updatePreview'])->name('preview.update');
-        // Users
+
+        // user account
         Route::get('/users',                [RegisterController::class, 'showFormRegister'])->name('users');
         Route::post('/users/register',      [RegisterController::class, 'register'])->name('users.register');
         Route::put('/users/{user}',         [RegisterController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}',      [RegisterController::class, 'destroy'])->name('users.destroy');
-        // Category
+
+        // category
         Route::get('/category',             [CategoryController::class, 'index'])->name('category');
         Route::post('/category',            [CategoryController::class, 'store'])->name('category.store');
         Route::put('/category/{code}',      [CategoryController::class, 'update'])->name('category.update');
         Route::delete('/category/{code}',   [CategoryController::class, 'destroy'])->name('category.destroy');
-        // Unit
+
+        // unit product
         Route::get('/unit',             [UomController::class, 'index'])->name('unit');
         Route::post('/unit',            [UomController::class, 'store'])->name('unit.store');
         Route::put('/unit/{code}',      [UomController::class, 'update'])->name('unit.update');
         Route::delete('/unit/{code}',   [UomController::class, 'destroy'])->name('unit.destroy');
-        // Products
+
+        // stock ajustment
+        Route::prefix('products/stock')->name('products.stock.')->group(function () {
+            Route::get('/',                          [StockAjustmentController::class, 'index'])->name('index');
+            Route::get('/create',                    [StockAjustmentController::class, 'create'])->name('create');
+            Route::post('/',                         [StockAjustmentController::class, 'store'])->name('store');
+            Route::get('/{stockAjustment}',          [StockAjustmentController::class, 'show'])->name('show');
+            Route::get('/{stockAjustment}/edit',     [StockAjustmentController::class, 'edit'])->name('edit');
+            Route::put('/{stockAjustment}',          [StockAjustmentController::class, 'update'])->name('update');
+            Route::delete('/{stockAjustment}',       [StockAjustmentController::class, 'destroy'])->name('destroy');
+            Route::post('/{stockAjustment}/approve', [StockAjustmentController::class, 'approve'])->name('approve');
+            Route::post('/{stockAjustment}/reject',  [StockAjustmentController::class, 'reject'])->name('reject');
+        });
+
+        // product
         Route::get('/products',             [ProductController::class, 'index'])->name('products.index');
         Route::get('/products/create',      [ProductController::class, 'create'])->name('products.create');
         Route::post('/products',            [ProductController::class, 'store'])->name('products.store');
         Route::get('/products/{code}/edit', [ProductController::class, 'edit'])->name('products.edit');
         Route::put('/products/{code}',      [ProductController::class, 'update'])->name('products.update');
         Route::delete('/products/{code}',   [ProductController::class, 'destroy'])->name('products.destroy');
-        // Product UOM
+        Route::post('/products/import',     [ProductController::class, 'import'])->name('products.import');
+
+        // product unit
         Route::get('/product-uom',              [ProductUomController::class, 'index'])->name('product-uom.index');
         Route::get('/product-uom/create',       [ProductUomController::class, 'create'])->name('product-uom.create');
         Route::post('/product-uom',             [ProductUomController::class, 'store'])->name('product-uom.store');
         Route::get('/product-uom/{id}/edit',    [ProductUomController::class, 'edit'])->name('product-uom.edit');
         Route::put('/product-uom/{id}',         [ProductUomController::class, 'update'])->name('product-uom.update');
         Route::delete('/product-uom/{id}',      [ProductUomController::class, 'destroy'])->name('product-uom.destroy');
-        // Customers
+
+        // customer
         Route::get('/customers/search',         [CustomerController::class, 'searchAjax'])->name('customers.search.ajax');
         Route::get('/customers',                [CustomerController::class, 'index'])->name('customers.index');
         Route::post('/customers',               [CustomerController::class, 'store'])->name('customers.st   ore');
         Route::put('/customers/{customer}',     [CustomerController::class, 'update'])->name('customers.update');
         Route::delete('/customers/{customer}',  [CustomerController::class, 'destroy'])->name('customers.destroy');
-        // Sales
+
+        // sales
         Route::get('/sales',                    [SaleController::class, 'index'])->name('sales.index');
         Route::post('/sales',                   [SaleController::class, 'store'])->name('sales.store');
         Route::get('/sales/{sale}',             [SaleController::class, 'show'])->name('sales.show');
         Route::get('/sales/{sale}/edit',        [SaleController::class, 'edit'])->name('sales.edit');
         Route::put('/sales/{sale}',             [SaleController::class, 'update'])->name('sales.update');
         Route::patch('/sales/{sale}/cancel',    [SaleController::class, 'cancel'])->name('sales.cancel');
+
         // Inventory & Stock
-        Route::get('/stock-update',     [InventoryController::class, 'index'])->name('stock-update');
-        Route::get('/stock-validation', [StockValidateController::class, 'index'])->name('stock-validation');
-        // Cash Register / Shift
+        Route::get('/stock-movement',       [StockMovementController::class, 'index'])->name('stock-movement');
+        Route::get('/stock-validation',     [StockValidateController::class, 'index'])->name('stock-validation');
+
+        //warehouse
+        Route::get('/warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
+        Route::post('/warehouses', [WarehouseController::class, 'store'])->name('warehouses.store');
+        Route::put('/warehouses/{warehouse}', [WarehouseController::class, 'update'])->name('warehouses.update');
+        Route::delete('/warehouses/{warehouse}', [WarehouseController::class, 'destroy'])->name('warehouses.destroy');
+
+        // cash register / shift
         Route::get('/shift', [CashController::class, 'index'])->name('shift');
-        // Reports
+        Route::get('/cash-register/export', [CashController::class,'export'])->name('cash-register.export');
+
+        // reports
         Route::get('/reports',          [ReportIndexController::class, 'index'])->name('reports.index');
         Route::get('/revenue-tracking', [RevenueTrackingController::class, 'index'])->name('revenue-tracking');
         Route::get('/sale-person',      [SalePerformanceController::class, 'index'])->name('sale-person');
         Route::get('/top-product',      [TopProductController::class, 'index'])->name('top-product');
+        Route::get('/top-product/export', [TopProductController::class, 'export'])->name('top-product.export');
+
+        //invoice
+        Route::get('/sales/{sale}/invoice/print', [InvoiceController::class, 'print'])->name('sales.invoice.print');
+
     });
 
     Route::prefix('cashier')->name('cashier.')->middleware('role:cashier')->group(function () {
-        // Customers
+
+        // customers
         Route::get('/customers/search', [CustomerController::class, 'searchAjax'])->name('customers.search.ajax');
         Route::post('/customers',       [CustomerController::class, 'store'])->name('customers.store');
-        // POS
+
+        // POS UI
         Route::get('/pos',                                      [PosController::class, 'index'])->name('pos');
         Route::get('/pos/products',                             [ProductUomController::class, 'posProducts'])->name('pos.products');
         Route::get('/pos/products/{productCode}/uoms',          [ProductUomController::class, 'getByProduct'])->name('pos.products.uoms');
-        // Shift
+
+        // shift
         Route::post('/open',                    [CashController::class, 'open'])->name('open');
         Route::post('/close',                   [CashController::class, 'close'])->name('close');
         Route::get('/current-shift-details',    [CashController::class, 'getCurrentShiftDetails'])->name('shift-details');
-        // Sale Items (cart)
+
+        // sale items
         Route::prefix('sale-items')->name('sale-items.')->group(function () {
             Route::post('/',            [SaleItemController::class, 'store'])->name('store');
             Route::put('/{rowId}',      [SaleItemController::class, 'update'])->name('update');
@@ -138,5 +189,6 @@ Route::middleware('auth')->group(function () {
             Route::delete('/',          [SaleItemController::class, 'clear'])->name('clear');
             Route::post('/confirm',     [SaleItemController::class, 'confirm'])->name('confirm');
         });
+
     });
 });

@@ -7,9 +7,7 @@ use Illuminate\Support\Collection;
 
 class InventoryNotificationService
 {
-    /**
-     * Expiry products (next 3 days)
-     */
+    // expire products
     public function getExpiryNotifications(): Collection
     {
         return Product::query()
@@ -18,9 +16,7 @@ class InventoryNotificationService
             ->get();
     }
 
-    /**
-     * Low stock products
-     */
+    // low stock
     public function getLowStockNotifications(): Collection
     {
         return Product::query()

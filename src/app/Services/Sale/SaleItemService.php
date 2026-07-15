@@ -2,10 +2,7 @@
 
 namespace App\Services\Sale;
 
-use App\Models\Product;
 use App\Models\SaleItem;
-// use App\Models\SaleItem;
-
 use Illuminate\Support\Str;
 
 class SaleItemService
@@ -17,16 +14,23 @@ class SaleItemService
         return session(self::SESSION_KEY, []);
     }
 
+    // function for manage add to cart items
     public function addItem(array $data): array
     {
+        // get current cart from session
         $items = $this->getItems();
+
         // Check if the product already exists in the items array
         $existingKey = $this->findItemKey($items, $data['product_code']);
+
         if ($existingKey !== null) {
+
             // Merge quantity if product already exists
             $items[$existingKey]['quantity'] += $data['quantity'] ?? 1;
+
             // Update other fields if provided
             $items[$existingKey]['amount']    = $this->calculateAmount($items[$existingKey]);
+
         } else {
             // Add new item
             $item = [
@@ -41,11 +45,25 @@ class SaleItemService
                 'discount_amount'      => $data['discount_amount'] ?? 0,
                 'amount'               => 0,
             ];
+
             // Calculate the amount for the new item
             $item['amount'] = $this->calculateAmount($item);
-            $items[]        = $item;
+            // add new item to cart array
+            /**
+             *  array_push($items, $item)
+             *
+             *  [
+             *      product A,
+             *      product B,
+             *  ]
+             *
+             */
+            $items[]= $item;
         }
+
+        // store update cart to session
         session([self::SESSION_KEY => $items]);
+
         return $items;
     }
 
@@ -53,6 +71,7 @@ class SaleItemService
     public function updateItem(string $rowId, array $data): array
     {
         $items = $this->getItems();
+
         foreach ($items as &$item) {
             if ($item['row_id'] === $rowId) {
                 $item['quantity']             = $data['quantity']            ?? $item['quantity'];
@@ -69,19 +88,24 @@ class SaleItemService
 
         return $items;
     }
-    // remove items by row
+
+    // remove items from cart
     public function removeItem(string $rowId): array
     {
+        // retrieve the current cart item from session
         $items = $this->getItems();
 
         $items = array_values(
             array_filter($items, fn($item) => $item['row_id'] !== $rowId)
         );
 
+        // store update back to the session
         session([self::SESSION_KEY => $items]);
 
         return $items;
     }
+
+    // function for remove cart from session
     public function clearItems(): void
     {
         session()->forget(self::SESSION_KEY);
@@ -90,22 +114,41 @@ class SaleItemService
     // get summary
     public function getSummary(): array
     {
+
         $items = $this->getItems();
         // calculate subtotal
-        $subtotal        = collect($items)->sum(fn($i) => $i['quantity'] * $i['unit_price']);
-        // calculate total discount based on discount percentage and amount
-        $totalDiscount   = collect($items)->sum(fn($i) => $i['discount_amount']);
-        // calculate total amount after discount
-        $total           = collect($items)->sum(fn($i) => $i['amount']);
+        $subtotal = '0.00';
+        $totalDiscount = '0.00';
+        $total = '0.00';
+
+        foreach( $items as $item ) {
+
+            // item_total : unit_price * qty
+            $itemTotal = bcmul((string)$item['unit_price'], (string)$item['quantity'], 2);
+
+            // sub_total : subtotal + item_total
+            $subtotal = bcadd($subtotal, $itemTotal, 2);
+
+            // BCMath
+            // 0.1+0.2 = 0.3 but actual 0.30000000000000004
+
+            // descount : totalDescount + decount_amount
+            $totalDiscount = bcadd($totalDiscount, (string)$item['discount_amount'], 2);
+
+            // total amount : total + amount
+            $total = bcadd($total, (string)$item['amount'], 2);
+
+        }
 
         return [
-            'subtotal'       => round($subtotal, 2), //round use for 2 decimal places
-            'total_discount' => round($totalDiscount, 2),
-            'total'          => round($total, 2),
+            'subtotal'       => $subtotal,
+            'total_discount' => $totalDiscount,
+            'total'          => $total,
             'item_count'     => count($items),
         ];
     }
 
+    // method save all cart items from the session into database after sale created
     public function persistToDatabase(int $saleId): void
     {
         $items = $this->getItems();
@@ -126,10 +169,11 @@ class SaleItemService
         SaleItem::insert($rows);
     }
 
+    // method finding item in cart and return array if it exists
     private function findItemKey(array $items, string $productCode): int|null
     {
         foreach ($items as $key => $item) {
-            // Check if the product code matches
+            // compare the current item's product_code with product code of item that finding
             if ($item['product_code'] === $productCode) {
                 return $key;
             }
@@ -137,15 +181,24 @@ class SaleItemService
         return null;
     }
 
+    // method calculates the final amount of a cart item after applying discounts.
     private function calculateAmount(array $item): float
     {
-        $subtotal = $item['quantity'] * $item['unit_price'];
-        // check if discount percentage > 0
-        if ($item['discount_percentage'] > 0) {
-            $discountAmount = $subtotal * ($item['discount_percentage'] / 100);
-        } else {
-            $discountAmount = $item['discount_amount'];
+        // calculate price before descount
+        $subtotal = bcmul((string)$item['unit_price'], (string)$item['quantity'], 4);
+
+        // calculate descount
+        $discount = (string)($item['discount_amount'] ?? '0');
+
+        if (($item['discount_percentage'] ?? 0) > 0) {
+            $percentVal = bcdiv((string)$item['discount_percentage'], '100', 4);
+            $discount = bcmul($subtotal, $percentVal, 4);
         }
-        return round($subtotal - $discountAmount, 2);
+
+        // sub_total - descount
+        $finalAmount = bcsub($subtotal, $discount, 2);
+
+        // make sure price it not < 0
+        return bccomp($finalAmount, '0', 2) === -1 ? '0.00' : $finalAmount;
     }
 }

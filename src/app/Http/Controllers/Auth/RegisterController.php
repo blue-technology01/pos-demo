@@ -16,6 +16,7 @@ class RegisterController extends Controller
         protected RegisterService $registerService
     ) {}
 
+    // show form register
     public function showFormRegister(Request $request)
     {
         $users = $this->registerService->getAllUsers($request);
@@ -30,10 +31,13 @@ class RegisterController extends Controller
         $roles = $this->registerService->getRoles();
         return view('admin.users.user-profile',compact('users','roles'));
     }
+
     // function for preview setting
     public function previewSetting() {
         return view('admin.users.preview-settings');
     }
+
+    // register
     public function register(RegisterRequest $request)
     {
         $key = 'register:' . $request->ip();
@@ -56,9 +60,11 @@ class RegisterController extends Controller
             : response()->json(['success' => false, 'message' => $result['message']], 422);
     }
 
+    // update user
     public function update(UpdateUserRequest $request, User $user)
     {
         $data = $request->validated();
+
         if (empty($data['password'] ?? '')) {
             unset($data['password'], $data['password_confirmation']);
         }
@@ -68,11 +74,13 @@ class RegisterController extends Controller
         }
 
         $result = $this->registerService->updateUser($user, $data);
+
         return $result['success']
             ? response()->json(['success' => true, 'message' => 'User updated!', 'user' => $this->formatUserResponse($result['user'])])
             : response()->json(['success' => false, 'message' => $result['message']], 422);
     }
 
+    /* remove user */
     public function destroy(int $id)
     {
         $result = $this->registerService->deleteUser($id);
@@ -84,7 +92,7 @@ class RegisterController extends Controller
         ], $result['success'] ? 200 : 422);
     }
 
-    /* Helper to keep response consistent */
+    /* helper to keep response consistent */
     private function formatUserResponse(User $user): array
     {
         return [

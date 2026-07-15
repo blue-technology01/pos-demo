@@ -10,8 +10,11 @@ use App\Services\Report\SalePerformanceService;
 
 class SalePerformanceController extends Controller
 {
+    // dependency injection
     public function __construct(
+
         protected SalePerformanceService $salePerformanceService
+
     ) {}
 
     public function index(Request $request): View|JsonResponse

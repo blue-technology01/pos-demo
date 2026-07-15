@@ -11,13 +11,12 @@ use App\Http\Requests\Product\CategoryRequest;
 
 class CategoryController extends Controller
 {
+    // dependency injection
     public function __construct(
         private readonly CategoryService $service
     ) {}
 
-    /**
-     * Display paginated list of categories.
-     */
+    // display paginated list of categories
     public function index(Request $request): View
     {
         $categories = $this->service->getAll($request);
@@ -25,9 +24,7 @@ class CategoryController extends Controller
         return view('admin.products.category', compact('categories'));
     }
 
-    /**
-     * Store a newly created category.
-     */
+    // store a newly created category
     public function store(CategoryRequest $request): RedirectResponse
     {
         $this->service->create($request->validated());
@@ -35,9 +32,7 @@ class CategoryController extends Controller
         return $this->redirectWithSuccess('Category created successfully.');
     }
 
-    /**
-     * Update an existing category.
-     */
+    // update existing category
     public function update(CategoryRequest $request, string $code): RedirectResponse
     {
         $this->service->update($code, $request->validated());
@@ -45,9 +40,7 @@ class CategoryController extends Controller
         return $this->redirectWithSuccess('Category updated successfully.');
     }
 
-    /**
-     * Delete a category and its associated image.
-     */
+    // remove category
     public function destroy(string $code): RedirectResponse
     {
         $this->service->delete($code);
@@ -55,10 +48,7 @@ class CategoryController extends Controller
         return $this->redirectWithSuccess('Category deleted successfully.');
     }
 
-    /* ─────────────────────────────────────────
-    |  Private helpers
-    ───────────────────────────────────────── */
-
+    // private helpers
     private function redirectWithSuccess(string $message): RedirectResponse
     {
         return redirect()

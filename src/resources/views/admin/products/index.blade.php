@@ -77,19 +77,16 @@
                 </a>
             @endif
         </form>
-        <form action="#"
-            method="POST"
-            enctype="multipart/form-data">
+        <form action="{{route('admin.products.import')}}" method="POST" enctype="multipart/form-data">
             @csrf
             <input type="file"
-                onclick="alert('Comming soon!.')"
                 name="file"
                 id="excelFile"
                 accept=".xlsx,.xls,.csv"
                 hidden>
             <button type="button"
                     class="product-section__btn-add"
-                    style="background-color: rgb(53, 185, 53)"
+                    style="background-color: rgb(80, 122, 80)"
                     onclick="document.getElementById('excelFile').click()">
                 <i class="ti ti-upload"></i> Choose File
             </button>

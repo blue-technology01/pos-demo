@@ -3,14 +3,14 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class RegisterService
@@ -28,6 +28,7 @@ class RegisterService
         return Role::hydrate($data);
     }
 
+    // get all user
     public function getAllUsers(Request $request): LengthAwarePaginator
     {
         return User::with('roles')
@@ -62,7 +63,7 @@ class RegisterService
             ->latest();
     }
 
-    // Role helper
+    // get all role name
     public function getRoleName(User $user): string
     {
         return $user->roles->first()?->name ?? 'none';
@@ -72,7 +73,6 @@ class RegisterService
     public function clearCache(): void
     {
         Cache::forget('users:all');
-        // Cache::forget('auth:roles'); // uncomment if roles change frequently
     }
 
     // function for register user
@@ -112,6 +112,7 @@ class RegisterService
             return ['success' => false, 'message' => 'Failed to create user.'];
         }
     }
+
     // function for update user
     public function updateUser(User $user, array $data): array
     {
@@ -155,6 +156,7 @@ class RegisterService
             return ['success' => false, 'message' => 'Failed to update user.'];
         }
     }
+
     // function for remove user
     public function deleteUser(int $id): array
     {
@@ -164,6 +166,7 @@ class RegisterService
         if ($current && $user->id === $current->id) {
             return ['success' => false, 'message' => 'Cannot delete your own account.'];
         }
+
         if ($user->hasRole('admin')) {
             return ['success' => false, 'message' => 'Cannot delete admin account.'];
         }

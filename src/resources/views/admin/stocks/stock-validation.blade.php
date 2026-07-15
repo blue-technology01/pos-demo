@@ -19,44 +19,6 @@
             <p class="pm-page-subtitle">Monitor product availability checks and blocked sale attempts.</p>
         </div>
     </div>
-
-    {{-- ── Charts: blocked reason breakdown ── --}}
-    @php
-        $reasonLabels = [
-            'out_of_stock'        => 'Out of stock',
-            'insufficient_stock'  => 'Insufficient stock',
-        ];
-        $totalBlocked = $reasonCounts->sum();
-    @endphp
-    <div class="chart-row">
-        <div class="chart-card chart-card-wide">
-            <div class="chart-card-header">
-                <h3>Blocked attempts by reason</h3>
-                <span class="muted">All matching results, not just this page</span>
-            </div>
-            <div id="chart-block-reasons"></div>
-        </div>
-
-        <div class="chart-card chart-card-narrow stat-card">
-            <div class="chart-card-header">
-                <h3>Total blocked</h3>
-                <span class="muted">Matching current search</span>
-            </div>
-            <div class="stat-value">{{ number_format($totalBlocked) }}</div>
-            <div class="stat-breakdown">
-                @forelse($reasonCounts as $reason => $count)
-                    <div class="stat-line">
-                        <span class="stat-dot stat-dot--{{ $reason }}"></span>
-                        {{ $reasonLabels[$reason] ?? ucwords(str_replace('_', ' ', $reason)) }}
-                        <strong>{{ number_format($count) }}</strong>
-                    </div>
-                @empty
-                    <div class="stat-line muted">No blocked attempts found.</div>
-                @endforelse
-            </div>
-        </div>
-    </div>
-
     {{-- ── Search / Filter Bar ── --}}
     <form method="GET" action="{{ route('admin.stock-validation') }}" class="pm-search-box">
 
@@ -104,6 +66,7 @@
                     <th>Current stock</th>
                     <th>Requested qty</th>
                     <th>Status</th>
+                    <th>Date</th>
                     <th>System action</th>
                 </tr>
             </thead>
@@ -141,6 +104,13 @@
                                     <i class="ti ti-circle-check" aria-hidden="true"></i> Allowed
                                 </span>
                             @endif
+                        </td>
+                        {{-- date --}}
+                        <td>
+                            <div class="pm-cell-icon">
+                                <i class="ti ti-calendar" aria-hidden="true"></i>
+                                {{ $attempt->created_at?->format('M d, Y H:i') ?? '—' }}
+                            </div>
                         </td>
                         <td>
                             <div class="pm-cell-icon">
@@ -193,48 +163,4 @@
 @endsection
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.0/dist/apexcharts.min.js"></script>
-<script>
-    @php
-        $colorMap = [
-            'out_of_stock'       => '#c62828',
-            'insufficient_stock' => '#ef6c00',
-        ];
-
-        $chartLabels = [];
-        $chartColors = [];
-        $chartCounts = [];
-
-        foreach ($reasonCounts as $reason => $count) {
-            $chartLabels[] = $reasonLabels[$reason] ?? ucwords(str_replace('_', ' ', $reason));
-            $chartColors[] = $colorMap[$reason] ?? '#607d8b';
-            $chartCounts[] = $count;
-        }
-    @endphp
-
-    const reasonLabels = @json($chartLabels);
-    const reasonCounts = @json($chartCounts);
-    const reasonColors = @json($chartColors);
-
-    if (document.getElementById('chart-block-reasons')) {
-        new ApexCharts(document.getElementById('chart-block-reasons'), {
-            chart: { type: 'donut', height: 300 },
-            series: reasonCounts,
-            labels: reasonLabels,
-            colors: reasonColors,
-            legend: { position: 'bottom' },
-            dataLabels: { enabled: true, formatter: (val) => val.toFixed(0) + '%' },
-            plotOptions: {
-                pie: {
-                    donut: {
-                        labels: {
-                            show: true,
-                            total: { show: true, label: 'Total blocked' },
-                        },
-                    },
-                },
-            },
-            noData: { text: 'No blocked attempts to chart' },
-        }).render();
-    }
-</script>
 @endpush

@@ -11,6 +11,7 @@
 @section('content')
 <x-spinner />
 <div class="unit-section">
+
     {{-- search and filter data --}}
     <div class="header-actions">
         <form action="{{ route('admin.shift') }}"  method="GET" class="search-wrap">
@@ -31,7 +32,12 @@
             <button type="submit" class="btn-filter" onclick="showLoader()">Filter</button>
             <a href="{{ route('admin.shift') }}" class="btn-reset" onclick="showLoader()">Reset</a>
         </form>
+        {{-- export to excel --}}
+        <a href="{{ route('admin.cash-register.export') }}" class="btn btn-success btn-filter">
+            Export Excel
+        </a>
     </div>
+
     {{-- summary cart --}}
     <div class="stat-grid">
         {{-- shift start --}}
@@ -90,7 +96,7 @@
             <table class="table-custom shift-table" id="shiftTable">
                 <thead>
                     <tr>
-                        <th class="col-id">Invoice no</th>
+                        <th class="col-id">No.</th>
                         <th>Cashier</th>
                         <th>Opening</th>
                         <th>Expected</th>
@@ -106,7 +112,7 @@
                 <tbody id="shift-table-body">
                     @forelse($history as $reg)
                         <tr>
-                            <td><span class="invoice-link">#INV-{{ $reg->id }}</span></td>
+                            <td><span class="invoice-link">#{{ $reg->id }}</span></td>
                             <td>
                                 <div class="cashier-cell">
                                     <div class="cashier-avatar">{{ strtoupper(substr($reg->user->name ?? 'U', 0, 1)) }}</div>

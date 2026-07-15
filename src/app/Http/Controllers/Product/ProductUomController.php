@@ -12,17 +12,20 @@ use App\Http\Requests\Product\ProductUomUpdateRequest;
 
 class ProductUomController extends Controller
 {
+    // dependency injection
     public function __construct(
+
         private readonly ProductUomService $productUomService
+
     ) {}
 
+    // show product uom list
     public function index(Request $request)
     {
-        $productUoms = $this->productUomService->getAll($request);
+        $productUoms = $this->productUomService->getAll($request); // controller -> productUomSerive -> Database
 
-        // Fixed queries
         $products = Product::select('code', 'name')->orderBy('name')->get();
-        $uoms = Uom::select('code', 'name')->orderBy('name')->get();   // Changed 'id' to 'code'
+        $uoms = Uom::select('code', 'name')->orderBy('name')->get();
 
         if ($request->ajax()) {
             return response()->json([
@@ -38,14 +41,16 @@ class ProductUomController extends Controller
         ));
     }
 
+    // show form create product uom
     public function create()
     {
         return view('admin.products.product-uom.create', [
             'products' => Product::select('code', 'name')->orderBy('name')->get(),
-            'uoms'     => Uom::select('code', 'name')->orderBy('name')->get(),   // Fixed
+            'uoms'     => Uom::select('code', 'name')->orderBy('name')->get(),
         ]);
     }
 
+    // save product uom new to database after user submit
     public function store(ProductUomStoreRequest $request)
     {
         $this->productUomService->create($request->validated());
@@ -55,6 +60,7 @@ class ProductUomController extends Controller
             ->with('success', 'Product UOM created successfully.');
     }
 
+    // get product uom that have ready for show on form edit
     public function edit(string $id)
     {
         $productUom = $this->productUomService->findOrFail($id);
@@ -66,6 +72,7 @@ class ProductUomController extends Controller
         ]);
     }
 
+    // update data after user submit
     public function update(ProductUomUpdateRequest $request, string $id)
     {
         $this->productUomService->update($id, $request->validated());
@@ -75,6 +82,7 @@ class ProductUomController extends Controller
             ->with('success', 'Product UOM updated successfully.');
     }
 
+    // remove product from database
     public function destroy(string $id)
     {
         $this->productUomService->delete($id);
@@ -84,14 +92,15 @@ class ProductUomController extends Controller
             ->with('success', 'Product UOM deleted successfully.');
     }
 
+    // get product uom
     public function getByProduct(string $productCode)
     {
-        // Call the Service method instead of writing the mapping logic here
         $uoms = $this->productUomService->getByProduct($productCode);
 
         return response()->json($uoms);
     }
 
+    // get data for pos
     public function posProducts(Request $request)
     {
         $products = $this->productUomService->getPOSProducts($request);

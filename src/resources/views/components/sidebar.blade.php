@@ -98,9 +98,15 @@
 
                 {{-- Unit --}}
                 <a href="{{ route('admin.unit') }}"
-                class="sub-item {{ request()->routeIs('admin.unit') ? 'active' : '' }}">
+                    class="sub-item {{ request()->routeIs('admin.unit') ? 'active' : '' }}">
                     <i class="ti ti-point"></i>
                     Units
+                </a>
+                {{-- ajustment --}}
+                <a href="{{ route('admin.products.stock.index') }}"
+                    class="sub-item {{ request()->routeIs('admin.products.stock.*') ? 'active' : '' }}">
+                    <i class="ti ti-point"></i>
+                    Ajustment
                 </a>
             </div>
         </div>
@@ -136,8 +142,8 @@
                 <i class="ti ti-chevron-right menu-arrow"></i>
             </div>
             <div class="sub-menu">
-                <a href="{{ route('admin.stock-update') }}"
-                    class="sub-item {{ request()->routeIs('admin.stock-update') ? 'active' : '' }}">
+                <a href="{{ route('admin.stock-movement') }}"
+                    class="sub-item {{ request()->routeIs('admin.stock-movement') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> Stock History
                 </a>
                 <a href="{{ route('admin.stock-validation') }}"
@@ -199,6 +205,10 @@
                 <a href="{{ route('admin.preview-settings') }}"
                    class="sub-item {{ request()->routeIs('admin.preview-settings') ? 'active' : '' }}">
                     <i class="ti ti-point"></i> Preview Settings
+                </a>
+                <a href="{{ route('admin.warehouses.index') }}"
+                    class="sub-item {{ request()->routeIs('admin.warehouses*') ? 'active' : '' }}">
+                    <i class="ti ti-point"></i> Warehouse
                 </a>
             </div>
         </div>

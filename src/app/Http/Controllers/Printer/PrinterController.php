@@ -8,21 +8,19 @@ use App\Http\Controllers\Controller;
 
 class PrinterController extends Controller
 {
-    /**
-     * Save User Preview Settings
-     */
+    // save user for preview setting
     public function savePreviewSettings(Request $request)
     {
         $previewUsers = $request->input('preview_users', []);
 
-        // Update each user's preview_receipt setting
+        // update each user's preview_receipt setting
         foreach ($previewUsers as $userId => $value) {
             User::where('id', $userId)->update([
                 'preview_receipt' => true
             ]);
         }
 
-        // Set preview_receipt = false for users who were NOT checked
+        // set preview_receipt = false for users who were NOT checked
         User::whereNotIn('id', array_keys($previewUsers))
              ->update(['preview_receipt' => false]);
 

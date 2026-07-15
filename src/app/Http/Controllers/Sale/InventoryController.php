@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 
 class InventoryController extends Controller
 {
+
     public function index(Request $request)
     {
         $search  = trim($request->get('search', ''));

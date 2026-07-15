@@ -2,22 +2,25 @@
 
 namespace App\Services\Report;
 
-use App\Models\Sale;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\Sale;
 use Carbon\CarbonPeriod;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
 class RevenueReportService
 {
-    private const CACHE_TTL = 10;
+    private const CACHE_TTL = 10;  // it will store on cache 10 mn
     private const MAX_DAYS  = 365;
 
+    // get all report of sale
     public function getReportData(?string $startDate = null, ?string $endDate = null): array
     {
         [$startDate, $endDate] = $this->resolveDateRange($startDate, $endDate);
 
-        $cacheKey = "report:{$startDate}:{$endDate}";
+        $version = Cache::get('revenue_report_version', 1);
+
+        $cacheKey = "report:v{$version}:{$startDate}:{$endDate}";
 
         return Cache::remember($cacheKey, now()->addMinutes(self::CACHE_TTL), function () use ($startDate, $endDate) {
 
@@ -58,14 +61,13 @@ class RevenueReportService
                 'summary' => [
                     'total_revenue' => $totalRevenue,
                     'total_orders'  => $totalOrders,
-                    'average_sale'  => $totalOrders > 0
-                        ? round($totalRevenue / $totalOrders, 2)
-                        : 0,
+                    'average_sale'  => $totalOrders > 0 ? round($totalRevenue / $totalOrders, 2) : 0,
                 ],
             ];
         });
     }
 
+    // function for get chart data
     public function getChartData(?string $startDate = null, ?string $endDate = null): array
     {
         $data = $this->getReportData($startDate, $endDate);
@@ -76,6 +78,7 @@ class RevenueReportService
         ];
     }
 
+    // get summary data
     public function getSummary(?string $startDate = null, ?string $endDate = null): array
     {
         $data = $this->getReportData($startDate, $endDate);
@@ -87,9 +90,11 @@ class RevenueReportService
         ];
     }
 
+    // get resolve date range
     public function resolveDateRange(?string $startDate, ?string $endDate): array
     {
         if (!$startDate || !$endDate) {
+            // it will show last 7 day
             return [
                 now()->subDays(6)->format('Y-m-d'),
                 now()->format('Y-m-d'),
@@ -113,8 +118,9 @@ class RevenueReportService
         ];
     }
 
+    // function write make sure it all sale it new and accurate
     public static function flushCache(): void
     {
-        Cache::flush();
+        Cache::increment('revenue_report_version');
     }
 }

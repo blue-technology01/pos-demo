@@ -1,3 +1,4 @@
+
 .unit-section {
     display: flex;
     flex-direction: column;
@@ -7,10 +8,14 @@
 .header-actions {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+
     flex-wrap: wrap;
     gap: 8px;
 }
-
+    a{
+        text-decoration: none;
+    }
 .search-wrap {
     display: flex;
     align-items: center;
@@ -670,20 +675,25 @@
         align-items: stretch;
         gap: 8px;
     }
+
     .stat-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
     .detail-stat-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
     .btn-filter,
     .btn-reset {
         width: 100%;
         justify-content: center;
     }
+
     .modal-footer {
         flex-direction: column;
     }
+
     .btn-cancel {
         width: 100%;
         justify-content: center;

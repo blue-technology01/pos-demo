@@ -12,18 +12,15 @@ use App\Http\Requests\Sale\SaleUpdateRequest;
 
 class SaleController extends Controller
 {
-    protected $saleService;
-    protected StockGuardService $stockGuardService;
+    // inject service
+    public function __construct(
 
-    public function __construct(SaleService $saleService, StockGuardService $stockGuardService)
-    {
-        $this->saleService = $saleService;
-        $this->stockGuardService = $stockGuardService;
-    }
+        protected SaleService $saleService,
+        protected StockGuardService $stockGuardService
 
-    /**
-     * Display list of sales for admin.
-     */
+    ) {}
+
+    // display list of sale history for admin
     public function index(Request $request)
     {
         $sales = $this->saleService->getAllSales($request);
@@ -31,18 +28,14 @@ class SaleController extends Controller
         return view('admin.sales.sale-history.index', compact('sales'));
     }
 
-    /**
-     * Display a single sale detail / receipt.
-     */
+    // display a single sale detail
     public function show(int $id)
     {
         $sale = Sale::with('items')->findOrFail($id);
         return view('admin.sales.sale-history.show', compact('sale'));
     }
 
-    /**
-     * Show edit form for a sale.
-     */
+    // for show form edit
     public function edit(int $id)
     {
         $sale = Sale::with('items')->findOrFail($id);
@@ -76,9 +69,8 @@ class SaleController extends Controller
             ], 422);
         }
     }
-    /**
-     * Update an existing sale.
-     */
+
+    // update sale existing sale
     public function update(SaleUpdateRequest $request, int $id)
     {
         try {
@@ -94,9 +86,7 @@ class SaleController extends Controller
         }
     }
 
-    /**
-     * Cancel a sale and restore stock.
-     */
+    // cancel a sale and restore stock
     public function cancel(int $id)
     {
         try {

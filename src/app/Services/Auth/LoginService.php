@@ -39,9 +39,7 @@ class LoginService
         Auth::logout();
     }
 
-    /**
-     * Send a message to the Telegram bot with the current login time
-    */
+    // send message to the telegram bot current login time
     private function sendTelegramMessage($user)
     {
         $telegramToken = config('services.telegram.token');

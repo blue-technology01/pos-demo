@@ -4,14 +4,13 @@ namespace App\Services\Customer;
 
     use App\Models\Customer;
     use Illuminate\Http\Request;
-    use Illuminate\Pagination\LengthAwarePaginator;
     use Illuminate\Database\Eloquent\Collection;
+    use Illuminate\Pagination\LengthAwarePaginator;
 
     class CustomerService
     {
-        /**
-         * Get all customers with pagination, search, and filter.
-         */
+
+        // get all customer with pagination
         public function getPagination(Request $request, int $perPage = 15): LengthAwarePaginator
         {
             $query = Customer::select('id', 'name', 'phone', 'email','status')
@@ -29,13 +28,12 @@ namespace App\Services\Customer;
             return $query->latest()->paginate($perPage)->withQueryString();
         }
 
-        /**
-         * Search active customers via AJAX.
-        */
+        // search active customers
         public function searchForPOS(?string $keyword = ''): Collection
         {
             $query = Customer::select('id', 'name', 'phone')
                 ->where('status', 'active');
+
             if (!empty($keyword)) {
                 $query->where(function ($q) use ($keyword) {
                     $q->where('name', 'LIKE', "%{$keyword}%")
@@ -49,10 +47,7 @@ namespace App\Services\Customer;
                 ->get();
         }
 
-
-        /**
-         * Get all active customers for POS UI.
-         */
+        // get all active customers for POS UI
         public function getAllCustomers(): Collection
         {
             return Customer::select('id', 'name', 'phone','status')
@@ -61,9 +56,7 @@ namespace App\Services\Customer;
                 ->get();
         }
 
-        /**
-         * Create a new customer.
-         */
+        // create a new customer
         public function createCustomer(array $data): Customer
         {
             return Customer::create([
@@ -75,9 +68,7 @@ namespace App\Services\Customer;
             ]);
         }
 
-        /**
-         * Quick add customer from POS.
-         */
+        // quick add customer from POS
         public function quickCreateCustomer(string $name, string $phone): Customer
         {
             return Customer::create([
@@ -87,9 +78,7 @@ namespace App\Services\Customer;
             ]);
         }
 
-        /**
-         * Update an existing customer.
-         */
+        // update customer
         public function updateCustomer(Customer $customer, array $data): bool
         {
             return $customer->update([
@@ -101,9 +90,7 @@ namespace App\Services\Customer;
             ]);
         }
 
-        /**
-         * Deactivate a customer.
-         */
+        // deactive a customer
         public function deactivate(Customer $customer): Customer
         {
             $customer->update(['status' => 'inactive']);

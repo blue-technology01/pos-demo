@@ -24,6 +24,7 @@
                 timer = setTimeout(() => fn.apply(this, args), delay);
             };
         },
+
         // Simple notification function
         notify(msg, type = 'info') {
             const colors = {
@@ -492,42 +493,66 @@
             }).join('');
             $list.html(html);
         },
-
         changeUom(oldId, newUomCode) {
             const item = state.cart.find(i => i.id === oldId);
             if (!item) return;
             const product = productManager.getByCode(item.product_code);
             if (!product) return;
+
             const newUom = product.uoms.find(u => u.uom_code === newUomCode);
-            if (!newUom || newUomCode === item.uom_code) return;
-            const newId    = `${product.product_code}-${newUomCode}`;
+            if (!newUom || newUom.uom_code === item.uom_code) return;
+
+            let newPrice = 0;
+
+            // FIX: If a specific price exists for the UOM,
+            // multiply it by the quantity per unit (e.g., $1.00 * 24 = $24.00)
+            if (newUom.selling_price != null && parseFloat(newUom.selling_price) > 0) {
+                const unitPrice = parseFloat(newUom.selling_price);
+                newPrice = unitPrice * newUom.quantity_per_unit;
+            } else {
+                // Fallback: Use base unit logic
+                const baseUom = product.uoms.find(u => u.is_default);
+                if (!baseUom) {
+                    utils.notify('System Error: No base unit defined.', 'error');
+                    return;
+                }
+                const unitPrice = parseFloat(baseUom.selling_price || 0);
+                newPrice = Math.round((unitPrice * newUom.quantity_per_unit) * 100) / 100;
+            }
+
+            const newId = `${product.product_code}-${newUomCode}`;
             const existing = state.cart.find(i => i.id === newId);
+
             if (existing) {
                 state.cart = state.cart.filter(i => i.id !== oldId);
                 this.updateQty(newId, existing.quantity + item.quantity);
+                this.renderCart();
+                this.renderTotals();
                 return;
             }
+
             const usedElse = state.cart.reduce((sum, i) =>
                 i.product_code === product.product_code && i.id !== oldId
-                    ? sum + i.quantity * i.uom_qty_per_unit
+                    ? sum + (i.quantity * i.uom_qty_per_unit)
                     : sum
             , 0);
-            if (item.quantity * newUom.quantity_per_unit > product.stock - usedElse) {
+
+            if ((item.quantity * newUom.quantity_per_unit) > (product.stock - usedElse)) {
                 utils.notify('Not enough stock for this UOM', 'warning');
                 $(`#cart-list [data-id="${oldId}"] .cart-uom-select`).val(item.uom_code);
                 return;
             }
-            const price           = parseFloat(newUom.selling_price) || product.price;
-            item.id               = newId;
-            item.uom_code         = newUom.uom_code;
-            item.uom_name         = newUom.uom_name;
+
+            item.id = newId;
+            item.uom_code = newUomCode;
+            item.uom_name = newUom.uom_name;
             item.uom_qty_per_unit = newUom.quantity_per_unit;
-            item.price            = price;
-            item.subtotal         = price * item.quantity;
+            item.price = newPrice;
+            item.subtotal = Math.round((newPrice * item.quantity) * 100) / 100;
+
             this.renderCart();
             this.renderTotals();
         },
-
         renderTotals() {
             const { subtotal, discount, tax, total } = this.computeTotals();
             const hasItems = state.cart.length > 0;
@@ -541,7 +566,6 @@
                 .css({ opacity: hasItems ? 1 : 0.5, cursor: hasItems ? 'pointer' : 'not-allowed' });
             updateCustomerScreen();
         },
-
         bindCart() {
             $('#cart-list')
                 .off('click.cart change.cart')
@@ -566,6 +590,7 @@
                 });
         },
     };
+
     /**
      * Manages the payment process, including opening the payment modal,
      * handling payment method selection, and confirming sales.

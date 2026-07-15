@@ -2,8 +2,8 @@
 
 namespace App\Services\Report;
 
-use App\Models\Sale;
 use Carbon\Carbon;
+use App\Models\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -27,10 +27,11 @@ class RevenueTrackingService
                 SUM(total_amount)           as total_revenue,
                 ROUND(AVG(total_amount), 2) as average_sale
             ')
+
             ->groupBy(DB::raw('DATE(sale_date)'))
             ->orderByDesc(DB::raw('DATE(sale_date)'))
             ->paginate($request->input('per_page', 15))
-            ->withQueryString();
+            ->withQueryString(); // it make sure when click from to page to other it will not remove ( start - end ) date
 
         $summary = Sale::query()
             ->where('status', 'completed')

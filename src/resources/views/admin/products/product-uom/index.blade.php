@@ -37,21 +37,6 @@
                    class="filter-control"
                    placeholder="Product name or barcode">
         </div>
-
-        {{-- Product --}}
-        <div class="filter-group">
-            <label>Filter by product</label>
-            <select name="product_code" class="filter-control">
-                <option value="">All products</option>
-                @foreach($products as $product)
-                    <option value="{{ $product->code }}"
-                        {{ request('product_code') == $product->code ? 'selected' : '' }}>
-                        {{ $product->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
         {{-- UOM --}}
         <div class="filter-group">
             <label>Filter by UOM</label>
@@ -115,7 +100,7 @@
 
                         {{-- Qty --}}
                         <td class="text-right">
-                            {{ number_format($item->quantity_per_unit, 2) }}
+                            {{ number_format($item->quantity_per_unit) }}
                         </td>
 
                         {{-- Cost --}}
@@ -174,7 +159,7 @@
                                     @method('DELETE')
 
                                     <button type="submit" class="btn-delete">
-                                        <i class="ti ti-ban"></i> Deactivate
+                                        <i class="ti ti-ban"></i> Remove
                                     </button>
                                 </form>
 
@@ -223,5 +208,4 @@
         </div>
     </div>
 </div>
-
 @endsection

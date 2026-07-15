@@ -4,25 +4,41 @@ namespace App\Http\Controllers\Report;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Exports\TopProductExport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
 use App\Services\Report\TopProductService;
 
 class TopProductController extends Controller
 {
+    // dependency injection
     public function __construct(
+
         protected TopProductService $topProductService
+
     ) {}
+
+    // export file to excel
+    public function export(Request $request)
+    {
+        return Excel::download(
+            new TopProductExport($request),
+            'top-product-report.xlsx'
+        );
+    }
+
     public function index(Request $request)
     {
-        $allProducts = $this->topProductService->getTopProducts($request);
-        $summary     = $this->topProductService->getSummary($allProducts);
-        $chartData   = $allProducts->take(10)->map(fn($p) => [
-            'name'          => $p->product_name,
-            'qty_sold'      => (float) $p->qty_sold,
-            'total_revenue' => (float) $p->total_revenue,
-        ])->values();
+        // get summary directly from database
+        $summary = $this->topProductService->getSummary($request);
 
-        $products   = $this->topProductService->getPaginatedProducts($request);
+        // get only top product 10 for chart
+        $chartData = $this->topProductService->getTopProducts($request, 10);
+
+        // get data for table
+        $products = $this->topProductService->getPaginatedProducts($request);
+
+        // category
         $categories = Category::where('status', 'active')->orderBy('name')->get();
 
         return view('admin.reports.top-product', compact(
@@ -32,4 +48,5 @@ class TopProductController extends Controller
             'chartData',
         ));
     }
+
 }

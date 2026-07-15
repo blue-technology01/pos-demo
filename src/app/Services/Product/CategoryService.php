@@ -10,14 +10,13 @@ use Illuminate\Support\Facades\Storage;
 
 class CategoryService
 {
+
     private const MAX_PER_PAGE    = 100;
     private const DEFAULT_PER_PAGE = 15;
     private const IMAGE_DISK      = 'public';
     private const IMAGE_DIR       = 'categories';
 
-    /**
-     * Get paginated categories with optional search, filter, and sort.
-     */
+    // get paginate category with option search, filter, sort
     public function getAll(Request $request): LengthAwarePaginator
     {
         $query = Category::query()->select([
@@ -38,17 +37,13 @@ class CategoryService
             ->withQueryString();
     }
 
-    /**
-     * Find a category by code or throw 404.
-    */
+    // finding category by code, if not found it will give Exception
     public function findOrFail(string $code): Category
     {
         return Category::where('code', $code)->firstOrFail();
     }
 
-    /**
-     * Create a new category.
-     */
+    //  create new category
     public function create(array $data): Category
     {
         return Category::create([
@@ -60,15 +55,14 @@ class CategoryService
         ]);
     }
 
-    /**
-     * Update an existing category.
-     */
+    // update category
     public function update(string $code, array $data): Category
     {
+        // finding category first
         $category = $this->findOrFail($code);
 
-        $image = ($data['image'] ?? null) instanceof UploadedFile
-            ? $this->replaceImage($category->image, $data['image'])
+        $image = ($data['image'] ?? null) instanceof UploadedFile // check user insert new file or not, if it true it will remove file and replace new file
+            ? $this->replaceImage($category->image, $data['image']) //
             : $category->image;
 
         $category->update([
@@ -78,12 +72,20 @@ class CategoryService
             'status'      => $data['status'] ?? $category->status,
         ]);
 
-        return $category->fresh();
+        return $category->fresh();  // fresh
     }
 
-    /**
-     * Delete a category and its associated image.
-     */
+    /* ??
+    * if(asset($data[name])) {
+            $name =  $data['name'];
+      } else {
+            $name = $category->name
+        }'
+    ! ??
+        $name = this['name'] ?? 'unkhnow'
+    */
+
+    // for remove category by code and picture that have relate
     public function delete(string $code): void
     {
         $category = Category::findOrFail($code);
@@ -93,9 +95,7 @@ class CategoryService
         $category->delete();
     }
 
-    /**
-     * Deactivate a category (soft status change).
-     */
+    // deactivate a category
     public function deactivate(string $code): Category
     {
         $category = Category::findOrFail($code);

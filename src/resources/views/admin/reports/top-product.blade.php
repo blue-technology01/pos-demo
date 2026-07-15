@@ -74,7 +74,7 @@
             </a>
 
             {{-- Excel Export --}}
-            <a href="#" class="btn-excel">
+            <a href="{{ route('admin.top-product.export') }}" class="btn-excel">
                 <i class="ti ti-file-spreadsheet" aria-hidden="true"></i> Excel
             </a>
 
@@ -220,20 +220,14 @@
             </div>
         </div>
     </div>
-
 </div>
-
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
 <script>
-window.topProductsData = @json($chartData);
+    window.topProductsData = @json($chartData);
 </script>
-
-<script src="{{ asset('assets/js/dashboard/chart/top-product-chart.js') }}"></script>
-
 <script>
 (function () {
 
@@ -243,7 +237,8 @@ window.topProductsData = @json($chartData);
         const data = window.topProductsData || [];
         if (!data.length) return;
 
-        const labels   = data.map(d => d.name);
+        // const labels   = data.map(d => d.name);
+        const labels = data.map(d => d.product_name);
         const qtySold  = data.map(d => parseInt(d.qty_sold) || 0);
         const revenues = data.map(d => parseFloat(d.total_revenue) || 0);
 
@@ -266,14 +261,22 @@ window.topProductsData = @json($chartData);
                 {
                     seriesName: 'Qty sold',
                     title: { text: 'Qty sold', style: { fontSize: '11px' } },
+                    tickAmount: 5,
+                    labels: {
+                        formatter: function(val) {
+                            return parseInt(val);
+                        }
+                    }
                 },
                 {
                     seriesName: 'Revenue ($)',
                     opposite: true,
                     title: { text: 'Revenue ($)', style: { fontSize: '11px' } },
+                    tickAmount: 5,
                     labels: {
-                        formatter: v =>
-                            '$' + v.toLocaleString('en-US', { minimumFractionDigits: 0 }),
+                        formatter: function(val) {
+                            return '$' + parseInt(val);
+                        }
                     },
                 },
             ],
@@ -292,9 +295,11 @@ window.topProductsData = @json($chartData);
 
         chartInstance.render();
     }
+
     function getView() {
         return new URLSearchParams(window.location.search).get('view') || 'chart';
     }
+
     function setView(view, updateUrl = false) {
 
         const chart = document.getElementById('chart-view');
@@ -332,6 +337,7 @@ window.topProductsData = @json($chartData);
             btnChart.classList.remove('active');
         }
     }
+
     document.getElementById('btn-chart').addEventListener('click', function () {
         setView('chart', true);
     });

@@ -11,10 +11,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class CashRegisterService
 {
-    /**
-     * cash register that opening active
-     * user for check UI POS
-     */
+
+    // cash register for opening active on POS
     public function getCurrentOpenRegister()
     {
         return CashRegister::where('status', 'open')
@@ -23,10 +21,7 @@ class CashRegisterService
             ->first();
     }
 
-    /**
-     * get history list with pagination
-     * show UI for admin and check day by day
-     */
+    // get history list with pagination show UI for admin
     public function getAllHistory(Request $request): LengthAwarePaginator
     {
         return CashRegister::query()
@@ -65,14 +60,16 @@ class CashRegisterService
             ->withQueryString();
     }
 
-    /**
-     * open shift on morning
-     */
+    // open shift
     public function openRegister(array $data): CashRegister
     {
         return DB::transaction(function () use ($data) {
 
-            $existing = CashRegister::where('status', 'open')
+            // Lock ALL rows for this user (open or not) so a concurrent request
+            // targeting the same user is forced to wait, instead of racing past
+            // a lockForUpdate() that has nothing to lock when no row exists yet.
+            $existing = CashRegister::where('user_id', Auth::id())
+                ->where('status', 'open')
                 ->lockForUpdate()
                 ->first();
 
@@ -80,23 +77,28 @@ class CashRegisterService
                 throw new \Exception('A cash register is already open.');
             }
 
-            return CashRegister::create([
-                'user_id'            => Auth::id(),
-                'opening_balance'    => $data['opening_balance'] ?? 0,
-                'closing_balance'    => 0,
-                'expected_balance'   => 0,
-                'difference_amount'  => 0,
-                'total_sales'        => 0,
-                'total_transactions' => 0,
-                'status'             => 'open',
-                'opened_at'          => now(),
-            ]);
+            // Belt-and-suspenders: enforce uniqueness at the DB layer too, so even
+            // if two transactions somehow interleave, the second INSERT fails loudly
+            // instead of silently creating a duplicate open register.
+            try {
+                return CashRegister::create([
+                    'user_id'            => Auth::id(),
+                    'opening_balance'    => $data['opening_balance'] ?? 0,
+                    'closing_balance'    => 0,
+                    'expected_balance'   => 0,
+                    'difference_amount'  => 0,
+                    'total_sales'        => 0,
+                    'total_transactions' => 0,
+                    'status'             => 'open',
+                    'opened_at'          => now(),
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                throw new \Exception('A cash register is already open.');
+            }
         });
     }
 
-    /**
-     * function for close shift after sale 8h
-     */
+    // close shift after sale 8h
     public function closeRegister(int $id, array $data): CashRegister
     {
         return DB::transaction(function () use ($id, $data) {

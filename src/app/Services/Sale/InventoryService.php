@@ -9,54 +9,83 @@ use Illuminate\Validation\ValidationException;
 
 class InventoryService
 {
-    public function deductStockWithCheck(string $productCode, string $uomCode, int|float $qty): void
+
+    // deduct stock for sale item, validating there's enoungh available
+    public function deductStockWithCheck(string $productCode, ?string $uomCode, int|float $qty): void
     {
         if ($qty <= 0) {
             throw new \InvalidArgumentException('Quantity must be greater than zero.');
         }
+
         $product = Product::where('code', $productCode)
-            ->lockForUpdate()
+            ->lockForUpdate() // for race conditions when 2 users buy the last unit
             ->firstOrFail();
-        $uom = ProductUom::where('product_code', $productCode)
-            ->where('uom_code', $uomCode)
-            ->first();
-        if (!$uom) {
-            throw new \Exception("UOM '{$uomCode}' not found for product '{$productCode}'.");
+
+        $quantityPerUnit = 1; // default: qty is already expressed in base units
+
+        if ($uomCode !== null) {
+            $uom = ProductUom::where('product_code', $productCode)
+                ->where('uom_code', $uomCode)
+                ->first();
+
+            if (!$uom) {
+                throw new \Exception("UOM '{$uomCode}' not found for product '{$productCode}'.");
+            }
+
+            $quantityPerUnit = $uom->quantity_per_unit;
         }
-        $requiredStock = $qty * $uom->quantity_per_unit;
+
         // normalize to prevent float precision issues
-        $requiredStock = (int) round($requiredStock);
-        if ($product->stock < $requiredStock) {
+        $requiredStock = bcmul((string) $qty, (string) $quantityPerUnit, 2);
+
+        if (bccomp((string) $product->stock, $requiredStock, 2) === -1) {
             throw ValidationException::withMessages([
                 'stock' => "{$product->name} is out of stock.",
             ]);
         }
+
         $product->decrement('stock', $requiredStock);
+        // decrement() already updates the in-memory attribute, no refresh() needed
+
         Log::info('Stock deducted', [
             'product_code' => $productCode,
             'uom_code'     => $uomCode,
             'qty'          => $qty,
             'deducted'     => $requiredStock,
-            'remaining'    => $product->stock, // already updated in memory after decrement
+            'remaining'    => $product->stock,
         ]);
     }
 
-    public function restoreStock(string $productCode, string $uomCode, int|float $qty): void
+    // restore stock when sale is voided or cancel
+    public function restoreStock(string $productCode, ?string $uomCode, int|float $qty): void
     {
         if ($qty <= 0) {
             return;
         }
-        $product = Product::where('code', $productCode)->lockForUpdate()->first();
+
+        $product = Product::where('code', $productCode)
+            ->lockForUpdate()
+            ->first();
+
         if (!$product) {
             return;
         }
-        $uom = ProductUom::where('product_code', $productCode)->where('uom_code', $uomCode)->first();
 
-        if (!$uom) {
-            throw new \Exception("UOM '{$uomCode}' not found for product '{$productCode}'.");
+        $quantityPerUnit = 1; // default: qty is already expressed in base units
+
+        if ($uomCode !== null) {
+            $uom = ProductUom::where('product_code', $productCode)
+                ->where('uom_code', $uomCode)
+                ->first();
+
+            if (!$uom) {
+                throw new \Exception("UOM '{$uomCode}' not found for product '{$productCode}'.");
+            }
+
+            $quantityPerUnit = $uom->quantity_per_unit;
         }
 
-        $restoreAmount = (int) round($qty * $uom->quantity_per_unit);
+        $restoreAmount = bcmul((string) $qty, (string) $quantityPerUnit, 2);
 
         $product->increment('stock', $restoreAmount);
 

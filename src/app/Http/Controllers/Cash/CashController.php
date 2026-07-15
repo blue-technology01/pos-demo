@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Cash;
 
 use Illuminate\Http\Request;
 use App\Models\CashRegister;
+use App\Exports\CashRegisterExport;
 use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Services\Cash\CashRegisterService;
 use App\Http\Requests\Cash\CashRegisterStoreRequest;
 use App\Http\Requests\Cash\CashRegisterUpdateRequest;
@@ -16,18 +18,27 @@ class CashController extends Controller
         protected CashRegisterService $cashRegisterService
     ) {}
 
-    // show cash register history ( admin/cashier )
+    /* export data to excel */
+    public function export() {
+        return Excel::download(
+            new CashRegisterExport(),
+            'Cash-register-report.xlsx'
+        );
+    }
+
+    /* show cash register history */
     public function index(Request $request)
     {
         // pagination history
         $history = $this->cashRegisterService->getAllHistory($request);
+
         // check shift that opening
         $currentRegister = $this->cashRegisterService->getCurrentOpenRegister();
 
         return view('admin.sales.shift', compact('history', 'currentRegister'));
     }
 
-    // open shift for cashier on POS
+    /* open shift for cashier on POS */
     public function open(CashRegisterStoreRequest $request)
     {
         try {
@@ -42,7 +53,7 @@ class CashController extends Controller
         }
     }
 
-    // function for close shift
+    /* close shift */
     public function close(CashRegisterUpdateRequest $request)
     {
         try {
@@ -61,7 +72,7 @@ class CashController extends Controller
         }
     }
 
-    // view detail about cashier register
+    /* view detail about cashier register */
     public function show($id)
     {
         try {

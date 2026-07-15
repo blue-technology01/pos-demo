@@ -8,14 +8,15 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class UomService
 {
-    /**
-     * Get all active uoms with pagination.
-    */
+
+    // get all active uom with pagination
     public function getAll(Request $request): LengthAwarePaginator
     {
         $query = Uom::query()->select('code', 'name', 'status', 'created_at');
+
         // filter
         if ($request->filled('search')) {
+
             $search = trim($request->search);
 
             $query->where(function ($q) use ($search) {
@@ -31,6 +32,7 @@ class UomService
             // default: only active data
             $query->where('status', 'active');
         }
+
         // sorting
         match ($request->get('sort', 'newest')) {
             'oldest'    => $query->oldest('created_at'),
@@ -39,6 +41,7 @@ class UomService
             'code_asc'  => $query->orderBy('code', 'asc'),
             default     => $query->latest('created_at'),
         };
+
         // pagination
         $perPage = (int) $request->get('per_page', 15);
 
@@ -47,18 +50,13 @@ class UomService
             ->withQueryString();
     }
 
-
-    /**
-     * Find a uom by code or throw 404.
-     */
+    // finding uom by code
     public function findOrFail(string $code): Uom
     {
         return Uom::findOrFail($code);
     }
 
-    /**
-     * Create a new uom.
-     */
+    //  create new uom
     public function create(array $data): Uom
     {
         return Uom::create([
@@ -68,9 +66,7 @@ class UomService
         ]);
     }
 
-    /**
-     * Update an existing uom by code.
-     */
+    // update uom existing
     public function update(string $code, array $data): Uom
     {
         $uom = Uom::findOrFail($code);
@@ -81,9 +77,7 @@ class UomService
         return $uom->fresh();
     }
 
-    /**
-     * Deactivate a uom (soft delete via status).
-     */
+    // deactivate uom
     public function deactivate(string $code): Uom
     {
         $uom = Uom::findOrFail($code);
