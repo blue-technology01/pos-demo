@@ -11,9 +11,8 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
-    /**
-     * Get products for Admin listing (keeps full Eloquent models)
-     */
+
+    // get products for admin listing
     public function getForAdmin(Request $request)
     {
         $query = Product::query()
@@ -63,9 +62,7 @@ class ProductService
             ->withQueryString();
     }
 
-    /**
-     * Get all active products with pagination returns arrays
-     */
+    // get all active product with pagination return array
     public function getAll(Request $request)
     {
         return Product::query()
@@ -95,7 +92,7 @@ class ProductService
                         'is_default'        => (bool) ($retailUom->is_default ?? false),
                         'uom_role'          => $retailUom->uom_role ?? 'retail',
                     ],
-        
+
                     'uom_matrix' => $product->uoms->map(function ($uom) {
                         return [
                             'uom_code'          => $uom->uom_code,
@@ -110,9 +107,7 @@ class ProductService
             });
     }
 
-    /**
-     * Find a product by code or throw 404.
-    */
+    // finding product code
     public function findOrFail(string $code): Product
     {
         return Product::with(['uoms.uom'])
@@ -120,9 +115,7 @@ class ProductService
             ->firstOrFail();
     }
 
-    /**
-     * Create a new product.
-     */
+    // create new product
     public function create(array $data): Product
     {
         // Handle image upload
@@ -144,9 +137,7 @@ class ProductService
         ]);
     }
 
-    /**
-     * Update existing product by code.
-     */
+    // udpdate product code
     public function update(string $code, array $data): Product
     {
         $product = $this->findOrFail($code);
@@ -179,9 +170,7 @@ class ProductService
         return Category::where('status', 'active')->orderBy('name')->get();
     }
 
-    /**
-     * Deactivate product (soft delete via status).
-     */
+    //  deactive product
     public function deactivate(string $code): Product
     {
         $product = $this->findOrFail($code);
