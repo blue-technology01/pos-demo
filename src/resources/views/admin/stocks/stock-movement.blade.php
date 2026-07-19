@@ -91,7 +91,7 @@
                         </td>
                         <td>
                             <span class="stock-num {{ $typeClass }}">
-                                {{ sprintf('%+d', $movement->quantity) }}
+                                {{ sprintf('%d', abs($movement->quantity)) }}
                             </span>
                         </td>
                         <td class="muted">{{ $movement->createdBy->name ?? '—' }}</td>

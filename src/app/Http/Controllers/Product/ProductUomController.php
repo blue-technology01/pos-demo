@@ -41,6 +41,14 @@ class ProductUomController extends Controller
         ));
     }
 
+    public function searchProduct(Request $request)
+    {
+        $products = $this->productUomService
+            ->searchProducts($request->get('q', ''));
+
+        return response()->json($products);
+    }
+
     // show form create product uom
     public function create()
     {

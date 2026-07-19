@@ -36,8 +36,9 @@ class ProductUomService
             $search = trim($request->search); // remove spaces
             if (!empty($search)) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('p.name', 'like', "%{$search}%")    // like % finding text
-                    ->orWhere('p.code', 'like', "%{$search}%")
+                    $q->where('p.name', 'like', "{$search}%")
+                    ->orWhere('p.code', 'like', "{$search}%")
+                    ->orWhere('p.barcode', 'like', "%{$search}%")
                     ->orWhere('p.category_code', 'like', "%{$search}%")
                     // exits it will stop finding first record that true
                     ->orWhereRaw("EXISTS (
@@ -161,6 +162,25 @@ class ProductUomService
             ->orderByDesc('pu.id')
             ->paginate((int) $request->get('per_page', 15))
             ->withQueryString();  //  for store data filter or param on url
+    }
+
+    //
+    public function searchProducts(string $search)
+    {
+        return DB::table('products as p')
+            ->select([
+                'p.code',
+                'p.name'
+            ])
+            ->where('p.status', 'active')
+            ->where(function ($q) use ($search) {
+
+                $q->where('p.name', 'like', "%{$search}%")
+                ->orWhere('p.code', 'like', "%{$search}%");
+
+            })
+            ->limit(20)
+            ->get();
     }
 
     public function findOrFail(int $id): ProductUom

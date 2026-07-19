@@ -334,67 +334,66 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-{{--  All window.* globals defined first, no DOM access here --}}
-<script>
-    window.CUSTOMER_DISPLAY_URL     = "{{ route('cashier.customer.display') }}";
-    window.PREVIEW_RECEIPT          = {{ auth()->user()->preview_receipt ? 'true' : 'false' }};
-    window.isShiftOpen              = {{ $currentShift ? 'true' : 'false' }};
-    window.expectedShiftBalance     = parseFloat("{{ $currentShift ? ($currentShift->opening_balance + $currentShift->total_sales) : 0 }}");
-    window.CUSTOMER_SEARCH_URL      = "{!! route('cashier.customers.search.ajax') !!}";
-    window.CUSTOMER_STORE_URL       = "{!! route('cashier.customers.store') !!}";
-    window.CSRF_TOKEN               = "{{ csrf_token() }}";
-    window.selectedCustomerId       = null;
-    window.selectedCustomerName     = null;
+    {{-- 1. Global Variables First (No defer) --}}
+    <script>
+        window.CUSTOMER_DISPLAY_URL     = "{{ route('cashier.customer.display') }}";
+        window.PREVIEW_RECEIPT          = {{ auth()->user()->preview_receipt ? 'true' : 'false' }};
+        window.isShiftOpen              = {{ $currentShift ? 'true' : 'false' }};
+        window.expectedShiftBalance     = parseFloat("{{ $currentShift ? ($currentShift->opening_balance + $currentShift->total_sales) : 0 }}");
+        window.CUSTOMER_SEARCH_URL      = "{!! route('cashier.customers.search.ajax') !!}";
+        window.CUSTOMER_STORE_URL       = "{!! route('cashier.customers.store') !!}";
+        window.CSRF_TOKEN               = "{{ csrf_token() }}";
+        window.selectedCustomerId       = null;
+        window.selectedCustomerName     = null;
 
-    window.ROUTES = {
-        posProducts: "{!! route('cashier.pos.products') !!}",
-        addItem:     "{!! route('cashier.sale-items.store') !!}",
-        updateItem:  "{!! route('cashier.sale-items.update', ':rowId') !!}",
-        removeItem:  "{!! route('cashier.sale-items.destroy', ':rowId') !!}",
-        clearCart:   "{!! route('cashier.sale-items.clear') !!}",
-        confirmSale: "{!! route('cashier.sale-items.confirm') !!}",
-    };
+        window.ROUTES = {
+            posProducts: "{!! route('cashier.pos.products') !!}",
+            confirmSale: "{!! route('cashier.sale-items.confirm') !!}",
+        };
 
-    window.POS_ASSETS = {
-        storageBase: "{{ asset('storage') }}",
-        placeholder: "{{ asset('assets/images/not-product.png') }}",
-    };
+        window.POS_ASSETS = {
+            storageBase: "{{ asset('storage') }}",
+            placeholder: "{{ asset('assets/images/not-product.png') }}",
+        };
 
-    window.currentRegisterId = {{
-        \App\Models\CashRegister::where('user_id', auth()->id())
-            ->where('status', 'open')
-            ->value('id') ?? 'null'
-    }};
-</script>
+        window.currentRegisterId = {{
+            \App\Models\CashRegister::where('user_id', auth()->id())
+                ->where('status', 'open')
+                ->value('id') ?? 'null'
+        }};
+    </script>
 
-{{--  Deferred JS files — load after globals are set --}}
-<script src="{{ asset('assets/js/components/togglescreen.js') }}" defer></script>
-<script src="{{ asset('assets/js/dashboard/pos/pos.js') }}" defer></script>
-<script src="{{ asset('assets/js/dashboard/customer/customer-pos.js') }}" defer></script>
-<script src="{{ asset('assets/js/dashboard/pos/cash-register-pos.js') }}" defer></script>
+    {{-- 2. jQuery - WITHOUT defer (Critical) --}}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-{{--  DOM-dependent code runs after everything is loaded --}}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const startBtn = document.getElementById('start-btn');
-        const video    = document.getElementById('webcam');
+    {{-- 3. POS Modules - Load in correct order --}}
+    <script src="{{ asset('assets/js/pos/utils.js') }}"></script>
+    <script src="{{ asset('assets/js/pos/state.js') }}"></script>
+    <script src="{{ asset('assets/js/pos/product-manager.js') }}"></script>
+    <script src="{{ asset('assets/js/pos/cart-manager.js') }}"></script>
+    <script src="{{ asset('assets/js/pos/customer-display.js') }}"></script>
+    <script src="{{ asset('assets/js/pos/payment-manager.js') }}"></script>
+    <script src="{{ asset('assets/js/pos/barcode-scanner.js') }}"></script>
 
-        if (!startBtn || !video) return; {{-- guard if elements don't exist --}}
+    {{-- 4. Main Initializer (Last) --}}
+    <script src="{{ asset('assets/js/pos.js') }}"></script>
 
-        startBtn.addEventListener('click', async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                video.srcObject    = stream;
-                video.style.display    = 'block';
-                startBtn.style.display = 'none';
-            } catch (err) {
-                console.error('Camera access denied or failed:', err);
-                alert('Could not access the camera. Please check permissions.');
+    {{-- Other scripts --}}
+    <script src="{{ asset('assets/js/components/togglescreen.js') }}" defer></script>
+    <script src="{{ asset('assets/js/dashboard/customer/customer-pos.js') }}" defer></script>
+    <script src="{{ asset('assets/js/dashboard/pos/cash-register-pos.js') }}" defer></script>
+
+    {{-- DOM Ready Scripts --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
             }
+
+            // Optional: Re-initialize if needed
+            console.log('POS Page Fully Loaded');
         });
-    });
-</script>
+    </script>
+
 @endpush
